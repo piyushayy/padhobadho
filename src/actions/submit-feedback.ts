@@ -1,0 +1,44 @@
+"use server"
+
+import { auth } from "@/auth"
+import { prisma } from "@/lib/prisma"
+import { revalidatePath } from "next/cache"
+import { z } from "zod"
+
+const feedbackSchema = z.object({
+    message: z.string().min(5, "Message must be at least 5 characters long").max(1000),
+    type: z.enum(["GENERAL", "BUG", "FEATURE"]).default("GENERAL")
+})
+
+export async function submitFeedback(formData: FormData) {
+    const session = await auth()
+    if (!session?.user?.id) {
+        return { error: "You must be logged in to submit feedback" }
+    }
+
+    const rawData = {
+        message: formData.get("message"),
+        type: formData.get("type") || "GENERAL",
+    }
+
+    const result = feedbackSchema.safeParse(rawData)
+
+    if (!result.success) {
+        return { error: result.error.errors[0].message }
+    }
+
+    try {
+        await prisma.feedback.create({
+            data: {
+                userId: session.user.id,
+                message: result.data.message,
+                type: result.data.type,
+            }
+        })
+
+        return { success: "Thank you for your feedback!" }
+    } catch (error) {
+        console.error("Failed to submit feedback:", error)
+        return { error: "Failed to submit feedback. Please try again." }
+    }
+}
