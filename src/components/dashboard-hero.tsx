@@ -88,7 +88,7 @@ export default function DashboardHero({ examCode, targetUniversity, totalAttempt
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.6, duration: 0.8 }}
-                    className="relative"
+                    className="relative hidden md:block" // Hidden on mobile to save space, visible on desktop
                 >
                     <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-blue-600 rounded-[2.5rem] blur-xl opacity-50 animate-pulse" />
                     <div className="relative bg-gradient-to-br from-[#6366f1] to-[#a855f7] p-8 md:p-10 rounded-[2.5rem] text-white shadow-2xl border border-white/20">
@@ -96,18 +96,15 @@ export default function DashboardHero({ examCode, targetUniversity, totalAttempt
                             <div className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                                 <Zap size={12} fill="currentColor" className="text-yellow-300" /> Daily Drop
                             </div>
-                            <div className="text-xs font-bold font-mono opacity-80">
-                                08:12:45 left
-                            </div>
                         </div>
 
-                        <h3 className="text-3xl font-black mb-2">Rapid Fire: Calculus</h3>
+                        <h3 className="text-3xl font-black mb-2">Keep the streak alive!</h3>
                         <p className="text-sm font-medium text-white/80 mb-8 leading-relaxed">
-                            Complete 3 questions in 2 minutes to win double XP.
+                            Consistency is the key to cracking your dream college. Don't break the chain.
                         </p>
 
                         <button className="w-full h-14 bg-white text-[#6366f1] rounded-xl font-black text-sm uppercase tracking-widest hover:bg-white/90 transition-colors flex items-center justify-center gap-2 shadow-lg">
-                            Start Challenge <ChevronRight size={16} strokeWidth={3} />
+                            Start Practice <ChevronRight size={16} strokeWidth={3} />
                         </button>
                     </div>
                 </motion.div>
