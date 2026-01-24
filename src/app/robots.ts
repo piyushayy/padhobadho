@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
         rules: {
             userAgent: '*',
             allow: '/',
-            disallow: ['/admin/', '/api/', '/dashboard/', '/onboarding/', '/checkout/'],
+            disallow: ['/api/', '/admin/'],
         },
         sitemap: 'https://padhobadho.com/sitemap.xml',
     }
