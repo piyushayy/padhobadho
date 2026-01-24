@@ -15,7 +15,9 @@ import {
     Medal,
     Crown,
     Award,
-    Sparkles
+    Sparkles,
+    BookOpen,
+    Clock
 } from "lucide-react"
 import AppLayout from "@/components/app-layout"
 import { Skeleton } from "@/components/skeletons"
@@ -30,7 +32,12 @@ const ICON_MAP = {
     "Star": Star,
     "Zap": Zap,
     "TrophyGold": Trophy,
-    "ShieldCheck": ShieldCheck
+    "ShieldCheck": ShieldCheck,
+    "Flame": Flame,
+    "Moon": Crown,
+    "Sun": Sparkles,
+    "Timer": Clock,
+    "BookOpen": BookOpen
 }
 
 function AchievementsSkeleton() {

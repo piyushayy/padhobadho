@@ -244,6 +244,36 @@ async function main() {
             name: "Elite Elite",
             description: "Unlock the North Campus Elite premium tier.",
             icon: "ShieldCheck"
+        },
+        {
+            name: "Seven Day Streak",
+            description: "Maintained a study streak for 7 consecutive days.",
+            icon: "Flame"
+        },
+        {
+            name: "Night Owl",
+            description: "Completed a practice session after 10 PM.",
+            icon: "Moon"
+        },
+        {
+            name: "Early Bird",
+            description: "Completed a practice session before 6 AM.",
+            icon: "Sun"
+        },
+        {
+            name: "Speed Demon",
+            description: "Answered a question correctly in under 10 seconds.",
+            icon: "Timer"
+        },
+        {
+            name: "Unstoppable",
+            description: "Maintained a 30-day study streak. Dedication incarnate.",
+            icon: "TrophyDiamond"
+        },
+        {
+            name: "Library Rat",
+            description: "Read through 50 detailed solution explanations.",
+            icon: "BookOpen"
         }
     ]
 
