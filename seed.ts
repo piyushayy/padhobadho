@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client"
+import { Exam, PrismaClient } from "@prisma/client"
 const prisma = new PrismaClient()
 
 async function main() {
@@ -139,13 +139,14 @@ async function main() {
         { code: "IPU-CET", name: "IP University Common Entrance Test", desc: "For admission to Guru Gobind Singh Indraprastha University." },
     ]
 
-    const exams = {};
+    const exams: Record<string, Exam> = {}
+
     for (const e of examsData) {
         exams[e.code] = await prisma.exam.upsert({
             where: { code: e.code },
             update: {},
             create: { name: e.name, code: e.code, description: e.desc }
-        });
+        })
     }
 
     // --- Create Additional Subjects (if needed) ---
