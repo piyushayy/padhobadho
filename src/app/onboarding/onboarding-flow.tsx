@@ -34,9 +34,32 @@ export default function OnboardingFlow({ subjects, exams }: { subjects: Subject[
         subjectIds: [] as string[]
     })
 
-    const filteredSubjects = subjects.filter(s =>
-        !formData.targetExamId || s.exams.some(e => e.id === formData.targetExamId)
-    )
+    const targetExam = exams.find(e => e.id === formData.targetExamId)
+    const isCuet = targetExam?.code === "CUET-UG"
+
+    const CUET_STREAM_SUBJECTS: Record<string, string[]> = {
+        "SCIENCE": ["Physics", "Chemistry", "Biology", "Computer Science", "Mathematics"],
+        "COMMERCE": ["Accountancy", "Business Studies", "Economics"],
+        "HUMANITIES": ["History", "Geography", "Political Science", "Psychology", "Sociology"]
+    }
+    const CUET_COMMON = ["English", "General Knowledge"]
+
+    const filteredSubjects = subjects.filter(s => {
+        // 1. Must belong to the selected exam
+        const belongsToExam = !formData.targetExamId || s.exams.some(e => e.id === formData.targetExamId)
+        if (!belongsToExam) return false
+
+        // 2. If CUET, filter by Stream
+        if (isCuet && formData.stream) {
+            const allowed = [
+                ...CUET_COMMON,
+                ...(CUET_STREAM_SUBJECTS[formData.stream] || [])
+            ]
+            return allowed.includes(s.name)
+        }
+
+        return true
+    })
 
     const streams = [
         { id: "SCIENCE", name: "Science", icon: "🔬", desc: "PCM, PCB, etc." },

@@ -150,14 +150,15 @@ async function main() {
     }
 
     // --- Create Additional Subjects (if needed) ---
+    // --- Create Additional Subjects ---
     const legalReasoning = await prisma.subject.upsert({
         where: { name: "Legal Reasoning" }, update: {}, create: { name: "Legal Reasoning", description: "Law-related logical reasoning." }
     });
     const logicalReasoning = await prisma.subject.upsert({
         where: { name: "Logical Reasoning" }, update: {}, create: { name: "Logical Reasoning", description: "Analytical and logical thinking." }
     });
-    const quant = await prisma.subject.upsert({
-        where: { name: "Quantitative Techniques" }, update: {}, create: { name: "Quantitative Techniques", description: "Mathematical problems and data interpretation." }
+    const quantitativeAptitude = await prisma.subject.upsert({
+        where: { name: "Quantitative Aptitude" }, update: {}, create: { name: "Quantitative Aptitude", description: "Mathematical problems and data interpretation." }
     });
     const chemistry = await prisma.subject.upsert({
         where: { name: "Chemistry" }, update: {}, create: { name: "Chemistry", description: "Study of matter and substances." }
@@ -165,16 +166,63 @@ async function main() {
     const biology = await prisma.subject.upsert({
         where: { name: "Biology" }, update: {}, create: { name: "Biology", description: "Study of living organisms." }
     });
-
+    const computerScience = await prisma.subject.upsert({
+        where: { name: "Computer Science" }, update: {}, create: { name: "Computer Science", description: "Computing and programming." }
+    });
+    const accountancy = await prisma.subject.upsert({
+        where: { name: "Accountancy" }, update: {}, create: { name: "Accountancy", description: "Financial accounting and analysis." }
+    });
+    const businessStudies = await prisma.subject.upsert({
+        where: { name: "Business Studies" }, update: {}, create: { name: "Business Studies", description: "Business principles and management." }
+    });
+    const economics = await prisma.subject.upsert({
+        where: { name: "Economics" }, update: {}, create: { name: "Economics", description: "Production, distribution, and consumption of goods." }
+    });
+    const historySubject = await prisma.subject.upsert({
+        where: { name: "History" }, update: {}, create: { name: "History", description: "Study of past events." }
+    });
+    const geography = await prisma.subject.upsert({
+        where: { name: "Geography" }, update: {}, create: { name: "Geography", description: "Study of lands, features, inhabitants." }
+    });
+    const polScience = await prisma.subject.upsert({
+        where: { name: "Political Science" }, update: {}, create: { name: "Political Science", description: "Systems of governance and analysis of political activities." }
+    });
+    const psychology = await prisma.subject.upsert({
+        where: { name: "Psychology" }, update: {}, create: { name: "Psychology", description: "Study of mind and behavior." }
+    });
+    const sociology = await prisma.subject.upsert({
+        where: { name: "Sociology" }, update: {}, create: { name: "Sociology", description: "Study of society and social behavior." }
+    });
+    const varc = await prisma.subject.upsert({
+        where: { name: "Verbal Ability & Reading Comprehension" }, update: {}, create: { name: "Verbal Ability & Reading Comprehension", description: "English usage and comprehension." }
+    });
+    const di = await prisma.subject.upsert({
+        where: { name: "Data Interpretation" }, update: {}, create: { name: "Data Interpretation", description: "Interpreting data charts and graphs." }
+    });
+    const currentAffairs = await prisma.subject.upsert({
+        where: { name: "Current Affairs" }, update: {}, create: { name: "Current Affairs", description: "Recent events and general awareness." }
+    });
+    const managementAptitude = await prisma.subject.upsert({
+        where: { name: "Management Aptitude" }, update: {}, create: { name: "Management Aptitude", description: "Business awareness and managerial skills." }
+    });
 
     // --- Define Links ---
     const examSubjects = {
-        "CUET-UG": [math, physics, chemistry, biology, english, gk],
-        "CAT": [english, quant, logicalReasoning],
+        "CUET-UG": [
+            // Common
+            english, gk,
+            // Science
+            physics, chemistry, biology, math, computerScience,
+            // Commerce
+            accountancy, businessStudies, economics,
+            // Humanities
+            historySubject, geography, polScience, psychology, sociology
+        ],
+        "CAT": [varc, di, logicalReasoning, quantitativeAptitude],
         "GATE": [math, physics, chemistry], // simplified
         "NDA": [math, physics, chemistry, gk, english],
-        "CLAT": [english, gk, legalReasoning, logicalReasoning, quant],
-        "IPU-CET": [math, physics, chemistry, english, logicalReasoning],
+        "CLAT": [english, currentAffairs, legalReasoning, logicalReasoning], // Note: user didn't mention Quant for CLAT, removing it to be precise? "english language, current affairs, legal reasoning, logical reasoning"
+        "IPU-CET": [english, gk, logicalReasoning, managementAptitude],
     };
 
     // --- Process Links ---
