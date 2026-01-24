@@ -108,7 +108,7 @@ export default function LandingPage() {
                                 Practice
                             </Link>
                             <Link href="/about" className="hover:text-primary transition-colors">
-                                Philosophy
+                                About Us
                             </Link>
                             <Link href="/auth/sign-in" className="hover:text-primary transition-colors">
                                 Sign in
@@ -147,7 +147,7 @@ export default function LandingPage() {
                         >
                             <nav className="flex flex-col gap-6 text-xl font-serif font-bold">
                                 <Link href="/practice" onClick={() => setMenuOpen(false)}>Practice</Link>
-                                <Link href="/about" onClick={() => setMenuOpen(false)}>Philosophy</Link>
+                                <Link href="/about" onClick={() => setMenuOpen(false)}>About Us</Link>
                                 <Link href="/auth/sign-in" onClick={() => setMenuOpen(false)}>Sign In</Link>
                                 <Link href="/auth/sign-up" onClick={() => setMenuOpen(false)} className="text-primary">Create Account</Link>
                             </nav>
@@ -411,7 +411,7 @@ export default function LandingPage() {
                     <div>
                         <h4 className="font-black uppercase tracking-widest text-xs mb-6 text-foreground">Company</h4>
                         <ul className="space-y-4 text-muted-foreground font-medium">
-                            <li><Link href="/about" className="hover:text-primary transition-colors">Philosophy</Link></li>
+                            <li><Link href="/about" className="hover:text-primary transition-colors">About Us</Link></li>
                             <li><Link href="/careers" className="hover:text-primary transition-colors">Careers</Link></li>
                             <li><Link href="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
                         </ul>

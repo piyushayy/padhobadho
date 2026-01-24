@@ -1,7 +1,7 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { LayoutDashboard, BookOpen, Layers, PlusCircle, LogOut, ShieldCheck, ChevronRight, Library } from "lucide-react"
+import { LayoutDashboard, BookOpen, Layers, PlusCircle, LogOut, ShieldCheck, ChevronRight, Library, Briefcase } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 export default async function AdminLayout({
@@ -62,6 +62,11 @@ export default async function AdminLayout({
                     <Link href="/admin/questions/upload" className="flex items-center justify-between px-4 py-3.5 text-muted-foreground hover:bg-muted rounded-2xl font-semibold transition-all hover:text-foreground">
                         <div className="flex items-center gap-3 text-primary">
                             <PlusCircle className="w-5 h-5" /> Bulk Upload
+                        </div>
+                    </Link>
+                    <Link href="/admin/careers" className="flex items-center justify-between px-4 py-3.5 text-muted-foreground hover:bg-muted rounded-2xl font-semibold transition-all hover:text-foreground">
+                        <div className="flex items-center gap-3">
+                            <Briefcase className="w-5 h-5" /> Careers
                         </div>
                     </Link>
                 </nav>
