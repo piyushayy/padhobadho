@@ -1,21 +1,27 @@
 "use client"
 
 import Link from "next/link";
+import { useState } from "react";
 import { MoveRight, Sparkles, BookOpen, Clock, Zap, Trophy } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function LandingPage() {
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
     return (
         <div className="flex flex-col min-h-screen selection:bg-primary/20 bg-background text-foreground">
             <div className="hero-gradient" />
 
             {/* Header */}
-            <header className="fixed top-0 w-full z-50 glass">
+            {/* Header */}
+            <header className="fixed top-0 w-full z-50 glass border-b border-border/10">
                 <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-                    <Link href="/" className="text-2xl font-serif font-black tracking-tighter text-primary flex items-center gap-2">
+                    <Link href="/" className="text-2xl font-serif font-black tracking-tighter text-primary flex items-center gap-2 relative z-50">
                         <span className="w-8 h-8 bg-primary text-background rounded-lg flex items-center justify-center text-lg">P</span>
                         padhobadho
                     </Link>
+
+                    {/* Desktop Nav */}
                     <nav className="hidden md:flex items-center gap-10 text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground">
                         <Link href="/about" className="hover:text-primary transition-all">About</Link>
                         <Link href="/practice" className="hover:text-primary transition-all">Practice</Link>
@@ -23,7 +29,45 @@ export default function LandingPage() {
                             Sign In
                         </Link>
                     </nav>
+
+                    {/* Mobile Menu Toggle */}
+                    <button
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        className="md:hidden relative z-50 p-2 -mr-2 text-foreground"
+                        aria-label="Toggle menu"
+                    >
+                        <div className="w-6 flex flex-col items-end gap-[5px]">
+                            <span className={`h-0.5 bg-current transition-all duration-300 ${isMobileMenuOpen ? "w-6 rotate-45 translate-y-[7px]" : "w-6"}`} />
+                            <span className={`h-0.5 bg-current transition-all duration-300 ${isMobileMenuOpen ? "opacity-0" : "w-4"}`} />
+                            <span className={`h-0.5 bg-current transition-all duration-300 ${isMobileMenuOpen ? "w-6 -rotate-45 -translate-y-[7px]" : "w-2"}`} />
+                        </div>
+                    </button>
                 </div>
+
+                {/* Mobile Menu Overlay */}
+                <motion.div
+                    initial={false}
+                    animate={isMobileMenuOpen ? { height: "100vh", opacity: 1 } : { height: 0, opacity: 0 }}
+                    className="md:hidden fixed inset-0 top-0 bg-background/95 backdrop-blur-xl z-40 overflow-hidden flex flex-col pt-32 px-6"
+                >
+                    <nav className="flex flex-col gap-8 text-2xl font-serif font-bold text-foreground">
+                        <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between group border-b border-border/20 pb-4">
+                            Home <MoveRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </Link>
+                        <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between group border-b border-border/20 pb-4">
+                            About <MoveRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </Link>
+                        <Link href="/practice" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between group border-b border-border/20 pb-4">
+                            Practice <MoveRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </Link>
+                        <Link href="/auth/sign-in" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between group border-b border-border/20 pb-4 text-primary">
+                            Sign In <MoveRight className="opacity-100" />
+                        </Link>
+                        <Link href="/auth/sign-up" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-center h-14 bg-foreground text-background rounded-full mt-4 text-base font-sans font-black uppercase tracking-widest">
+                            Get Started
+                        </Link>
+                    </nav>
+                </motion.div>
             </header>
 
             {/* Hero Section */}
