@@ -145,7 +145,7 @@ async function DashboardContent() {
                                 <h4 className="text-4xl font-serif font-black">Level {user?.level || 1}</h4>
                                 <div className="space-y-2 mt-6">
                                     <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-                                        <span>XP: {user?.xp || 0}</span>
+                                        <span>XP: {user?.xp || 0} ✨</span>
                                         <span>{1000 - ((user?.xp || 0) % 1000)} to Level Up</span>
                                     </div>
                                     <div className="h-1.5 bg-background/20 rounded-full overflow-hidden">

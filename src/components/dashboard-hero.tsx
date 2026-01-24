@@ -42,56 +42,74 @@ export default function DashboardHero({ examCode, targetUniversity, totalAttempt
                 />
             </div>
 
-            {/* Content */}
-            <div className="relative z-10 max-w-2xl">
-                <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.2, duration: 0.8 }}
-                >
-                    <h2 className="text-5xl md:text-7xl font-serif font-black tracking-tight mb-6 leading-[1.1]">
-                        Your journey to <br />
-                        <motion.span
-                            animate={{ y: [0, -5, 0] }}
-                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                            className="text-primary italic inline-block relative"
-                        >
-                            {examCode || "CUET"} Excellence.
-                            <motion.div
-                                className="absolute -bottom-2 left-0 h-1.5 bg-primary/30 rounded-full"
-                                initial={{ width: 0 }}
-                                animate={{ width: "100%" }}
-                                transition={{ delay: 1, duration: 1 }}
-                            />
-                        </motion.span>
-                    </h2>
-                </motion.div>
+            {/* Content Container */}
+            <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
+                {/* Left: Welcome & Progress */}
+                <div className="space-y-8">
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2, duration: 0.8 }}
+                    >
+                        <h2 className="text-4xl md:text-6xl font-serif font-black tracking-tight mb-4 leading-[1.1]">
+                            Welcome back, 👋 <br />
+                            <motion.span
+                                animate={{ color: ["#fff", "#10b981", "#fff"] }}
+                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                className="italic inline-block"
+                            >
+                                Aspirant.
+                            </motion.span>
+                        </h2>
+                        <p className="text-lg opacity-70 font-medium max-w-md leading-relaxed">
+                            {targetUniversity
+                                ? `Destined for ${targetUniversity}. ${totalAttempted} questions down, a lifetime of glory to go.`
+                                : "Your daily streak is waiting. Let's make today count."}
+                        </p>
+                    </motion.div>
 
-                <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5, duration: 0.8 }}
-                    className="text-xl opacity-70 font-medium mb-10 max-w-md leading-relaxed"
-                >
-                    {targetUniversity
-                        ? `Destined for ${targetUniversity}. You've tackled ${totalAttempted} practice questions so far.`
-                        : totalAttempted > 0
-                            ? `Great progress! You've tackled ${totalAttempted} practice questions. Keep the momentum going.`
-                            : "Welcome! Start your first practice session to begin your journey to success."}
-                </motion.p>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4, duration: 0.8 }}
+                        className="flex flex-wrap gap-4"
+                    >
+                        <Link href="/practice" className="h-14 px-8 bg-white text-black rounded-2xl font-black flex items-center gap-2 hover:scale-105 transition-all shadow-xl active:scale-95 text-sm uppercase tracking-widest">
+                            Continue <ChevronRight size={18} strokeWidth={3} />
+                        </Link>
+                        <Link href="/mock-test" className="h-14 px-8 bg-zinc-800 text-white border border-white/10 rounded-2xl font-black flex items-center gap-2 hover:bg-zinc-700 transition-all text-sm uppercase tracking-widest">
+                            Mock Test
+                        </Link>
+                    </motion.div>
+                </div>
 
+                {/* Right: Daily Drop Card (Gamification) */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.8, duration: 0.8 }}
-                    className="flex flex-wrap gap-6"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.6, duration: 0.8 }}
+                    className="relative"
                 >
-                    <Link href="/practice" className="h-16 px-10 bg-white text-black rounded-full font-black flex items-center gap-3 hover:scale-105 transition-all shadow-2xl active:scale-95">
-                        Continue Learning <ChevronRight size={20} strokeWidth={3} />
-                    </Link>
-                    <Link href="/mock-test" className="h-16 px-10 bg-primary text-white rounded-full font-black flex items-center gap-3 hover:scale-105 transition-all shadow-2xl active:scale-95">
-                        Take Mock Test <Zap size={20} fill="currentColor" />
-                    </Link>
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-blue-600 rounded-[2.5rem] blur-xl opacity-50 animate-pulse" />
+                    <div className="relative bg-gradient-to-br from-[#6366f1] to-[#a855f7] p-8 md:p-10 rounded-[2.5rem] text-white shadow-2xl border border-white/20">
+                        <div className="flex justify-between items-start mb-8">
+                            <div className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                                <Zap size={12} fill="currentColor" className="text-yellow-300" /> Daily Drop
+                            </div>
+                            <div className="text-xs font-bold font-mono opacity-80">
+                                08:12:45 left
+                            </div>
+                        </div>
+
+                        <h3 className="text-3xl font-black mb-2">Rapid Fire: Calculus</h3>
+                        <p className="text-sm font-medium text-white/80 mb-8 leading-relaxed">
+                            Complete 3 questions in 2 minutes to win double XP.
+                        </p>
+
+                        <button className="w-full h-14 bg-white text-[#6366f1] rounded-xl font-black text-sm uppercase tracking-widest hover:bg-white/90 transition-colors flex items-center justify-center gap-2 shadow-lg">
+                            Start Challenge <ChevronRight size={16} strokeWidth={3} />
+                        </button>
+                    </div>
                 </motion.div>
             </div>
 

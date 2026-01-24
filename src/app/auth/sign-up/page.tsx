@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Chrome, MoveRight, User, Mail, Lock, ArrowLeft, Loader2, Sparkles } from "lucide-react"
+import { Chrome, Mail, Lock, MoveRight, Loader2, ArrowLeft, Sparkles, User } from "lucide-react"
 import { signUp } from "@/actions/auth"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
@@ -39,95 +39,107 @@ export default function SignUpPage() {
     }
 
     return (
-        <div className="min-h-screen bg-background flex flex-col justify-center items-center px-6 selection:bg-primary/20 py-12">
-            {/* Back to Home */}
-            <Link href="/" className="absolute top-12 left-12 flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors group">
-                <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Back to Home
+        <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 flex items-center justify-center p-4 md:p-8 font-sans">
+            <Link href="/" className="absolute top-8 left-8 flex items-center gap-2 text-[13px] font-bold text-muted-foreground hover:text-foreground transition-colors group z-50">
+                <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> Back to Home
             </Link>
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-[440px] space-y-12"
+                className="flex flex-col md:flex-row w-full max-w-5xl bg-white dark:bg-zinc-950 rounded-[2.5rem] shadow-2xl overflow-hidden border border-border/50 min-h-[600px]"
             >
-                <div className="text-center space-y-6">
-                    <Link href="/" className="text-4xl font-serif font-black tracking-tighter text-primary inline-block">pb.</Link>
-                    <div className="space-y-2">
-                        <h1 className="text-4xl font-serif font-black tracking-tight leading-tight">Start your journey</h1>
-                        <p className="text-muted-foreground font-medium text-lg leading-relaxed px-4 text-center">Join thousands of students mastering subjects through smart practice.</p>
+
+                {/* Left Side: Welcome + Benefits */}
+                <div className="md:w-1/2 bg-[#8371F5] text-white flex flex-col items-center justify-center p-12 text-center relative overflow-hidden order-1 md:order-1">
+                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
+                    <div className="absolute bottom-0 left-0 w-80 h-80 bg-white/10 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2"></div>
+
+                    <div className="relative z-10 max-w-sm">
+                        <Link href="/" className="text-3xl font-serif font-black tracking-tighter text-white inline-block mb-8">pb.</Link>
+                        <h2 className="text-4xl md:text-5xl font-serif font-black mb-6 leading-tight">Join the Elite.</h2>
+                        <p className="text-lg text-white/80 font-medium leading-relaxed mb-10">
+                            Create your account to unlock adaptive practice, mock tests, and personalized analytics.
+                        </p>
+
+                        {/* Benefits */}
+                        <div className="space-y-4 text-left bg-white/10 backdrop-blur-md p-6 rounded-3xl border border-white/20">
+                            {[
+                                "Unlimited Practice Questions",
+                                "Detailed Performance Analytics",
+                                "National Mock Tests"
+                            ].map((benefit, i) => (
+                                <div key={i} className="flex items-center gap-3">
+                                    <div className="p-1 bg-white rounded-full"><Sparkles className="w-3 h-3 text-[#8371F5]" /></div>
+                                    <span className="font-bold text-sm">{benefit}</span>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                {/* Benefits List */}
-                <div className="bg-slate-50 dark:bg-white/5 rounded-[2rem] p-6 space-y-4">
-                    {[
-                        { text: "Unlimited Adaptive Practice", icon: <Sparkles className="w-4 h-4 text-primary" /> },
-                        { text: "Real Exam Mock Tests", icon: <Sparkles className="w-4 h-4 text-primary" /> },
-                    ].map((benefit, i) => (
-                        <div key={i} className="flex items-center gap-3 text-sm font-bold">
-                            {benefit.icon}
-                            {benefit.text}
+                {/* Right Side: Sign Up Form */}
+                <div className="md:w-1/2 p-10 md:p-14 flex flex-col justify-center bg-background order-2 md:order-2">
+                    <div className="w-full max-w-md mx-auto space-y-8">
+                        <div>
+                            <h3 className="text-3xl font-bold tracking-tight text-foreground">Create Account</h3>
+                            <p className="text-muted-foreground mt-2 font-medium">It takes less than a minute</p>
                         </div>
-                    ))}
-                </div>
 
-                {/* Credentials Form */}
-                <form onSubmit={handleSignUp} className="space-y-4">
-                    <div className="space-y-2">
-                        <div className="relative">
-                            <User className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 pointer-events-none" />
-                            <input
-                                name="name"
-                                type="text"
-                                placeholder="Full Name"
-                                required
-                                className="w-full h-16 bg-card border-2 border-border rounded-[1.25rem] pl-14 pr-6 focus:border-primary focus:ring-4 focus:ring-primary/5 outline-none transition-all font-medium text-lg text-foreground"
-                            />
-                        </div>
+                        <form onSubmit={handleSignUp} className="space-y-5">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold uppercase tracking-wide text-foreground/80 pl-1" htmlFor="name">Full Name</label>
+                                <div className="relative">
+                                    <input
+                                        id="name"
+                                        name="name"
+                                        type="text"
+                                        placeholder="John Doe"
+                                        required
+                                        className="w-full h-14 bg-muted/30 border-2 border-border/50 rounded-xl px-4 focus:border-[#8371F5] focus:ring-4 focus:ring-[#8371F5]/10 outline-none transition-all font-medium text-foreground placeholder:text-muted-foreground/50"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold uppercase tracking-wide text-foreground/80 pl-1" htmlFor="email">Email Address</label>
+                                <div className="relative">
+                                    <input
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        placeholder="you@example.com"
+                                        required
+                                        className="w-full h-14 bg-muted/30 border-2 border-border/50 rounded-xl px-4 focus:border-[#8371F5] focus:ring-4 focus:ring-[#8371F5]/10 outline-none transition-all font-medium text-foreground placeholder:text-muted-foreground/50"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold uppercase tracking-wide text-foreground/80 pl-1" htmlFor="password">Password</label>
+                                <div className="relative">
+                                    <input
+                                        id="password"
+                                        name="password"
+                                        type="password"
+                                        placeholder="••••••••"
+                                        required
+                                        className="w-full h-14 bg-muted/30 border-2 border-border/50 rounded-xl px-4 focus:border-[#8371F5] focus:ring-4 focus:ring-[#8371F5]/10 outline-none transition-all font-medium text-foreground placeholder:text-muted-foreground/50"
+                                    />
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={isLoading}
+                                className="w-full h-14 bg-[#8371F5] text-white rounded-xl text-lg font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 mt-4 shadow-xl shadow-[#8371F5]/20"
+                            >
+                                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Get Started <MoveRight className="w-5 h-5" /></>}
+                            </button>
+                        </form>
+
+                        <p className="mt-8 text-sm text-center font-medium text-muted-foreground">
+                            Already have an account? <Link href="/auth/sign-in" className="text-[#8371F5] hover:underline font-bold">Sign in</Link>
+                        </p>
                     </div>
-                    <div className="space-y-2">
-                        <div className="relative">
-                            <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 pointer-events-none" />
-                            <input
-                                name="email"
-                                type="email"
-                                placeholder="Email address"
-                                required
-                                className="w-full h-16 bg-card border-2 border-border rounded-[1.25rem] pl-14 pr-6 focus:border-primary focus:ring-4 focus:ring-primary/5 outline-none transition-all font-medium text-lg text-foreground"
-                            />
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <div className="relative">
-                            <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 pointer-events-none" />
-                            <input
-                                name="password"
-                                type="password"
-                                placeholder="Secure Password"
-                                required
-                                className="w-full h-16 bg-card border-2 border-border rounded-[1.25rem] pl-14 pr-6 focus:border-primary focus:ring-4 focus:ring-primary/5 outline-none transition-all font-medium text-lg text-foreground"
-                            />
-                        </div>
-                    </div>
-
-                    <button
-                        type="submit"
-                        disabled={isLoading}
-                        className="w-full h-16 bg-black dark:bg-white text-white dark:text-black rounded-[1.25rem] text-xl font-black flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:active:scale-100 shadow-2xl shadow-black/10 dark:shadow-white/10 mt-4"
-                    >
-                        {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : <>Create Account <MoveRight className="w-6 h-6" /></>}
-                    </button>
-                </form>
-
-                <p className="text-center text-muted-foreground font-bold pt-4">
-                    Already have an account? <Link href="/auth/sign-in" className="text-primary hover:underline underline-offset-4 decoration-2">Sign in here</Link>
-                </p>
-
-                <div className="pt-8 text-center">
-                    <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.2em] leading-relaxed">
-                        By creating an account, you agree to our <br />
-                        <Link href="/terms" className="underline underline-offset-2">Terms of Service</Link> and <Link href="/privacy" className="underline underline-offset-2">Privacy Policy</Link>
-                    </p>
                 </div>
             </motion.div>
         </div>

@@ -22,7 +22,7 @@ export default function DailyTracker({
                 </div>
 
                 <p className="text-5xl font-serif font-black tracking-tight mb-2">
-                    {solvedToday}<span className="text-2xl opacity-30 font-sans">/{goal}</span>
+                    {solvedToday}<span className="text-2xl opacity-30 font-sans">/{goal}</span> 🔥
                 </p>
 
                 <div className="mt-6 space-y-3">
