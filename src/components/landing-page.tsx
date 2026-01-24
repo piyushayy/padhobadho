@@ -168,25 +168,10 @@ export default function LandingPage() {
                             <Sparkles className="w-3 h-3" /> Designed for deep work
                         </div>
 
-                        <h1 className="text-4xl md:text-6xl font-serif font-bold leading-[1.2] mb-10 tracking-tight text-foreground">
-                            <span>Silence the Noise.</span>
+                        <h1 className="text-4xl md:text-7xl font-serif font-bold leading-[1.1] mb-10 tracking-tight text-foreground">
+                            <span>Padhega India.</span>
                             <br />
-                            <span className="block mt-2 md:mt-4 text-muted-foreground/40 font-light">Find your</span>
-
-                            <span className="relative flex w-full justify-center overflow-hidden text-center h-[1.5em] text-primary italic">
-                                &nbsp;
-                                {titles.map((title, index) => (
-                                    <motion.span
-                                        key={index}
-                                        className="absolute font-serif"
-                                        initial={{ opacity: 0, y: 100 }}
-                                        animate={titleNumber === index ? { y: 0, opacity: 1 } : { y: titleNumber > index ? -100 : 100, opacity: 0 }}
-                                        transition={{ type: "spring", stiffness: 50, damping: 20 }}
-                                    >
-                                        {title}
-                                    </motion.span>
-                                ))}
-                            </span>
+                            <span className="text-primary italic">Badhega India.</span>
                         </h1>
 
                         <p className="text-lg md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-14 leading-relaxed font-medium">

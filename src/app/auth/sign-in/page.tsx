@@ -101,7 +101,7 @@ export default function SignInPage() {
                             Welcome back.
                         </h2>
                         <p className="text-white/80">
-                            Stay consistent. Stay focused. Results follow.
+                            Padhega India. Badhega India.
                         </p>
                     </div>
                 </div>

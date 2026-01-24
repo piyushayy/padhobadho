@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     locale: "en_IN",
     url: "https://padhobadho.com",
     title: "padhobadho | Excellence in Exam Preparation",
-    description: "Personalized AI-powered practice for CAT, GATE, NDA, and CUET. Join the Elite.",
+    description: "Padhega India. Badhega India. Personalized AI-powered practice for CAT, GATE, NDA, and CUET. Join the Elite.",
     siteName: "padhobadho",
   },
   twitter: {

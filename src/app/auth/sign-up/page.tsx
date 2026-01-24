@@ -96,7 +96,7 @@ export default function SignUpPage() {
                             Build the habit.
                         </h2>
                         <p className="text-white/80">
-                            Consistency beats motivation — every time.
+                            Padhega India. Badhega India.
                         </p>
                     </div>
                 </div>
