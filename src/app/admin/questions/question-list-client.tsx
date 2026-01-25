@@ -5,17 +5,30 @@ import { deleteQuestion } from "@/actions/admin"
 import { toast } from "sonner"
 import { Search, Filter, Edit3, Trash2, CheckCircle2, AlertTriangle } from "lucide-react"
 
+import QuestionDialog from "./question-dialog"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+
 interface Question {
     id: string
     content: string
     difficulty: string
     subject: { name: string }
     topic: { name: string }
+    options: any
+    correctOption: number
+    explanation?: string | null
+    subjectId: string
+    topicId: string
 }
 
-export default function QuestionListClient({ initialQuestions }: { initialQuestions: Question[] }) {
+export default function QuestionListClient({ initialQuestions, subjects }: { initialQuestions: Question[], subjects: any[] }) {
     const [questions, setQuestions] = useState(initialQuestions)
     const [search, setSearch] = useState("")
+    const router = useRouter()
+
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [editingQuestion, setEditingQuestion] = useState<Question | null>(null)
 
     const filtered = questions.filter(q =>
         q.content.toLowerCase().includes(search.toLowerCase()) ||
@@ -35,27 +48,43 @@ export default function QuestionListClient({ initialQuestions }: { initialQuesti
         }
     }
 
+    const handleEdit = (question: Question) => {
+        setEditingQuestion(question)
+        setIsDialogOpen(true)
+    }
+
+    const handleCreate = () => {
+        setEditingQuestion(null)
+        setIsDialogOpen(true)
+    }
+
     return (
         <div className="space-y-12">
-            {/* Filters Bar */}
-            <div className="flex flex-wrap gap-4 items-center bg-card border p-6 rounded-[2rem] shadow-sm">
-                <div className="flex-1 min-w-[300px] relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                    <input
-                        type="text"
-                        placeholder="Search question content, subjects or topics..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 bg-card border-2 border-border rounded-2xl outline-none focus:border-primary transition-all text-foreground font-bold"
-                    />
-                </div>
-                <div className="flex gap-4">
-                    <button className="flex items-center gap-2 px-6 py-3 bg-card border-2 border-border rounded-2xl font-bold hover:bg-muted transition-all text-foreground">
-                        <Filter className="w-4 h-4" /> Filter by Subject
-                    </button>
-                    <button className="flex items-center gap-2 px-6 py-3 bg-card border-2 border-border rounded-2xl font-bold hover:bg-muted transition-all text-foreground">
-                        Difficulty
-                    </button>
+            {/* Action Bar */}
+            <div className="flex flex-col md:flex-row justify-between gap-6 items-end">
+                <div className="flex-1 w-full">
+                    {/* Filters Bar */}
+                    <div className="flex flex-wrap gap-4 items-center bg-card border p-6 rounded-[2rem] shadow-sm w-full">
+                        <div className="flex-1 min-w-[300px] relative">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                            <input
+                                type="text"
+                                placeholder="Search question content, subjects or topics..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="w-full pl-12 pr-4 py-3 bg-card border-2 border-border rounded-2xl outline-none focus:border-primary transition-all text-foreground font-bold"
+                            />
+                        </div>
+                        <Link href="/admin/questions/upload" className="flex items-center gap-2 px-6 py-3 bg-muted border-2 border-transparent hover:border-border rounded-2xl font-bold transition-all text-foreground">
+                            Bulk Upload
+                        </Link>
+                        <button
+                            onClick={handleCreate}
+                            className="flex items-center gap-2 px-6 py-3 bg-foreground text-background rounded-2xl font-bold hover:scale-105 transition-all shadow-lg"
+                        >
+                            + New Question
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -100,7 +129,10 @@ export default function QuestionListClient({ initialQuestions }: { initialQuesti
                                     </td>
                                     <td className="px-8 py-6 text-right">
                                         <div className="flex items-center justify-end gap-2">
-                                            <button className="p-3 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl border border-transparent transition-all">
+                                            <button
+                                                onClick={() => handleEdit(q)}
+                                                className="p-3 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl border border-transparent transition-all"
+                                            >
                                                 <Edit3 className="w-4 h-4" />
                                             </button>
                                             <button
@@ -117,6 +149,14 @@ export default function QuestionListClient({ initialQuestions }: { initialQuesti
                     </tbody>
                 </table>
             </div>
+
+            <QuestionDialog
+                isOpen={isDialogOpen}
+                onClose={() => setIsDialogOpen(false)}
+                initialData={editingQuestion}
+                subjects={subjects}
+                onSuccess={router.refresh}
+            />
         </div>
     )
 }

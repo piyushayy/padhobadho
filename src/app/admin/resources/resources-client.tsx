@@ -91,7 +91,7 @@ export default function AdminResourcesClient({ initialResources, subjects }: Adm
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
                     <h1 className="text-4xl font-serif font-black tracking-tight mb-2 text-foreground luxury-text">Resource Library</h1>
-                    <p className="text-muted-foreground font-medium">Manage PDFs, links, and study materials for students.</p>
+                    <p className="text-muted-foreground font-medium">Manage Previous Year Questions (PYQs), PDFs, and study materials.</p>
                 </div>
                 <button
                     onClick={() => setIsAdding(!isAdding)}
@@ -123,7 +123,7 @@ export default function AdminResourcesClient({ initialResources, subjects }: Adm
                                 onChange={e => setForm({ ...form, type: e.target.value })}
                                 className="w-full h-14 bg-card border-2 border-border focus:border-primary rounded-2xl px-4 font-bold outline-none transition-all text-foreground"
                             >
-                                <option value="PDF">PDF Document</option>
+                                <option value="PDF">PDF / PYQ Document</option>
                                 <option value="LINK">External Link</option>
                                 <option value="NOTES">Notes / Text</option>
                             </select>

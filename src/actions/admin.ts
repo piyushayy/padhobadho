@@ -65,6 +65,47 @@ export async function bulkUploadQuestions(data: any[]) {
     return results
 }
 
+export async function createQuestionSingle(data: {
+    content: string
+    options: string[]
+    correctOption: number
+    explanation?: string
+    subjectId: string
+    topicId: string
+    difficulty: "EASY" | "MEDIUM" | "HARD"
+}) {
+    const session = await auth()
+    if (session?.user?.role !== "ADMIN") throw new Error("Unauthorized")
+
+    await prisma.question.create({
+        data
+    })
+
+    revalidatePath("/admin/questions")
+    return { success: true }
+}
+
+export async function updateQuestion(id: string, data: {
+    content: string
+    options: string[]
+    correctOption: number
+    explanation?: string
+    subjectId: string
+    topicId: string
+    difficulty: "EASY" | "MEDIUM" | "HARD"
+}) {
+    const session = await auth()
+    if (session?.user?.role !== "ADMIN") throw new Error("Unauthorized")
+
+    await prisma.question.update({
+        where: { id },
+        data
+    })
+
+    revalidatePath("/admin/questions")
+    return { success: true }
+}
+
 export async function getAdminDashboardData() {
     const session = await auth()
     if (session?.user?.role !== "ADMIN") throw new Error("Unauthorized")
