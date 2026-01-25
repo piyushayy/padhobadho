@@ -93,7 +93,8 @@ export default async function PracticeSessionPage({
                     id: q.id,
                     content: q.content,
                     options: q.options as string[],
-                    explanation: q.explanation || undefined
+                    explanation: q.explanation || undefined,
+                    correctOption: q.correctOption
                 }))}
             />
         </div>

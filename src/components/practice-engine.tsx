@@ -13,6 +13,7 @@ interface Question {
     content: string
     options: string[]
     explanation?: string
+    correctOption?: number
 }
 
 export default function PracticeEngine({
@@ -39,35 +40,52 @@ export default function PracticeEngine({
     async function submit() {
         if (selected === null) return
 
-        const result = await submitQuestionAnswer(
+        // Instant / Optimistic Validation
+        let isAnswerCorrect = false
+        let correctOpt = -1
+
+        if (question.correctOption !== undefined) {
+            isAnswerCorrect = selected === question.correctOption
+            correctOpt = question.correctOption
+        } else {
+            // Fallback for secure mode (though we are moving away from this for speed)
+            const result = await submitQuestionAnswer(sessionId, question.id, selected, 0)
+            if (result) {
+                isAnswerCorrect = result.isCorrect
+                correctOpt = result.correctOption
+            }
+        }
+
+        // Update UI immediately
+        setIsCorrect(isAnswerCorrect)
+        setCorrectOption(correctOpt)
+        setSubmitted(true)
+
+        // Play Sound
+        const audio = new Audio(isAnswerCorrect ? '/sounds/correct.mp3' : '/sounds/incorrect.mp3')
+        audio.volume = 0.5
+        audio.play().catch(() => { })
+
+        if (isAnswerCorrect) {
+            setShowExplanation(true)
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#10b981', '#34d399', '#6ee7b7']
+            })
+        } else {
+            setShowExplanation(false)
+            setMistakes(prev => [...prev, index])
+        }
+
+        // Sync with server in background
+        submitQuestionAnswer(
             sessionId,
             question.id,
             selected,
-            0 // No timer
-        )
-        if (result) {
-            setCorrectOption(result.correctOption)
-            setIsCorrect(result.isCorrect)
-            setSubmitted(true)
-
-            // Sound Effects
-            const audio = new Audio(result.isCorrect ? '/sounds/correct.mp3' : '/sounds/incorrect.mp3')
-            audio.volume = 0.5
-            audio.play().catch(() => { })
-
-            if (result.isCorrect) {
-                setShowExplanation(true)
-                confetti({
-                    particleCount: 150,
-                    spread: 70,
-                    origin: { y: 0.6 },
-                    colors: ['#10b981', '#34d399', '#6ee7b7']
-                })
-            } else {
-                setShowExplanation(false)
-                setMistakes(prev => [...prev, index])
-            }
-        }
+            0
+        ).catch(e => console.error("Sync failed", e))
     }
 
     function next() {
@@ -229,6 +247,46 @@ export default function PracticeEngine({
                 </div>
             )}
 
+            {/* Report Ticket Modal */}
+            {showReportModal && (
+                <div className="fixed inset-0 z-[70] flex items-end md:items-center justify-end md:justify-center p-0 md:p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+                    {/* Side Panel for Desktop, Bottom Sheet for Mobile - Using the Screenshot Design */}
+                    <div className="bg-card w-full md:w-[400px] h-full md:h-auto md:max-h-[600px] md:right-4 md:fixed md:top-4 md:bottom-4 md:rounded-[2rem] rounded-t-[2rem] shadow-2xl p-6 flex flex-col animate-in slide-in-from-right-10 duration-300 border border-border/50">
+                        <div className="flex items-start justify-between mb-6">
+                            <h2 className="text-2xl font-serif font-black">New ticket</h2>
+                            <button onClick={() => setShowReportModal(false)} className="p-1 hover:bg-muted rounded-full">
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <form onSubmit={submitReport} className="space-y-6 flex-1 flex flex-col">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Ticket type</label>
+                                <select className="w-full p-4 rounded-xl bg-muted/30 border border-border/50 font-medium outline-none focus:ring-2 focus:ring-primary/20">
+                                    <option>Bug report</option>
+                                    <option>Content Error</option>
+                                    <option>Feature Request</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+
+                            <div className="space-y-2 flex-1">
+                                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Description</label>
+                                <textarea required className="w-full h-full min-h-[150px] p-4 rounded-xl bg-muted/30 border border-border/50 font-medium outline-none focus:ring-2 focus:ring-primary/20 resize-none" placeholder="Describe the issue..."></textarea>
+                            </div>
+
+                            <button className="w-full py-4 bg-primary text-background font-black rounded-xl hover:opacity-90 transition-opacity mt-auto">
+                                Submit
+                            </button>
+
+                            <p className="text-[10px] text-muted-foreground text-center px-4">
+                                Note: Your feedback is invaluable to us. We read every ticket. 😅
+                            </p>
+                        </form>
+                    </div>
+                </div>
+            )}
+
             {/* Progress Bar */}
             <div className="space-y-2 mb-4 text-center md:text-left mt-12 md:mt-0">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-1">
@@ -335,7 +393,7 @@ export default function PracticeEngine({
                             <div>
                                 <h4 className={`text-2xl font-black tracking-tight ${isCorrect ? "text-emerald-700 dark:text-emerald-400" : "text-rose-600"
                                     }`}>
-                                    {isCorrect ? "Excellent!" : "Incorrect"}
+                                    {isCorrect ? "Correct!" : "Incorrect"}
                                 </h4>
                                 {!isCorrect && (
                                     <p className="text-sm font-bold text-rose-600/70 dark:text-rose-400/70">
