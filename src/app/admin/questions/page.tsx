@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { Search, Filter, Edit3, Trash2, ExternalLink } from "lucide-react"
 import Link from "next/link"
+import { PageHeader } from "@/components/page-header"
 
 import QuestionListClient from "./question-list-client"
 export const dynamic = 'force-dynamic'
@@ -17,15 +18,15 @@ export default async function QuestionListPage() {
 
     return (
         <div className="space-y-12">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <h1 className="text-4xl font-serif font-black mb-2 text-foreground luxury-text">Question Library</h1>
-                    <p className="text-muted-foreground font-medium ">Manage the repository of all exam questions.</p>
-                </div>
-                <Link href="/admin/questions/upload" className="px-8 py-4 bg-foreground text-background dark:bg-white dark:text-black rounded-full font-black flex items-center gap-2 shadow-xl hover:scale-105 transition-all">
-                    <PlusCircle className="w-5 h-5" /> Add Questions
-                </Link>
-            </div>
+            <PageHeader
+                title="Question Library"
+                subtitle="Manage the repository of all exam questions."
+                action={
+                    <Link href="/admin/questions/upload" className="px-8 py-4 bg-foreground text-background dark:bg-white dark:text-black rounded-full font-black flex items-center gap-2 shadow-xl hover:scale-105 transition-all">
+                        <PlusCircle className="w-5 h-5" /> Add Questions
+                    </Link>
+                }
+            />
 
             <QuestionListClient initialQuestions={questions} />
         </div>

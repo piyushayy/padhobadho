@@ -4,6 +4,7 @@ import { useState } from "react"
 import { createSubject, createTopic, deleteSubject, deleteTopic } from "@/actions/admin"
 import { toast } from "sonner"
 import { Layers, Plus, ChevronRight, MoreVertical, Trash2, X } from "lucide-react"
+import { PageHeader } from "@/components/page-header"
 
 interface Topic {
     id: string
@@ -80,18 +81,18 @@ export default function SubjectListClient({ initialSubjects }: { initialSubjects
 
     return (
         <div className="space-y-12">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <h1 className="text-4xl font-serif font-black mb-2 text-foreground luxury-text">Subjects & Topics</h1>
-                    <p className="text-muted-foreground font-medium italic">Manage the hierarchy of academic subjects and their topics.</p>
-                </div>
-                <button
-                    onClick={() => setIsAddingSubject(true)}
-                    className="px-8 py-4 bg-foreground text-background dark:bg-white dark:text-black rounded-full font-black flex items-center gap-2 shadow-xl hover:scale-105 transition-all outline-none"
-                >
-                    <Plus className="w-5 h-5" /> Add Subject
-                </button>
-            </div>
+            <PageHeader
+                title="Subjects & Topics"
+                subtitle="Manage the hierarchy of academic subjects and their topics."
+                action={
+                    <button
+                        onClick={() => setIsAddingSubject(true)}
+                        className="px-8 py-4 bg-foreground text-background dark:bg-white dark:text-black rounded-full font-black flex items-center gap-2 shadow-xl hover:scale-105 transition-all outline-none"
+                    >
+                        <Plus className="w-5 h-5" /> Add Subject
+                    </button>
+                }
+            />
 
             {isAddingSubject && (
                 <div className="brilliant-card bg-card border-2 p-8 rounded-[2.5rem] shadow-2xl animate-in zoom-in-95 duration-300">

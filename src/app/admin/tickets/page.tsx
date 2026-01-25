@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
+import { PageHeader } from "@/components/page-header"
 
 export default async function AdminTicketsPage() {
     const session = await auth()
@@ -17,10 +18,10 @@ export default async function AdminTicketsPage() {
 
     return (
         <div className="space-y-8">
-            <div>
-                <h1 className="text-4xl font-serif font-black mb-2 text-foreground luxury-text">Support Tickets</h1>
-                <p className="text-muted-foreground font-medium">View and manage user reports and feedback.</p>
-            </div>
+            <PageHeader
+                title="Support Tickets"
+                subtitle="View and manage user reports and feedback."
+            />
 
             <div className="grid gap-4">
                 {tickets.length === 0 ? (
@@ -32,8 +33,8 @@ export default async function AdminTicketsPage() {
                         <div key={ticket.id} className="p-6 bg-card border rounded-2xl shadow-sm hover:shadow-md transition-shadow">
                             <div className="flex justify-between items-start mb-4">
                                 <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase border ${ticket.type === "BUG" ? "bg-rose-500/10 text-rose-600 border-rose-500/20" :
-                                        ticket.type === "FEATURE" ? "bg-purple-500/10 text-purple-600 border-purple-500/20" :
-                                            "bg-blue-500/10 text-blue-600 border-blue-500/20"
+                                    ticket.type === "FEATURE" ? "bg-purple-500/10 text-purple-600 border-purple-500/20" :
+                                        "bg-blue-500/10 text-blue-600 border-blue-500/20"
                                     }`}>
                                     {ticket.type}
                                 </span>

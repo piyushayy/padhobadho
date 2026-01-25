@@ -5,6 +5,7 @@ import { exportStudentsCSV, initAchievements, initExams, exportSubjectPopularity
 import { toast } from "sonner"
 import { motion } from "framer-motion"
 import { useState } from "react"
+import { PageHeader } from "@/components/page-header"
 
 interface GrowthData {
     date: string
@@ -76,19 +77,19 @@ export default function AdminDashboardClient({ stats }: AdminDashboardClientProp
 
     return (
         <div className="space-y-12">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <h1 className="text-4xl font-serif font-black tracking-tight mb-2 text-foreground luxury-text">Admin Dashboard</h1>
-                    <p className="text-muted-foreground font-medium text-lg">Monitor platform performance and student growth.</p>
-                </div>
-                <button
-                    onClick={handleExport}
-                    className="h-14 px-8 bg-foreground text-background dark:bg-white dark:text-black rounded-2xl font-black flex items-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-xl"
-                >
-                    <Download size={20} strokeWidth={3} />
-                    Export Students
-                </button>
-            </div>
+            <PageHeader
+                title="Admin Dashboard"
+                subtitle="Monitor platform performance and student growth."
+                action={
+                    <button
+                        onClick={handleExport}
+                        className="h-14 px-8 bg-foreground text-background dark:bg-white dark:text-black rounded-2xl font-black flex items-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-xl"
+                    >
+                        <Download size={20} strokeWidth={3} />
+                        Export Students
+                    </button>
+                }
+            />
 
             {/* Stats Row */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

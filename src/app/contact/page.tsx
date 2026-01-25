@@ -23,7 +23,7 @@ export default function ContactPage() {
                                 <div className="space-y-2">
                                     <h3 className="text-xl font-bold">Email Us</h3>
                                     <p className="text-muted-foreground font-medium">Our support team typically responds within 4 hours.</p>
-                                    <p className="text-primary font-black text-lg">support@padhobadho.com</p>
+                                    <p className="text-primary font-black text-lg">piyushkaushik121@gmail.com</p>
                                 </div>
                             </div>
 
