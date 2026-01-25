@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { submitQuestionAnswer } from "@/actions/practice"
 import { toast } from "sonner"
-import { ArrowRight, CheckCircle2, XCircle, Sparkles, X } from "lucide-react"
+import { ArrowRight, CheckCircle2, XCircle, Sparkles, X, Flag } from "lucide-react"
 import confetti from "canvas-confetti"
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts"
 import { useRouter } from "next/navigation"
@@ -29,6 +29,9 @@ export default function PracticeEngine({
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
     const [showExplanation, setShowExplanation] = useState(false)
     const [showQuitModal, setShowQuitModal] = useState(false)
+    const [showReportModal, setShowReportModal] = useState(false)
+    const [mistakes, setMistakes] = useState<number[]>([]) // Indices of incorrect questions
+    const [isCompleted, setIsCompleted] = useState(false)
     const router = useRouter()
 
     const question = initialQuestions[index]
@@ -50,11 +53,10 @@ export default function PracticeEngine({
             // Sound Effects
             const audio = new Audio(result.isCorrect ? '/sounds/correct.mp3' : '/sounds/incorrect.mp3')
             audio.volume = 0.5
-            audio.play().catch(() => { }) // Catch error if file doesn't exist or interaction policy blocks
+            audio.play().catch(() => { })
 
             if (result.isCorrect) {
-                setShowExplanation(true) // Auto-show for correct? Or maybe just for learning. Usually correct doesn't need "Why".
-                // Actually, let's show explanation if correct to reinforce learning, but for incorrect, hide it behind "Why?"
+                setShowExplanation(true)
                 confetti({
                     particleCount: 150,
                     spread: 70,
@@ -63,6 +65,7 @@ export default function PracticeEngine({
                 })
             } else {
                 setShowExplanation(false)
+                setMistakes(prev => [...prev, index])
             }
         }
     }
@@ -76,7 +79,12 @@ export default function PracticeEngine({
             setIsCorrect(null)
             setShowExplanation(false)
         } else {
-            toast.success("Practice session completed! Well done.")
+            setIsCompleted(true)
+            confetti({
+                particleCount: 300,
+                spread: 100,
+                origin: { y: 0.3 }
+            })
         }
     }
 
@@ -100,11 +108,83 @@ export default function PracticeEngine({
     })
 
     const handleReport = () => {
-        toast("Report flagged sent to admins. We'll look into it.")
+        // setShowReportModal(true)
+        // toast("Report functionality coming soon")
+        setShowReportModal(true)
+    }
+
+    const submitReport = (e: React.FormEvent) => {
+        e.preventDefault()
+        setShowReportModal(false)
+        toast.success("Ticket submitted successfully. Thank you for your feedback!")
     }
 
     const handleQuit = () => {
         router.push('/practice')
+    }
+
+    // Summary View
+    if (isCompleted) {
+        return (
+            <div className="max-w-4xl mx-auto px-6 py-12 animate-in fade-in zoom-in-95 duration-500">
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl md:text-5xl font-serif font-black mb-4">Session Complete!</h1>
+                    <p className="text-xl text-muted-foreground">
+                        You scored <span className="text-primary font-bold">{initialQuestions.length - mistakes.length}</span> out of <span className="font-bold">{initialQuestions.length}</span>.
+                    </p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8">
+                    {/* Mistakes List */}
+                    <div className="space-y-6">
+                        <h2 className="text-2xl font-bold border-b pb-4">Needs Improvement</h2>
+                        {mistakes.length === 0 ? (
+                            <div className="p-8 bg-card border rounded-2xl text-center text-muted-foreground">
+                                <Sparkles className="w-12 h-12 mx-auto mb-4 text-emerald-500" />
+                                <p>Flawless victory! No mistakes to review.</p>
+                            </div>
+                        ) : (
+                            mistakes.map((idx) => {
+                                const q = initialQuestions[idx]
+                                return (
+                                    <div key={q.id} className="p-6 bg-rose-500/5 border border-rose-500/20 rounded-2xl">
+                                        <h3 className="font-bold mb-3 text-lg leading-tight">{q.content}</h3>
+                                        <div className="text-sm font-medium text-muted-foreground mb-4">
+                                            <span className="text-rose-500 font-bold uppercase text-xs tracking-wider">Mistake</span>
+                                        </div>
+                                        <p className="text-sm leading-relaxed border-l-2 border-primary/30 pl-4 text-muted-foreground">
+                                            {q.explanation || "No explanation provided."}
+                                        </p>
+                                    </div>
+                                )
+                            })
+                        )}
+                    </div>
+
+                    {/* Improvements / Upsell */}
+                    <div className="bg-card border rounded-[2rem] p-8 h-fit shadow-xl sticky top-8">
+                        <h2 className="text-2xl font-serif font-black mb-6">Mastery Insights</h2>
+                        <ul className="space-y-4 text-muted-foreground">
+                            <li className="flex gap-3">
+                                <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0" />
+                                <span>Consistency is key. You've practiced for <strong>{initialQuestions.length} questions</strong> today.</span>
+                            </li>
+                            <li className="flex gap-3">
+                                <ArrowRight className="w-6 h-6 text-primary shrink-0" />
+                                <span>Review the explanations on the left to close your knowledge gaps.</span>
+                            </li>
+                            <li className="flex gap-3">
+                                <Sparkles className="w-6 h-6 text-yellow-500 shrink-0" />
+                                <span>Try a Mock Test next to simulate exam pressure.</span>
+                            </li>
+                        </ul>
+                        <button onClick={() => router.push('/practice')} className="w-full mt-8 py-4 bg-primary text-background font-black rounded-xl hover:opacity-90 transition-opacity">
+                            Back to Practice
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     return (
