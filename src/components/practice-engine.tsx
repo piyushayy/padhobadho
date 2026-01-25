@@ -162,7 +162,7 @@ export default function PracticeEngine({
         return (
             <div className="max-w-4xl mx-auto px-6 py-12 animate-in fade-in zoom-in-95 duration-500">
                 <div className="text-center mb-12">
-                    <h1 className="text-4xl md:text-5xl font-serif font-black mb-4">Session Complete!</h1>
+                    <h1 className="text-4xl md:text-5xl font-serif font-black mb-4 text-foreground">Session Complete!</h1>
                     <p className="text-xl text-muted-foreground">
                         You scored <span className="text-primary font-bold">{initialQuestions.length - mistakes.length}</span> out of <span className="font-bold">{initialQuestions.length}</span>.
                     </p>
@@ -171,7 +171,7 @@ export default function PracticeEngine({
                 <div className="grid md:grid-cols-2 gap-8">
                     {/* Mistakes List */}
                     <div className="space-y-6">
-                        <h2 className="text-2xl font-bold border-b pb-4">Needs Improvement</h2>
+                        <h2 className="text-2xl font-bold border-b pb-4 text-foreground">Needs Improvement</h2>
                         {mistakes.length === 0 ? (
                             <div className="p-8 bg-card border rounded-2xl text-center text-muted-foreground">
                                 <Sparkles className="w-12 h-12 mx-auto mb-4 text-emerald-500" />
@@ -182,7 +182,7 @@ export default function PracticeEngine({
                                 const q = initialQuestions[idx]
                                 return (
                                     <div key={q.id} className="p-6 bg-rose-500/5 border border-rose-500/20 rounded-2xl">
-                                        <h3 className="font-bold mb-3 text-lg leading-tight">{q.content}</h3>
+                                        <h3 className="font-bold mb-3 text-lg leading-tight text-foreground">{q.content}</h3>
                                         <div className="text-sm font-medium text-muted-foreground mb-4">
                                             <span className="text-rose-500 font-bold uppercase text-xs tracking-wider">Mistake</span>
                                         </div>
@@ -197,7 +197,7 @@ export default function PracticeEngine({
 
                     {/* Improvements / Upsell */}
                     <div className="bg-card border rounded-[2rem] p-8 h-fit shadow-xl sticky top-8">
-                        <h2 className="text-2xl font-serif font-black mb-6">Mastery Insights</h2>
+                        <h2 className="text-2xl font-serif font-black mb-6 text-foreground">Mastery Insights</h2>
                         <ul className="space-y-4 text-muted-foreground">
                             <li className="flex gap-3">
                                 <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0" />
