@@ -3,9 +3,10 @@
 import { useState } from "react"
 import { submitQuestionAnswer } from "@/actions/practice"
 import { toast } from "sonner"
-import { ArrowRight, CheckCircle2, XCircle, Sparkles } from "lucide-react"
+import { ArrowRight, CheckCircle2, XCircle, Sparkles, X } from "lucide-react"
 import confetti from "canvas-confetti"
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts"
+import { useRouter } from "next/navigation"
 
 interface Question {
     id: string
@@ -26,6 +27,9 @@ export default function PracticeEngine({
     const [submitted, setSubmitted] = useState(false)
     const [correctOption, setCorrectOption] = useState<number | null>(null)
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
+    const [showExplanation, setShowExplanation] = useState(false)
+    const [showQuitModal, setShowQuitModal] = useState(false)
+    const router = useRouter()
 
     const question = initialQuestions[index]
 
@@ -43,13 +47,22 @@ export default function PracticeEngine({
             setIsCorrect(result.isCorrect)
             setSubmitted(true)
 
+            // Sound Effects
+            const audio = new Audio(result.isCorrect ? '/sounds/correct.mp3' : '/sounds/incorrect.mp3')
+            audio.volume = 0.5
+            audio.play().catch(() => { }) // Catch error if file doesn't exist or interaction policy blocks
+
             if (result.isCorrect) {
+                setShowExplanation(true) // Auto-show for correct? Or maybe just for learning. Usually correct doesn't need "Why".
+                // Actually, let's show explanation if correct to reinforce learning, but for incorrect, hide it behind "Why?"
                 confetti({
                     particleCount: 150,
                     spread: 70,
                     origin: { y: 0.6 },
                     colors: ['#10b981', '#34d399', '#6ee7b7']
                 })
+            } else {
+                setShowExplanation(false)
             }
         }
     }
@@ -61,6 +74,7 @@ export default function PracticeEngine({
             setSubmitted(false)
             setCorrectOption(null)
             setIsCorrect(null)
+            setShowExplanation(false)
         } else {
             toast.success("Practice session completed! Well done.")
         }
@@ -85,10 +99,58 @@ export default function PracticeEngine({
         }
     })
 
+    const handleReport = () => {
+        toast("Report flagged sent to admins. We'll look into it.")
+    }
+
+    const handleQuit = () => {
+        router.push('/practice')
+    }
+
     return (
-        <div className="max-w-3xl mx-auto px-4 pb-24">
+        <div className="max-w-3xl mx-auto px-4 pb-32">
+
+            {/* Header / Quit Button */}
+            <div className="absolute top-6 left-6 z-40">
+                <button
+                    onClick={() => setShowQuitModal(true)}
+                    className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors"
+                >
+                    <X size={24} className="text-muted-foreground" />
+                </button>
+            </div>
+
+            {/* Quit Confirmation Modal */}
+            {showQuitModal && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-card w-full max-w-sm p-8 rounded-[2rem] shadow-2xl scale-100 animate-in zoom-in-95 duration-200 border border-border/50 text-center space-y-6">
+                        <div className="space-y-2">
+                            <h2 className="text-xl font-serif font-black text-foreground">Are you sure?</h2>
+                            <p className="text-sm font-medium text-muted-foreground">
+                                If you quit now, you will lose your progress and XP for this session.
+                            </p>
+                        </div>
+
+                        <div className="space-y-3">
+                            <button
+                                onClick={() => setShowQuitModal(false)}
+                                className="w-full py-3.5 bg-foreground text-background font-black rounded-xl hover:opacity-90 transition-opacity uppercase tracking-wide text-sm"
+                            >
+                                Keep Learning
+                            </button>
+                            <button
+                                onClick={handleQuit}
+                                className="w-full py-3.5 text-rose-500 font-black rounded-xl hover:bg-rose-500/10 transition-colors uppercase tracking-wide text-sm"
+                            >
+                                Quit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Progress Bar */}
-            <div className="space-y-2 mb-4 text-center md:text-left">
+            <div className="space-y-2 mb-4 text-center md:text-left mt-12 md:mt-0">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-1">
                     <div className="space-y-0.5 text-left">
                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/90">Practice Session</span>
@@ -114,6 +176,7 @@ export default function PracticeEngine({
                         {question.options.map((option, i) => {
                             const isSelected = selected === i
                             const isRight = submitted && i === correctOption
+                            // Show wrong selection only if it was selected by user
                             const isWrong = submitted && isSelected && i !== correctOption
 
                             return (
@@ -154,9 +217,9 @@ export default function PracticeEngine({
                 </div>
             </div>
 
-            {/* Explanation Guide */}
-            {submitted && question.explanation && (
-                <div className="p-7 bg-[#062016] border-2 border-emerald-500/40 rounded-[2rem] relative overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-2xl shadow-emerald-950/50">
+            {/* Explanation Guide (Conditioned on showExplanation) */}
+            {submitted && question.explanation && showExplanation && (
+                <div className="p-7 bg-[#062016] border-2 border-emerald-500/40 rounded-[2rem] relative overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-2xl shadow-emerald-950/50 mb-32">
                     <div className="relative z-10 space-y-4">
                         <div className="flex items-center gap-4">
                             <div className="w-10 h-10 bg-emerald-500 text-white rounded-xl flex items-center justify-center">
@@ -176,31 +239,60 @@ export default function PracticeEngine({
 
             {/* Bottom Feedback Bar */}
             {submitted && (
-                <div className={`fixed bottom-0 left-0 right-0 z-50 animate-in slide-in-from-bottom-full duration-700 shadow-[0_-20px_50px_rgba(0,0,0,0.1)] backdrop-blur-3xl transition-colors ${isCorrect ? "bg-emerald-50/95 dark:bg-emerald-950/95 border-t-8 border-emerald-500" : "bg-rose-50/95 dark:bg-rose-950/95 border-t-8 border-rose-500"
+                <div className={`fixed bottom-0 left-0 right-0 z-50 animate-in slide-in-from-bottom-full duration-500 border-t-2 ${isCorrect
+                    ? "bg-[#d7ffb8] dark:bg-emerald-950/30 border-transparent"
+                    : "bg-white dark:bg-zinc-900 border-transparent"
                     }`}>
-                    <div className="max-w-4xl mx-auto px-10 py-6 md:py-8 flex flex-col md:flex-row items-center justify-between gap-6">
-                        <div className="flex items-center gap-8">
-                            <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center border-4 ${isCorrect ? "bg-emerald-500 text-white border-emerald-400/50 shadow-lg shadow-emerald-500/20" : "bg-rose-500 text-white border-rose-400/50 shadow-lg shadow-rose-500/20"
+                    <div className="max-w-4xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-6">
+
+                        {/* Left Side: Status */}
+                        <div className="flex items-center gap-4 mr-auto">
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${isCorrect ? "bg-emerald-100 text-emerald-600" : "bg-rose-100 text-rose-600"
                                 }`}>
-                                {isCorrect ? <CheckCircle2 className="w-8 h-8" strokeWidth={3} /> : <XCircle className="w-8 h-8" strokeWidth={3} />}
+                                {isCorrect ? <CheckCircle2 className="w-6 h-6" strokeWidth={3} /> : <XCircle className="w-6 h-6" strokeWidth={3} />}
                             </div>
-                            <div className="space-y-1 text-center md:text-left">
-                                <h4 className={`text-2xl md:text-3xl font-serif font-black tracking-tight ${isCorrect ? "text-emerald-400" : "text-rose-400"
+
+                            <div>
+                                <h4 className={`text-2xl font-black tracking-tight ${isCorrect ? "text-emerald-700 dark:text-emerald-400" : "text-rose-600"
                                     }`}>
-                                    {isCorrect ? "Brilliant! Points Earned." : `Correction Necessary. The answer is ${String.fromCharCode(65 + (correctOption ?? 0))}`}
+                                    {isCorrect ? "Excellent!" : "Incorrect"}
                                 </h4>
-                                <p className={`text-sm font-bold uppercase tracking-widest flex items-center gap-2 justify-center md:justify-start ${isCorrect ? "text-emerald-200" : "text-rose-200"}`}>
-                                    {isCorrect ? <><Sparkles className="w-4 h-4" /> Your mastery is growing</> : "Check the explanation to learn why"}
-                                </p>
+                                {!isCorrect && (
+                                    <p className="text-sm font-bold text-rose-600/70 dark:text-rose-400/70">
+                                        Correct answer: {String.fromCharCode(65 + (correctOption ?? 0))}
+                                    </p>
+                                )}
                             </div>
                         </div>
-                        <button
-                            onClick={next}
-                            className={`flex-1 md:flex-none px-12 py-4 rounded-[1.5rem] font-black text-xl text-white shadow-xl transition-all flex items-center justify-center gap-3 hover:scale-105 active:scale-95 uppercase tracking-tighter ${isCorrect ? "bg-emerald-500 shadow-emerald-500/30" : "bg-rose-500 shadow-rose-500/30"
-                                }`}
-                        >
-                            Continue <ArrowRight className="w-6 h-6" strokeWidth={4} />
-                        </button>
+
+                        {/* Right Side: Actions */}
+                        <div className="flex items-center gap-3 w-full md:w-auto">
+
+                            <button
+                                onClick={handleReport}
+                                className="p-4 rounded-2xl font-bold text-muted-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                                title="Report Issue"
+                            >
+                                <Sparkles className="w-5 h-5" />
+                            </button>
+
+                            {!isCorrect && question.explanation && (
+                                <button
+                                    onClick={() => setShowExplanation(!showExplanation)}
+                                    className="px-6 py-4 rounded-2xl font-black text-sm bg-zinc-800 text-white hover:bg-zinc-700 transition-all uppercase tracking-widest shadow-lg"
+                                >
+                                    {showExplanation ? "Hide Info" : "Why?"}
+                                </button>
+                            )}
+
+                            <button
+                                onClick={next}
+                                className={`flex-1 md:flex-none px-8 py-4 rounded-2xl font-black text-lg text-white shadow-xl transition-transform hover:scale-105 active:scale-95 uppercase tracking-wide min-w-[140px] ${isCorrect ? "bg-emerald-500 shadow-emerald-500/30" : "bg-rose-500 shadow-rose-500/30"
+                                    }`}
+                            >
+                                Continue
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

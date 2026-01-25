@@ -292,11 +292,11 @@ export default function LandingPage() {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {[
                                 { name: "Algebra", status: "mastered", color: "blue" },
-                                { name: "Calculus", status: "learning", color: "purple" },
+                                { name: "Accountancy", status: "learning", color: "purple" },
                                 { name: "Logic", status: "mastered", color: "green" },
                                 { name: "Physics", status: "learning", color: "orange" },
                                 { name: "Chemistry", status: "pending", color: "red" },
-                                { name: "Botany", status: "pending", color: "emerald" },
+                                { name: "Economics", status: "pending", color: "emerald" },
                             ].map((topic, i) => (
                                 <motion.div
                                     key={i}
