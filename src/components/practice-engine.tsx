@@ -196,8 +196,8 @@ export default function PracticeEngine({
                                 <span>Try a Mock Test next to simulate exam pressure.</span>
                             </li>
                         </ul>
-                        <button onClick={() => router.push('/practice')} className="w-full mt-8 py-4 bg-primary text-background font-black rounded-xl hover:opacity-90 transition-opacity">
-                            Back to Practice
+                        <button onClick={() => router.push('/dashboard')} className="w-full mt-8 py-4 bg-primary text-background font-black rounded-xl hover:opacity-90 transition-opacity">
+                            Continue
                         </button>
                     </div>
                 </div>

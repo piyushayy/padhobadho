@@ -243,6 +243,11 @@ export async function deleteQuestion(id: string) {
     const session = await auth()
     if (session?.user?.role !== "ADMIN") throw new Error("Unauthorized")
 
+    // Manually cleanup dependencies to ensure deletion works even without DB cascade
+    await prisma.userQuestionHistory.deleteMany({
+        where: { questionId: id }
+    })
+
     await prisma.question.delete({
         where: { id }
     })
