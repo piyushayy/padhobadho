@@ -5,6 +5,7 @@ import { submitQuestionAnswer } from "@/actions/practice"
 import { toast } from "sonner"
 import { ArrowRight, CheckCircle2, XCircle, Sparkles, X, Flag } from "lucide-react"
 import confetti from "canvas-confetti"
+import { submitTicket } from "@/actions/support"
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts"
 import { useRouter } from "next/navigation"
 
@@ -131,10 +132,25 @@ export default function PracticeEngine({
         setShowReportModal(true)
     }
 
-    const submitReport = (e: React.FormEvent) => {
+    const submitReport = async (e: React.FormEvent) => {
         e.preventDefault()
-        setShowReportModal(false)
-        toast.success("Ticket submitted successfully. Thank you for your feedback!")
+        const form = e.target as HTMLFormElement
+        const typeSelect = form.querySelector('select')
+        const message = form.querySelector('textarea')
+
+        if (!message?.value) return
+
+        try {
+            await submitTicket({
+                type: (typeSelect?.value.toUpperCase().replace(" ", "_") as any) || "GENERAL",
+                message: message.value
+            })
+            setShowReportModal(false)
+            toast.success("Ticket submitted successfully. Thank you for your feedback!")
+            form.reset()
+        } catch (err) {
+            toast.error("Failed to submit ticket.")
+        }
     }
 
     const handleQuit = () => {

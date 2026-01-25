@@ -25,6 +25,11 @@ export default async function CareersPage() {
                         Join us in our mission to personalize education for every student in India.
                         We are looking for passionate builders, not just employees.
                     </p>
+                    <div className="pt-4">
+                        <a href="mailto:piyushkaushik121@gmail.com" className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 text-primary font-bold hover:bg-primary/20 transition-colors">
+                            Or email us directly: piyushkaushik121@gmail.com
+                        </a>
+                    </div>
                 </div>
 
                 <div className="grid gap-6">
