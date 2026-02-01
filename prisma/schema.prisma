@@ -96,7 +96,9 @@ model Exam {
 model Subject {
   id                   String                   @id @default(cuid())
   name                 String                   @unique
+  clean_slug           String?                  @unique
   description          String?
+  order                Int                      @default(0)
   mockSessions         MockSession[]
   questions            Question[]
   topics               Topic[]
@@ -109,6 +111,8 @@ model Subject {
 model Topic {
   id        String     @id @default(cuid())
   name      String
+  clean_slug String?
+  order     Int        @default(0)
   subjectId String
   questions Question[]
   resources Resource[]

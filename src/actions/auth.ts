@@ -6,6 +6,7 @@ import { z } from "zod"
 
 import { signIn } from "@/auth"
 import { AuthError } from "next-auth"
+import { rateLimit } from "@/lib/rate-limit"
 
 const SignUpSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters"),
@@ -16,6 +17,12 @@ const SignUpSchema = z.object({
 export async function login(formData: FormData) {
     const email = formData.get("email") as string
     const password = formData.get("password") as string
+
+    // Rate limit based on email to prevent brute force
+    const limit = rateLimit(email, { windowMs: 60 * 1000, max: 5 })
+    if (!limit.success) {
+        return { error: "Too many login attempts. Please try again later." }
+    }
 
     try {
         await signIn("credentials", {
