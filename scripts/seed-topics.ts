@@ -9,9 +9,6 @@ const TopicSchema = z.object({
     name: z.string(),
     slug: z.string().optional(), // clean_slug
     order: z.number().default(0),
-    subtopics: z.array(z.lazy(() => TopicSchema)).optional(), // Recursion if we supported it deeply, but current schema is 1-level.
-    // Actually, schema is Subject -> Topic. So topics don't have subtopics in DB yet.
-    // We will flatten this: Subject -> Topics
 })
 
 const SubjectSchema = z.object({
