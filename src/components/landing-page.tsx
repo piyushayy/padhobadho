@@ -98,7 +98,7 @@ export default function LandingPage() {
                         href="/"
                         className="text-2xl font-serif font-black tracking-tight text-foreground flex items-center gap-2"
                     >
-                        <span className="w-8 h-8 bg-primary/10 text-primary rounded-lg flex items-center justify-center text-lg">P</span>
+                        <span className="w-9 h-9 bg-primary/10 text-primary rounded-lg flex items-center justify-center text-sm font-black tracking-tighter">PB</span>
                         padhobadho
                     </Link>
 
