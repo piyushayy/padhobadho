@@ -77,6 +77,12 @@ export default function SignInPage() {
                             className="w-full h-12 rounded-lg border px-4 focus:ring-2 focus:ring-primary outline-none"
                         />
 
+                        <div className="flex justify-end">
+                            <Link href="/auth/forgot-password" className="text-sm font-medium text-primary hover:underline">
+                                Forgot password?
+                            </Link>
+                        </div>
+
                         <button
                             disabled={isLoading}
                             className="w-full h-12 bg-primary text-primary-foreground rounded-lg font-semibold flex items-center justify-center gap-2 hover:opacity-90"

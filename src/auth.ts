@@ -6,7 +6,7 @@ import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 
 export const {
-    handlers: { GET, POST },
+    handlers,
     auth,
     signIn,
     signOut,
