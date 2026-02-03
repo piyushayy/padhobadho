@@ -153,6 +153,15 @@ export default function PracticeEngine({
         }
     }
 
+    const handleSkip = () => {
+        // Mark as skipped (incorrect for score purposes)
+        setSubmitted(true)
+        setIsCorrect(false)
+        setCorrectOption(question.correctOption ?? 0) // Show correct answer
+        setMistakes(prev => [...prev, index])
+        setShowExplanation(true) // Show explanation immediately on skip
+    }
+
     const handleQuit = () => {
         router.push('/practice')
     }
@@ -357,8 +366,15 @@ export default function PracticeEngine({
                         })}
                     </div>
 
+
                     {!submitted && (
-                        <div className="mt-4 flex justify-end">
+                        <div className="mt-4 flex justify-between items-center">
+                            <button
+                                onClick={handleSkip}
+                                className="px-6 py-3 text-muted-foreground font-bold hover:bg-muted rounded-full transition-colors uppercase tracking-widest text-sm"
+                            >
+                                Skip
+                            </button>
                             <button
                                 onClick={submit}
                                 disabled={selected === null}
@@ -371,22 +387,39 @@ export default function PracticeEngine({
                 </div>
             </div>
 
-            {/* Explanation Guide (Conditioned on showExplanation) */}
+            {/* Explanation Modal (Popup) */}
             {submitted && question.explanation && showExplanation && (
-                <div className="p-7 bg-[#062016] border-2 border-emerald-500/40 rounded-[2rem] relative overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-2xl shadow-emerald-950/50 mb-32">
-                    <div className="relative z-10 space-y-4">
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-emerald-500 text-white rounded-xl flex items-center justify-center">
-                                <CheckCircle2 className="w-6 h-6" strokeWidth={3} />
+                <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-card w-full max-w-lg max-h-[80vh] overflow-y-auto rounded-[2rem] shadow-2xl p-6 md:p-8 animate-in zoom-in-95 duration-200 border border-border/50 relative flex flex-col gap-4">
+                        <button
+                            onClick={() => setShowExplanation(false)}
+                            className="absolute top-4 right-4 p-2 hover:bg-muted rounded-full transition-colors"
+                        >
+                            <X size={20} />
+                        </button>
+
+                        <div className="flex items-center gap-3 border-b pb-4">
+                            <div className="w-10 h-10 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center">
+                                <Sparkles className="w-5 h-5" />
                             </div>
                             <div>
-                                <h4 className="text-xl font-serif font-black text-emerald-400">Solution Guide</h4>
-                                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-500/50">Mastery Insights</p>
+                                <h4 className="text-xl font-serif font-black">Explanation</h4>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Why is this correct?</p>
                             </div>
                         </div>
-                        <p className="text-lg text-white leading-relaxed font-bold whitespace-pre-line border-l-4 border-emerald-500/40 pl-5 py-0.5">
-                            {question.explanation}
-                        </p>
+
+                        <div className="prose dark:prose-invert prose-sm leading-relaxed text-muted-foreground overflow-y-auto pr-2 custom-scrollbar">
+                            <p className="whitespace-pre-line">{question.explanation}</p>
+                        </div>
+
+                        <div className="pt-2 mt-auto">
+                            <button
+                                onClick={() => setShowExplanation(false)}
+                                className="w-full py-3 bg-foreground text-background font-bold rounded-xl hover:opacity-90 transition-opacity"
+                            >
+                                Got it
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -427,15 +460,15 @@ export default function PracticeEngine({
                                 className="p-4 rounded-2xl font-bold text-muted-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
                                 title="Report Issue"
                             >
-                                <Sparkles className="w-5 h-5" />
+                                <Flag className="w-5 h-5" />
                             </button>
 
-                            {!isCorrect && question.explanation && (
+                            {question.explanation && (
                                 <button
-                                    onClick={() => setShowExplanation(!showExplanation)}
+                                    onClick={() => setShowExplanation(true)}
                                     className="px-6 py-4 rounded-2xl font-black text-sm bg-zinc-800 text-white hover:bg-zinc-700 transition-all uppercase tracking-widest shadow-lg"
                                 >
-                                    {showExplanation ? "Hide Info" : "Why?"}
+                                    Explanation
                                 </button>
                             )}
 
@@ -453,3 +486,4 @@ export default function PracticeEngine({
         </div>
     )
 }
+
