@@ -14,89 +14,112 @@ export default async function PracticeSessionPage({
 
     const { subjectId } = await params
 
-    // 1. Validate subject
-    const subject = await prisma.subject.findUnique({
-        where: { id: subjectId }
-    })
-    if (!subject) redirect("/practice")
+    try {
+        // 1. Validate subject
+        const subject = await prisma.subject.findUnique({
+            where: { id: subjectId }
+        })
+        if (!subject) redirect("/practice")
 
-    // 2. Adaptive "Smart Fetch" Logic
+        // 2. Strict Random Logic as requested
+        // "User should not see questions they attempted once correctly"
+        // "Give them randomly questions"
 
-    // A. Get questions user has mastered recently (last 7 days) to avoid repetition
-    const sevenDaysAgo = new Date()
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+        // A. Examples of IDs to EXCLUDE (Already solved correctly)
+        const mastered = await prisma.userQuestionHistory.findMany({
+            where: {
+                userId: session.user.id,
+                isCorrect: true, // STRICT: If ever solved correctly, exclude it.
+                // removed date filter
+            },
+            select: { questionId: true }
+        })
+        const excludeIds = mastered.map(m => m.questionId)
 
-    const mastered = await prisma.userQuestionHistory.findMany({
-        where: {
-            userId: session.user.id,
-            isCorrect: true,
-            lastAttempted: { gte: sevenDaysAgo }
-        },
-        select: { questionId: true }
-    })
-    const masteredIds = mastered.map(m => m.questionId)
+        // B. Fetch Random Questions 
+        // Since Prisma doesn't support random well, we used raw SQL or map-and-shuffle.
+        // For large datasets, raw SQL is better. For small/medium, fetching ID list then random sampling is okay.
+        // We'll use a pragmatic approach: Fetch candidate questions (excluding mastered) and shuffle in JS. 
+        // Why in JS? Because `NOT IN` with raw SQL and UUIDs can be tricky with Prisma typed raw queries.
 
-    // B. Prioritize Mistakes (questions answered incorrectly)
-    const mistakes = await prisma.userQuestionHistory.findMany({
-        where: {
-            userId: session.user.id,
-            isCorrect: false
-        },
-        select: { questionId: true },
-        take: 10
-    })
-    const mistakeIds = mistakes.map(m => m.questionId)
+        // Step 1: Count available questions
+        const count = await prisma.question.count({
+            where: {
+                subjectId,
+                id: { notIn: excludeIds }
+            }
+        })
 
-    // C. Fetch Questions
-    // 1. Get up to 5 retry questions (mistakes)
-    const retries = mistakeIds.length > 0 ? await prisma.question.findMany({
-        where: { id: { in: mistakeIds }, subjectId },
-        take: 5
-    }) : []
+        const TAKE_COUNT = 15;
 
-    // 2. Fill the rest with new/unmastered questions
-    // We intentionally exclude 'masteredIds' but allow 'mistakeIds' (in case logic A didn't catch them or they are old)
-    // However, since we explicitly fetched retries, we might want to exclude those specific IDs from the FILL query to avoid duplicates if possible,
-    // though Prisma 'in' vs 'not in' performance varies. Simplest balanced approach:
+        // Step 2: Fetch efficient implementation
+        // If we have many questions, random offset is decent.
+        // const skip = Math.max(0, Math.floor(Math.random() * (count - TAKE_COUNT)));
 
-    const needed = 15 - retries.length
-    const freshContent = await prisma.question.findMany({
-        where: {
-            subjectId,
-            id: { notIn: [...masteredIds, ...retries.map(r => r.id)] }
-        },
-        take: needed,
-        orderBy: { difficulty: 'asc' } // Ramp up difficulty naturally
-    })
+        // However, the user wants TRUE random, not just a random block.
+        // Let's fetch the available IDs first, shuffle them, then slice.
 
-    const initialQuestions = [...retries, ...freshContent]
+        const candidateQuestions = await prisma.question.findMany({
+            where: {
+                subjectId,
+                id: { notIn: excludeIds }
+            },
+            select: { id: true },
+            take: 1000 // Limit to avoid memory issues, assuming <1000 active questions per practice session
+        })
 
-    // Create a session in DB
-    const sessionId = await createPracticeSession(subjectId)
+        // Shuffle IDs
+        const shuffledIds = candidateQuestions
+            .map(q => q.id)
+            .sort(() => 0.5 - Math.random())
+            .slice(0, TAKE_COUNT);
 
-    if (initialQuestions.length === 0) {
+        // Fetch full data for these IDs
+        const freshContent = await prisma.question.findMany({
+            where: { id: { in: shuffledIds } }
+        })
+
+
+        const initialQuestions = freshContent
+
+        // Create a session in DB
+        const sessionId = await createPracticeSession(subjectId)
+
+        if (initialQuestions.length === 0) {
+            return (
+                <div className="min-h-screen flex items-center justify-center p-8 text-center text-muted-foreground">
+                    <div>
+                        <h2 className="text-2xl font-serif font-bold mb-2">No Questions Found</h2>
+                        <p>You have mastered all available questions for this subject!</p>
+                        <p className="text-sm mt-2">Check back later for new content.</p>
+                    </div>
+                </div>
+            )
+        }
+
         return (
-            <div className="min-h-screen flex items-center justify-center p-8 text-center text-muted-foreground">
+            <div className="min-h-screen bg-slate-50 dark:bg-black py-10">
+                <PracticeEngine
+                    sessionId={sessionId}
+                    initialQuestions={initialQuestions.map(q => ({
+                        id: q.id,
+                        content: q.content,
+                        options: Array.isArray(q.options) ? q.options as string[] : [],
+                        explanation: q.explanation || undefined,
+                        correctOption: q.correctOption
+                    }))}
+                />
+            </div>
+        )
+    } catch (error) {
+        console.error("Practice Page Error:", error)
+        return (
+            <div className="min-h-screen flex items-center justify-center p-8 text-center text-destructive">
                 <div>
-                    <h2 className="text-2xl font-serif font-bold mb-2">No Questions Found</h2>
-                    <p>Please contact the administrator or check back later.</p>
+                    <h2 className="text-xl font-bold mb-2">Something went wrong</h2>
+                    <p>We couldn't load the practice session.</p>
                 </div>
             </div>
         )
     }
-
-    return (
-        <div className="min-h-screen bg-slate-50 dark:bg-black py-10">
-            <PracticeEngine
-                sessionId={sessionId}
-                initialQuestions={initialQuestions.map(q => ({
-                    id: q.id,
-                    content: q.content,
-                    options: q.options as string[],
-                    explanation: q.explanation || undefined,
-                    correctOption: q.correctOption
-                }))}
-            />
-        </div>
-    )
 }
