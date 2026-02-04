@@ -18,7 +18,6 @@ export function SiteFooter() {
                     <ul className="space-y-4 text-muted-foreground font-medium">
                         <li><Link href="/practice" className="hover:text-primary transition-colors">Practice</Link></li>
                         <li><Link href="/mock-test" className="hover:text-primary transition-colors">Mock Tests</Link></li>
-                        <li><Link href="/pricing" className="hover:text-primary transition-colors">Pricing</Link></li>
                     </ul>
                 </div>
 

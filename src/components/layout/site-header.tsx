@@ -33,9 +33,6 @@ export function SiteHeader() {
                             <Link href="/practice" className="hover:text-primary transition-colors">
                                 Practice
                             </Link>
-                            <Link href="/pricing" className="hover:text-primary transition-colors">
-                                Pricing
-                            </Link>
                             <Link href="/auth/sign-in" className="hover:text-primary transition-colors">
                                 Login
                             </Link>
@@ -76,7 +73,6 @@ export function SiteHeader() {
                                 <Link href="/" onClick={() => setMenuOpen(false)}>Home</Link>
                                 <Link href="/about" onClick={() => setMenuOpen(false)}>About</Link>
                                 <Link href="/practice" onClick={() => setMenuOpen(false)}>Practice</Link>
-                                <Link href="/pricing" onClick={() => setMenuOpen(false)}>Pricing</Link>
                                 <Link href="/auth/sign-in" onClick={() => setMenuOpen(false)}>Login</Link>
                                 <Link href="/auth/sign-up" onClick={() => setMenuOpen(false)} className="text-primary">Get Started</Link>
                             </nav>
