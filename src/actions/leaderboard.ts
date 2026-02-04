@@ -23,14 +23,14 @@ export async function getLeaderboard() {
     })
 
     return users.map((user, index) => {
-        const totalCorrect = user.performance.reduce((acc, curr) => acc + curr.totalCorrect, 0)
-        const totalAttempted = user.performance.reduce((acc, curr) => acc + curr.totalAttempted, 0)
+        const totalCorrect = user.performance.reduce((acc: number, curr: any) => acc + curr.totalCorrect, 0)
+        const totalAttempted = user.performance.reduce((acc: number, curr: any) => acc + curr.totalAttempted, 0)
         const accuracy = totalAttempted > 0 ? Math.round((totalCorrect / totalAttempted) * 100) : 0
 
         return {
             rank: index + 1,
             userId: user.id,
-            name: user.username || user.name || "Anonymous",
+            name: (user.username && user.username.length > 0) ? `@${user.username}` : (user.name || "Anonymous Aspirant"),
             image: user.image,
             score: user.xp,
             level: user.level,

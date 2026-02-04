@@ -2,17 +2,16 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowRight, Sparkles, Loader2, User, School, Calendar, AtSign, Check, X } from "lucide-react"
+import { ArrowRight, Sparkles, Loader2, User, School, Calendar, AtSign, Check, X, AlertCircle } from "lucide-react"
 import { submitOnboarding, checkUsername } from "@/actions/onboarding"
-import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 export default function OnboardingFlow() {
-    const router = useRouter()
     const [step, setStep] = useState(1)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isCheckingUsername, setIsCheckingUsername] = useState(false)
     const [usernameStatus, setUsernameStatus] = useState<'idle' | 'available' | 'taken'>('idle')
+    const [serverError, setServerError] = useState<string | null>(null)
 
     const [formData, setFormData] = useState({
         name: "",
@@ -32,6 +31,7 @@ export default function OnboardingFlow() {
     const handleUsernameChange = async (val: string) => {
         const cleanVal = val.toLowerCase().replace(/[^a-z0-9_]/g, '')
         setFormData(p => ({ ...p, username: cleanVal }))
+        setServerError(null)
 
         if (cleanVal.length < 3) {
             setUsernameStatus('idle')
@@ -55,21 +55,23 @@ export default function OnboardingFlow() {
             return
         }
 
-        if (usernameStatus === 'taken') {
-            toast.error("This username is already taken.")
-            return
-        }
-
         setIsSubmitting(true)
+        setServerError(null)
         try {
-            await submitOnboarding({
+            const res = await submitOnboarding({
                 ...formData,
                 age: Number(formData.age)
             })
-            toast.success("Profile customized!")
-            router.push("/dashboard")
+
+            if (res.success) {
+                toast.success("Profile customized!")
+                // Use window.location for a hard redirect to ensure session state is refreshed
+                window.location.href = "/dashboard"
+            }
         } catch (err: any) {
-            toast.error(err.message || "Something went wrong.")
+            const msg = err.message || "An unexpected error occurred. Please try again."
+            setServerError(msg)
+            toast.error(msg)
         } finally {
             setIsSubmitting(false)
         }
@@ -112,7 +114,10 @@ export default function OnboardingFlow() {
                                     <input
                                         placeholder="Enter your name"
                                         value={formData.name}
-                                        onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
+                                        onChange={(e) => {
+                                            setFormData(p => ({ ...p, name: e.target.value }))
+                                            setServerError(null)
+                                        }}
                                         className="w-full h-14 rounded-xl border-2 px-4 bg-background outline-none focus:border-primary transition-all font-bold"
                                     />
                                 </div>
@@ -148,7 +153,10 @@ export default function OnboardingFlow() {
                                         type="number"
                                         placeholder="e.g. 18"
                                         value={formData.age}
-                                        onChange={(e) => setFormData(p => ({ ...p, age: e.target.value }))}
+                                        onChange={(e) => {
+                                            setFormData(p => ({ ...p, age: e.target.value }))
+                                            setServerError(null)
+                                        }}
                                         className="w-full h-14 rounded-xl border-2 px-4 bg-background outline-none focus:border-primary transition-all font-bold"
                                     />
                                 </div>
@@ -160,7 +168,10 @@ export default function OnboardingFlow() {
                                     <input
                                         placeholder="Where do you study?"
                                         value={formData.school}
-                                        onChange={(e) => setFormData(p => ({ ...p, school: e.target.value }))}
+                                        onChange={(e) => {
+                                            setFormData(p => ({ ...p, school: e.target.value }))
+                                            setServerError(null)
+                                        }}
                                         className="w-full h-14 rounded-xl border-2 px-4 bg-background outline-none focus:border-primary transition-all font-bold"
                                     />
                                 </div>
@@ -191,11 +202,21 @@ export default function OnboardingFlow() {
                                 <p className="text-muted-foreground text-lg">Choose the academic background you're preparing in.</p>
                             </div>
 
+                            {serverError && (
+                                <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center gap-3 text-rose-500 text-sm font-bold">
+                                    <AlertCircle size={18} />
+                                    {serverError}
+                                </div>
+                            )}
+
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {streams.map((s) => (
                                     <button
                                         key={s.id}
-                                        onClick={() => setFormData(prev => ({ ...prev, stream: s.id }))}
+                                        onClick={() => {
+                                            setFormData(prev => ({ ...prev, stream: s.id }))
+                                            setServerError(null)
+                                        }}
                                         className={`p-6 rounded-3xl border-2 text-left transition-all relative ${formData.stream === s.id ? "border-primary bg-primary/5 ring-4 ring-primary/5" : "border-border hover:border-primary/20 hover:bg-muted/50"}`}
                                     >
                                         <div className="flex items-center gap-4">
