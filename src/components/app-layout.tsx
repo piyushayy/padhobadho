@@ -22,6 +22,10 @@ export default async function AppLayout({ children, session }: { children: React
         prisma.exam.findMany({ orderBy: { code: "asc" } }).catch(() => [])
     ])
 
+    // Sanitize data for client components (remove Date objects)
+    const sanitizedUser = user ? JSON.parse(JSON.stringify(user)) : null
+    const sanitizedExams = JSON.parse(JSON.stringify(allExams))
+
     const userName = session.user.name || "Student"
     const userInitials = userName[0]?.toUpperCase() || "S"
 
@@ -57,7 +61,7 @@ export default async function AppLayout({ children, session }: { children: React
             {/* Main Content */}
             <main className="lg:ml-64">
                 {/* Header */}
-                <AppHeader user={user} allExams={allExams} userName={userName} userInitials={userInitials} />
+                <AppHeader user={sanitizedUser} allExams={sanitizedExams} userName={userName} userInitials={userInitials} />
 
                 <div className="p-8 lg:p-12 space-y-12 max-w-7xl mx-auto">
                     {children}
