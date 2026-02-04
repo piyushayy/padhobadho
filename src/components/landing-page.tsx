@@ -271,7 +271,7 @@ export default function LandingPage() {
                         </div>
                     </div>
                     <div className="order-1 lg:order-2">
-                        <h2 className="text-5xl font-serif font-bold mb-6">Concepts that <span className="text-primary italic">click.</span></h2>
+                        <h2 className="text-5xl font-serif font-bold mb-6">Understanding Comes <span className="text-primary italic">First.</span></h2>
                         <p className="text-xl text-muted-foreground leading-relaxed font-medium">
                             Our visual, interactive engine makes even complex ideas feel intuitive. Custom, intelligent feedback catches mistakes as you learn, not just when you fail.
                         </p>
@@ -283,7 +283,7 @@ export default function LandingPage() {
             <section className="py-32 bg-accent/10 border-y border-border/30">
                 <div className="container mx-auto px-6 grid lg:grid-cols-2 gap-20 items-center">
                     <div>
-                        <h2 className="text-5xl font-serif font-bold mb-6">Personalized <br />Learning.</h2>
+                        <h2 className="text-5xl font-serif font-bold mb-6">Practice That Adapts <br />to You.</h2>
                         <p className="text-xl text-muted-foreground leading-relaxed font-medium">
                             Padhobadho tracks the concepts you've mastered, designs practice sets based on your progress, and adapts to your pace. No two students see the same path.
                         </p>
@@ -361,7 +361,7 @@ export default function LandingPage() {
                     </div>
 
                     <div>
-                        <h2 className="text-5xl font-serif font-bold mb-6">Stay <span className="text-yellow-500">Motivated.</span></h2>
+                        <h2 className="text-5xl font-serif font-bold mb-6">Consistency <span className="text-yellow-500">Wins.</span></h2>
                         <p className="text-xl text-muted-foreground leading-relaxed font-medium">
                             Finish every day smarter with engaging lessons, competitive leaderboards, and daily streak protection. We make consistency addictive.
                         </p>
