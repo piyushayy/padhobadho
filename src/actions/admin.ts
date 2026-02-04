@@ -325,12 +325,18 @@ export async function deleteTopic(id: string) {
     return { success: true }
 }
 
-export async function createSubject(data: { name: string, description?: string }) {
+export async function createSubject(data: { name: string, description?: string, courseIds?: string[] }) {
     const session = await auth()
     if (session?.user?.role !== "ADMIN") throw new Error("Unauthorized")
 
     const subject = await prisma.subject.create({
-        data
+        data: {
+            name: data.name,
+            description: data.description,
+            courses: {
+                connect: data.courseIds?.map(id => ({ id })) || []
+            }
+        }
     })
 
     revalidatePath("/admin/subjects")

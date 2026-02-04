@@ -1,66 +1,18 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useMemo, useEffect } from "react"
-import { ArrowRight, Sparkles, Quote, MoveRight, Menu, X, CheckCircle2, Moon, Sun, Zap, Brain, Target, BarChart3, Calculator, Code2 } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
-import { ThemeToggle } from "@/components/theme-toggle"
-
-const testimonials = [
-    {
-        quote: "I was drowning in study materials. Padhobadho gave me the structure I was missing. It felt like someone finally turned on the lights.",
-        author: "Aditya S.",
-        role: "IIT Bombay '26",
-        exam: "JEE Advanced"
-    },
-    {
-        quote: "The interface is so calm, it actually made me want to study. I went from anxious to confident in three months.",
-        author: "Priya M.",
-        role: "IIM Ahmedabad '25",
-        exam: "CAT 2024"
-    },
-    {
-        quote: "No noise. No ads. Just pure, high-quality practice. This isn't just a website; it's a sanctuary for serious aspirants.",
-        author: "Rahul K.",
-        role: "AIIMS Delhi '27",
-        exam: "NEET UG"
-    },
-    {
-        quote: "The analytics breakdown helps me pinpoint exactly where I'm losing marks. It's surgical precision for my prep.",
-        author: "Vikram R.",
-        role: "NLSIU '28",
-        exam: "CLAT"
-    },
-    {
-        quote: "Adaptive difficulty is a game changer. I never feel bored or overwhelmed, just constantly challenged.",
-        author: "Sneha G.",
-        role: "SRCC '26",
-        exam: "CUET"
-    }
-]
-
-function TestimonialCard({ quote, author, role, exam }: any) {
-    return (
-        <div className="w-[400px] shrink-0 bg-background p-8 rounded-[2rem] border border-border/50 relative shadow-sm hover:shadow-xl transition-all duration-500 group mx-4">
-            <Quote className="absolute top-8 left-8 text-primary/10 w-12 h-12 -z-10 group-hover:text-primary/20 transition-colors" fill="currentColor" />
-            <p className="text-lg leading-relaxed font-medium mb-6 text-foreground/80">"{quote}"</p>
-            <div>
-                <div className="font-serif font-bold text-lg">{author}</div>
-                <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs font-black uppercase tracking-widest text-primary">{role}</span>
-                    <span className="text-xs text-muted-foreground">• {exam}</span>
-                </div>
-            </div>
-        </div>
-    )
-}
+import { useState, useRef } from "react"
+import { ArrowRight, Sparkles, Quote, MoveRight, CheckCircle2, Zap, Target, BookOpen, Trophy, ChevronLeft, ChevronRight, GraduationCap, Brain } from "lucide-react"
+import { motion, useScroll, useTransform } from "framer-motion"
+import { FAQ } from "@/components/landing/faq"
+import { StaggerTestimonials } from "@/components/landing/stagger-testimonials"
 
 function FloatingBadge({ children, className, delay = 0 }: any) {
     return (
         <motion.div
             initial={{ y: 0 }}
-            animate={{ y: [-10, 10, -10] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay }}
+            animate={{ y: [-5, 5, -5] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay }}
             className={`absolute ${className}`}
         >
             {children}
@@ -69,213 +21,264 @@ function FloatingBadge({ children, className, delay = 0 }: any) {
 }
 
 export default function LandingPage() {
-    const [menuOpen, setMenuOpen] = useState(false)
-    const [titleNumber, setTitleNumber] = useState(0);
-    const titles = useMemo(
-        () => ["Focus", "Clarity", "Speed", "Mastery", "Success"],
-        []
-    );
+    const faqCategories = {
+        general: "General",
+        practice: "Practice",
+        account: "Account"
+    }
 
-    useEffect(() => {
-        const timeoutId = setTimeout(() => {
-            if (titleNumber === titles.length - 1) {
-                setTitleNumber(0);
-            } else {
-                setTitleNumber(titleNumber + 1);
+    const faqData = {
+        general: [
+            {
+                question: "Is Padhobadho free?",
+                answer: "Yes! We believe quality education should be accessible to everyone. Our core practice features are completely free."
+            },
+            {
+                question: "Which exams do you cover?",
+                answer: "We currently focus on CUET (UG & PG), JEE Mains, NEET, and CLAT. We're adding more exams like GATE and CAT soon."
             }
-        }, 2000);
-        return () => clearTimeout(timeoutId);
-    }, [titleNumber, titles]);
+        ],
+        practice: [
+            {
+                question: "How does the adaptive difficulty work?",
+                answer: "Our system analyzes your performance in real-time. If you answer correctly, the questions get slightly harder. If you struggle, we provide easier questions to build your foundation first."
+            },
+            {
+                question: "Can I create custom tests?",
+                answer: "Absolutely. You can choose specific subjects, topics, and difficulty levels to create a practice session that fits your needs."
+            }
+        ],
+        account: [
+            {
+                question: "Do I need to sign up?",
+                answer: "You can try a few practice questions as a guest, but to save your progress, track analytics, and earn badges, you'll need to create a free account."
+            }
+        ]
+    }
 
     return (
         <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/20 overflow-x-hidden">
             <div className="hero-gradient fixed inset-0 pointer-events-none" />
 
-            {/* HEADER */}
-            <header className="fixed top-0 inset-x-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/20">
-                <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-                    <Link
-                        href="/"
-                        className="text-2xl font-serif font-black tracking-tight text-foreground flex items-center gap-2"
-                    >
-                        <span className="w-9 h-9 bg-primary/10 text-primary rounded-lg flex items-center justify-center text-sm font-black tracking-tighter">PB</span>
-                        padhobadho
-                    </Link>
-
-                    <div className="flex items-center gap-8">
-                        <nav className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                            <Link href="/practice" className="hover:text-primary transition-colors">
-                                Practice
-                            </Link>
-                            <Link href="/about" className="hover:text-primary transition-colors">
-                                About Us
-                            </Link>
-                            <Link href="/auth/sign-in" className="hover:text-primary transition-colors">
-                                Sign in
-                            </Link>
-                        </nav>
-
-                        <div className="hidden md:block">
-                            <ThemeToggle />
-                        </div>
-
-                        <Link href="/auth/sign-up" className="hidden md:block px-6 py-2.5 bg-foreground text-background rounded-full hover:opacity-90 transition-all text-xs font-bold uppercase tracking-widest">
-                            Get Started
-                        </Link>
-
-                        {/* Mobile Toggle */}
-                        <div className="flex items-center gap-4 md:hidden">
-                            <ThemeToggle />
-                            <button
-                                className="p-2 text-foreground"
-                                onClick={() => setMenuOpen(!menuOpen)}
-                            >
-                                {menuOpen ? <X /> : <Menu />}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Mobile Menu */}
-                <AnimatePresence>
-                    {menuOpen && (
-                        <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "100vh", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            className="md:hidden fixed inset-0 top-20 bg-background z-40 border-t border-border/20 p-6"
-                        >
-                            <nav className="flex flex-col gap-6 text-xl font-serif font-bold">
-                                <Link href="/practice" onClick={() => setMenuOpen(false)}>Practice</Link>
-                                <Link href="/about" onClick={() => setMenuOpen(false)}>About Us</Link>
-                                <Link href="/auth/sign-in" onClick={() => setMenuOpen(false)}>Sign In</Link>
-                                <Link href="/auth/sign-up" onClick={() => setMenuOpen(false)} className="text-primary">Create Account</Link>
-                            </nav>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </header>
-
             {/* HERO */}
-            <section className="relative pt-48 pb-32 md:pt-60 md:pb-48">
+            <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
                 <div className="container mx-auto px-6 max-w-6xl text-center relative z-10">
                     <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
+                        initial="hidden"
+                        animate="visible"
+                        variants={{
+                            hidden: { opacity: 0 },
+                            visible: {
+                                opacity: 1,
+                                transition: {
+                                    staggerChildren: 0.2
+                                }
+                            }
+                        }}
                     >
-                        <div className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-8 px-4 py-2 bg-primary/5 rounded-full border border-primary/10">
-                            <Sparkles className="w-3 h-3" /> Designed for deep work
-                        </div>
+                        <motion.div
+                            variants={{
+                                hidden: { opacity: 0, y: 20 },
+                                visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+                            }}
+                            className="inline-flex items-center gap-2 text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-primary mb-8 px-4 py-2 bg-primary/5 rounded-full border border-primary/10"
+                        >
+                            <Sparkles className="w-3 h-3" /> Master Your CUET Journey
+                        </motion.div>
 
-                        <h1 className="text-4xl md:text-7xl font-serif font-bold leading-[1.1] mb-10 tracking-tight text-foreground">
-                            <span>Padhega India.</span>
-                            <br />
+                        <motion.h1
+                            variants={{
+                                hidden: { opacity: 0, y: 30 },
+                                visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+                            }}
+                            className="text-4xl md:text-7xl font-serif font-bold leading-[1.1] mb-8 tracking-tight text-foreground"
+                        >
+                            Padhega India. <br />
                             <span className="text-primary italic">Badhega India.</span>
-                        </h1>
+                        </motion.h1>
 
-                        <p className="text-lg md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-14 leading-relaxed font-medium">
-                            The comprehensive ecosystem to master competitive exams. <br className="hidden md:block" />
-                            Adaptive practice, zero distractions, and pure performance.
-                        </p>
+                        <motion.p
+                            variants={{
+                                hidden: { opacity: 0, y: 30 },
+                                visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+                            }}
+                            className="text-lg md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed font-medium"
+                        >
+                            Stop guessing. Start improving. <br className="hidden md:block" />
+                            CUET-focused questions, adaptive difficulty, and mistake-driven learning to secure your seat.
+                        </motion.p>
 
-                        <div className="flex flex-col sm:flex-row justify-center gap-6">
+                        <motion.div
+                            variants={{
+                                hidden: { opacity: 0, y: 20 },
+                                visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+                            }}
+                            className="flex flex-col sm:flex-row justify-center gap-4 md:gap-6"
+                        >
                             <Link
                                 href="/auth/sign-up"
-                                className="group relative h-16 pl-8 pr-16 bg-foreground text-background rounded-full font-black text-lg flex items-center shadow-2xl shadow-black/20 hover:scale-105 transition-all duration-300 overflow-hidden"
                             >
-                                <span className="relative z-10">Start Your Journey</span>
-                                <div className="absolute right-2 top-2 bottom-2 w-12 bg-background/20 rounded-full flex items-center justify-center group-hover:bg-primary group-hover:text-background transition-all duration-300">
-                                    <MoveRight className="w-5 h-5" />
-                                </div>
+                                <motion.div
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="group relative h-14 md:h-16 pl-8 pr-16 bg-foreground text-background rounded-full font-black text-lg flex items-center shadow-xl overflow-hidden cursor-pointer"
+                                >
+                                    <span className="relative z-10">Start Practice Free</span>
+                                    <div className="absolute right-2 top-2 bottom-2 w-12 bg-background/20 rounded-full flex items-center justify-center group-hover:bg-primary group-hover:text-background transition-all duration-300">
+                                        <MoveRight className="w-5 h-5" />
+                                    </div>
+                                </motion.div>
                             </Link>
 
                             <Link
                                 href="/practice"
-                                className="h-16 px-10 border-2 border-border rounded-full font-bold text-lg flex items-center hover:bg-accent hover:border-foreground transition-all duration-300"
                             >
-                                Explore Platform
+                                <motion.div
+                                    whileHover={{ scale: 1.05, backgroundColor: "var(--accent)" }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="h-14 md:h-16 px-10 border-2 border-border rounded-full font-bold text-lg flex items-center transition-all duration-300 justify-center cursor-pointer"
+                                >
+                                    Explore Subjects
+                                </motion.div>
                             </Link>
-                        </div>
+                        </motion.div>
                     </motion.div>
                 </div>
             </section>
 
-            {/* TESTIMONIALS MARQUEE */}
-            <section className="py-24 bg-accent/20 border-y border-border/30 overflow-hidden relative">
-                <div className="container mx-auto px-6 mb-16 text-center">
-                    <h2 className="text-3xl md:text-5xl font-serif font-black mb-4">The Padhobadho Effect</h2>
-                    <p className="text-muted-foreground text-lg">Join thousands of students who stopped scrolling and started solving.</p>
-                </div>
-
-                <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
-                    <div className="group flex overflow-hidden p-2 [--gap:2rem] [gap:var(--gap)] flex-row [--duration:120s] w-full">
-                        <div className="flex shrink-0 justify-around [gap:var(--gap)] animate-marquee flex-row group-hover:[animation-play-state:paused]">
-                            {[...Array(4)].map((_, setIndex) => (
-                                testimonials.map((t, i) => (
-                                    <TestimonialCard key={`${setIndex}-${i}`} {...t} />
-                                ))
-                            ))}
-                        </div>
+            {/* HOW IT WORKS / VALUE PROP */}
+            <section className="py-24 bg-accent/30 border-y border-border/30">
+                <div className="container mx-auto px-6">
+                    <div className="text-center mb-16">
+                        <motion.h2
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="text-3xl md:text-4xl font-serif font-bold mb-4"
+                        >
+                            How Padhobadho Works
+                        </motion.h2>
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.1 }}
+                            className="text-muted-foreground text-lg max-w-2xl mx-auto"
+                        >
+                            A simple, scientific approach to improving your CUET score every single day.
+                        </motion.p>
                     </div>
-                    <div className="pointer-events-none absolute inset-y-0 left-0 w-32 md:w-64 bg-gradient-to-r from-background to-transparent z-10" />
-                    <div className="pointer-events-none absolute inset-y-0 right-0 w-32 md:w-64 bg-gradient-to-l from-background to-transparent z-10" />
+
+                    <div className="grid md:grid-cols-3 gap-8">
+                        {[
+                            {
+                                icon: Target,
+                                title: "Pick Your Domain",
+                                desc: "Choose from Commerce, Science, Humanities or General Test. Specific to CUET syllabus."
+                            },
+                            {
+                                icon: Brain,
+                                title: "Solve & Learn",
+                                desc: "Get questions that adapt to your level. Detailed explanations help you fix mistakes instantly."
+                            },
+                            {
+                                icon: Trophy,
+                                title: "Track Growth",
+                                desc: "Watch your accuracy score climb. See exactly where you stand against the competition."
+                            }
+                        ].map((item, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.2 }}
+                                whileHover={{ y: -10, transition: { duration: 0.3 } }}
+                                className="bg-background p-8 rounded-2xl border border-border/50 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all cursor-default"
+                            >
+                                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-6 transition-transform group-hover:scale-110 duration-300">
+                                    <item.icon size={24} />
+                                </div>
+                                <h3 className="text-xl font-bold mb-3">{item.title}</h3>
+                                <p className="text-muted-foreground leading-relaxed">{item.desc}</p>
+                            </motion.div>
+                        ))}
+                    </div>
                 </div>
             </section>
 
             {/* VISUAL FEATURE: Concepts that click */}
-            <section className="py-32 overflow-hidden">
-                <div className="container mx-auto px-6 grid lg:grid-cols-2 gap-20 items-center">
-                    <div className="order-2 lg:order-1 relative">
-                        {/* Abstract Code/Math Visual */}
-                        <div className="relative h-[400px] w-full bg-accent/30 rounded-[3rem] border border-border/50 p-8 flex items-center justify-center overflow-hidden group">
+            <section className="py-24 md:py-32 overflow-hidden">
+                <div className="container mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
+                    <motion.div
+                        initial={{ opacity: 0, x: -50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8 }}
+                        className="order-2 lg:order-1 relative"
+                    >
+                        {/* Abstract Exam Visual */}
+                        <div className="relative h-[400px] w-full bg-accent/20 rounded-[3rem] border border-border/50 p-8 flex items-center justify-center overflow-hidden">
                             <div className="absolute inset-0 bg-grid-slate-200/20 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))]" />
 
-                            {/* Floating Cards */}
-                            <FloatingBadge className="top-12 left-12 bg-background p-4 rounded-xl shadow-xl border border-border/50 rotate-3 z-10" delay={0}>
+                            <FloatingBadge className="top-12 left-8 bg-background p-4 rounded-xl shadow-lg border border-border/50 rotate-3 z-10" delay={0}>
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-blue-500/10 text-blue-500 rounded-lg"><Calculator size={20} /></div>
-                                    <div className="text-sm font-bold">Calculus II</div>
+                                    <div className="font-serif font-bold text-lg text-foreground">General Test</div>
+                                    <div className="text-xs font-black bg-green-100 text-green-700 px-2 py-0.5 rounded">HIGH YIELD</div>
                                 </div>
                             </FloatingBadge>
 
-                            <FloatingBadge className="bottom-20 right-12 bg-background p-4 rounded-xl shadow-xl border border-border/50 -rotate-2 z-20" delay={1.5}>
+                            <FloatingBadge className="bottom-20 right-8 bg-background p-4 rounded-xl shadow-lg border border-border/50 -rotate-2 z-20" delay={1.5}>
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-red-500/10 text-red-500 rounded-lg"><Code2 size={20} /></div>
-                                    <div className="text-sm font-bold">Python Logic</div>
+                                    <div className="font-serif font-bold text-lg text-foreground">English</div>
+                                    <div className="text-xs font-black bg-blue-100 text-blue-700 px-2 py-0.5 rounded">VOCAB</div>
                                 </div>
                             </FloatingBadge>
 
-                            {/* Central Element */}
                             <motion.div
-                                initial={{ scale: 0.9, opacity: 0 }}
-                                whileInView={{ scale: 1, opacity: 1 }}
-                                className="bg-background rounded-2xl p-6 shadow-2xl border border-border max-w-xs relative z-30"
+                                initial={{ scale: 0.95 }}
+                                whileInView={{ scale: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ type: "spring", stiffness: 100 }}
+                                className="bg-background rounded-2xl p-6 shadow-2xl border border-border w-64 md:w-80 relative z-30"
                             >
                                 <div className="flex justify-between items-center mb-4">
-                                    <h4 className="font-bold text-sm">Question 4/15</h4>
-                                    <span className="text-[10px] font-black bg-green-500/10 text-green-600 px-2 py-1 rounded">EASY</span>
+                                    <h4 className="font-bold text-sm text-muted-foreground uppercase tracking-wider">Mock Question</h4>
                                 </div>
-                                <div className="space-y-2 mb-4">
-                                    <div className="h-2 w-3/4 bg-muted rounded-full" />
-                                    <div className="h-2 w-1/2 bg-muted rounded-full" />
+                                <div className="space-y-3 mb-6">
+                                    <div className="h-2 w-full bg-muted rounded-full" />
+                                    <div className="h-2 w-5/6 bg-muted rounded-full" />
+                                    <div className="h-2 w-4/6 bg-muted rounded-full" />
                                 </div>
-                                <div className="grid grid-cols-2 gap-2">
-                                    {[1, 2, 3, 4].map(i => (
-                                        <div key={i} className={`h-10 rounded-lg border flex items-center justify-center text-xs font-bold ${i === 2 ? "bg-primary text-background border-primary" : "bg-muted/30 border-transparent"}`}>
-                                            Option {String.fromCharCode(64 + i)}
-                                        </div>
-                                    ))}
+                                <div className="grid gap-2">
+                                    <div className="h-10 rounded-lg border border-border flex items-center px-4 text-xs font-bold hover:bg-muted/50 transition-colors cursor-pointer">
+                                        Option A
+                                    </div>
+                                    <div className="h-10 rounded-lg border border-primary bg-primary/5 text-primary flex items-center px-4 text-xs font-bold ring-1 ring-primary transition-colors cursor-pointer">
+                                        Option B <CheckCircle2 className="ml-auto w-4 h-4" />
+                                    </div>
+                                    <div className="h-10 rounded-lg border border-border flex items-center px-4 text-xs font-bold hover:bg-muted/50 transition-colors cursor-pointer">
+                                        Option C
+                                    </div>
                                 </div>
                             </motion.div>
                         </div>
-                    </div>
-                    <div className="order-1 lg:order-2">
-                        <h2 className="text-5xl font-serif font-bold mb-6">Understanding Comes <span className="text-primary italic">First.</span></h2>
-                        <p className="text-xl text-muted-foreground leading-relaxed font-medium">
-                            Our visual, interactive engine makes even complex ideas feel intuitive. Custom, intelligent feedback catches mistakes as you learn, not just when you fail.
+                    </motion.div>
+                    <motion.div
+                        initial={{ opacity: 0, x: 50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8 }}
+                        className="order-1 lg:order-2"
+                    >
+                        <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary mb-4">
+                            <BookOpen size={14} /> Smart Practice
+                        </div>
+                        <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6">Questions that feel <br /><span className="text-primary italic">real.</span></h2>
+                        <p className="text-lg md:text-xl text-muted-foreground leading-relaxed font-medium">
+                            We don't use generic question banks. Our content is curated for specific exams like CUET, ensuring you're practicing exactly what you'll see on test day.
                         </p>
-                    </div>
+                    </motion.div>
                 </div>
             </section>
 
@@ -325,6 +328,7 @@ export default function LandingPage() {
                         <div className="flex items-end gap-6 relative z-10">
                             <motion.div
                                 whileInView={{ height: "150px" }}
+                                viewport={{ once: true }}
                                 initial={{ height: 0 }}
                                 className="w-20 bg-gradient-to-t from-yellow-400/20 to-yellow-400/60 rounded-t-3xl border-t border-x border-yellow-400/30 backdrop-blur-sm relative group"
                             >
@@ -336,6 +340,7 @@ export default function LandingPage() {
 
                             <motion.div
                                 whileInView={{ height: "220px" }}
+                                viewport={{ once: true }}
                                 initial={{ height: 0 }}
                                 transition={{ delay: 0.2 }}
                                 className="w-20 bg-gradient-to-t from-orange-400/20 to-orange-400/60 rounded-t-3xl border-t border-x border-orange-400/30 backdrop-blur-sm relative"
@@ -348,6 +353,7 @@ export default function LandingPage() {
 
                             <motion.div
                                 whileInView={{ height: "180px" }}
+                                viewport={{ once: true }}
                                 initial={{ height: 0 }}
                                 transition={{ delay: 0.4 }}
                                 className="w-20 bg-gradient-to-t from-primary/20 to-primary/60 rounded-t-3xl border-t border-x border-primary/30 backdrop-blur-sm relative"
@@ -360,68 +366,56 @@ export default function LandingPage() {
                         </div>
                     </div>
 
-                    <div>
+                    <motion.div
+                        initial={{ opacity: 0, x: 50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8 }}
+                    >
                         <h2 className="text-5xl font-serif font-bold mb-6">Consistency <span className="text-yellow-500">Wins.</span></h2>
                         <p className="text-xl text-muted-foreground leading-relaxed font-medium">
                             Finish every day smarter with engaging lessons, competitive leaderboards, and daily streak protection. We make consistency addictive.
                         </p>
-                    </div>
+                    </motion.div>
                 </div>
             </section>
 
+            {/* TESTIMONIALS */}
+            <section className="py-24 bg-accent/20 border-y border-border/30 overflow-hidden">
+                <div className="container mx-auto px-6 mb-12 text-center">
+                    <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6">Don't just take our word for it</h2>
+                    <p className="text-xl text-muted-foreground font-medium max-w-2xl mx-auto">
+                        Join thousands of students who are crushing their exams with Padhobadho.
+                    </p>
+                </div>
+
+                <StaggerTestimonials />
+            </section>
+
+            {/* FAQ SECTION */}
+            <FAQ
+                categories={faqCategories}
+                faqData={faqData}
+            />
+
             {/* CTA */}
-            <section className="py-32 border-t border-border/30 relative overflow-hidden bg-foreground text-background">
-                <div className="container mx-auto px-6 max-w-4xl text-center relative z-10">
-                    <h2 className="text-5xl md:text-7xl font-serif font-black mb-8 leading-tight">
-                        Ready to achieve your <span className="text-primary">dream rank?</span>
+            <section className="py-24 md:py-32 relative overflow-hidden bg-foreground text-background text-center">
+                <div className="container mx-auto px-6 max-w-4xl relative z-10">
+                    <GraduationCap className="w-16 h-16 mx-auto mb-6 text-primary/80" />
+                    <h2 className="text-4xl md:text-6xl font-serif font-black mb-8 leading-tight">
+                        Your dream college <br /> is waiting.
                     </h2>
-                    <p className="text-xl text-primary-foreground/70 mb-12 max-w-2xl mx-auto">
-                        The best time to start was yesterday. The second best time is right now.
+                    <p className="text-xl text-primary-foreground/70 mb-10 max-w-2xl mx-auto">
+                        Don't let another day of vague prep go by. Start precise, daily practice today.
                     </p>
                     <Link
                         href="/auth/sign-up"
-                        className="inline-flex items-center gap-3 px-12 py-6 bg-background text-foreground rounded-full font-black text-xl hover:scale-105 hover:shadow-2xl transition-all duration-300"
+                        className="inline-flex items-center gap-3 px-10 py-5 bg-background text-foreground rounded-full font-black text-xl hover:scale-105 hover:shadow-2xl transition-all duration-300"
                     >
-                        Start Learning Free <ArrowRight />
+                        Sign Up for Free <ArrowRight />
                     </Link>
                 </div>
             </section>
-
-            {/* FOOTER */}
-            <footer className="border-t border-border/30 py-16 bg-accent/5">
-                <div className="container mx-auto px-6 grid md:grid-cols-4 gap-12 text-sm">
-                    <div className="col-span-2">
-                        <Link href="/" className="text-2xl font-serif font-black tracking-tight text-foreground flex items-center gap-2 mb-6">
-                            padhobadho
-                        </Link>
-                        <p className="text-muted-foreground max-w-sm leading-relaxed">
-                            A calm, focused learning platform for students preparing for competitive exams and better colleges. Built with intentionality.
-                        </p>
-                    </div>
-
-                    <div>
-                        <h4 className="font-black uppercase tracking-widest text-xs mb-6 text-foreground">Platform</h4>
-                        <ul className="space-y-4 text-muted-foreground font-medium">
-                            <li><Link href="/practice" className="hover:text-primary transition-colors">Practice</Link></li>
-                            <li><Link href="/mock-test" className="hover:text-primary transition-colors">Mock Tests</Link></li>
-                            <li><Link href="/pricing" className="hover:text-primary transition-colors">Pricing</Link></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 className="font-black uppercase tracking-widest text-xs mb-6 text-foreground">Company</h4>
-                        <ul className="space-y-4 text-muted-foreground font-medium">
-                            <li><Link href="/about" className="hover:text-primary transition-colors">About Us</Link></li>
-                            <li><Link href="/careers" className="hover:text-primary transition-colors">Careers</Link></li>
-                            <li><Link href="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div className="container mx-auto px-6 mt-16 pt-8 border-t border-border/30 text-center text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                    © {new Date().getFullYear()} padhobadho. Engineered with Heart.
-                </div>
-            </footer>
         </div>
     )
 }

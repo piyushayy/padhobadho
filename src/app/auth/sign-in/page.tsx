@@ -30,13 +30,19 @@ export default function SignInPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-background px-4">
-            <Link
-                href="/"
-                className="absolute top-6 left-6 flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground"
-            >
-                <ArrowLeft size={14} /> Back
-            </Link>
+        <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 relative">
+            <div className="w-full max-w-4xl mb-6 flex items-center justify-between px-2">
+                <Link
+                    href="/"
+                    className="inline-flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors p-2"
+                >
+                    <ArrowLeft size={18} /> <span className="hidden sm:inline">Back</span>
+                </Link>
+                <Link href="/" className="text-xl font-serif font-black tracking-tight flex items-center gap-2">
+                    <span className="w-6 h-6 bg-primary/10 text-primary rounded flex items-center justify-center text-[10px] font-black">PB</span>
+                    <span className="text-base sm:text-xl">padhobadho</span>
+                </Link>
+            </div>
 
             <motion.div
                 initial={{ opacity: 0, y: 16 }}

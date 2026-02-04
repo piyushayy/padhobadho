@@ -1,12 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import {
     User, Mail, Shield, Palette,
     Bell, ChevronLeft, Save, LogOut,
     Trash2, RefreshCw, GraduationCap,
-    Target, Zap, Flame, Loader2, Sparkles
+    Target, Zap, Flame, Loader2, Sparkles,
+    Lock, Smartphone, Layout
 } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { updateProfile, resetProgress } from "@/actions/profile"
@@ -32,6 +33,7 @@ interface SettingsProps {
 
 export default function SettingsClient({ user }: SettingsProps) {
     const router = useRouter()
+    const [activeTab, setActiveTab] = useState("general")
     const [isSaving, setIsSaving] = useState(false)
     const [isResetting, setIsResetting] = useState(false)
 
@@ -70,219 +72,252 @@ export default function SettingsClient({ user }: SettingsProps) {
         }
     }
 
+    const tabs = [
+        { id: "general", label: "General", icon: User },
+        { id: "academic", label: "Academic Focus", icon: GraduationCap },
+        { id: "preferences", label: "Preferences", icon: Palette },
+        { id: "security", label: "Security", icon: Shield },
+    ]
+
     return (
-        <div className="max-w-4xl mx-auto space-y-12 pb-24">
+        <div className="max-w-5xl mx-auto pb-24 px-6 md:px-0">
             {/* Header */}
-            <div className="space-y-4">
-                <Link href="/dashboard" className="flex items-center gap-2 text-sm font-black text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest">
+            <div className="mb-12 space-y-4">
+                <Link href="/dashboard" className="flex items-center gap-2 text-sm font-black text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest w-fit">
                     <ChevronLeft size={16} strokeWidth={3} /> Back to Dashboard
                 </Link>
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
-                        <h1 className="text-5xl md:text-6xl font-serif font-black tracking-tight leading-tight">Preferences</h1>
-                        <p className="text-muted-foreground font-medium text-lg mt-2">
-                            Customize your identity, academic goals, and app experience.
-                        </p>
+                        <h1 className="text-4xl md:text-5xl font-serif font-black tracking-tight leading-tight">Settings</h1>
+                        <p className="text-muted-foreground font-medium text-lg mt-2">Manage your account and preferences.</p>
                     </div>
                     <button
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="h-16 px-10 bg-primary text-background rounded-2xl font-black text-lg flex items-center gap-3 hover:scale-105 transition-all shadow-2xl shadow-primary/20 disabled:opacity-50"
+                        className="h-14 px-8 bg-primary text-background rounded-xl font-black text-sm uppercase tracking-widest flex items-center gap-3 hover:scale-105 transition-all shadow-xl shadow-primary/20 disabled:opacity-50"
                     >
-                        {isSaving ? <Loader2 className="animate-spin w-5 h-5" /> : <Save className="w-5 h-5" />}
+                        {isSaving ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="w-4 h-4" />}
                         Save Changes
                     </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Sidebar Stats */}
-                <div className="space-y-6">
-                    <div className="brilliant-card bg-primary text-background p-8 space-y-6 relative overflow-hidden">
-                        <div className="relative z-10">
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Your Mastery</p>
-                            <h3 className="text-4xl font-serif font-black mt-1">Level {user.level}</h3>
-                            <div className="mt-4 space-y-2">
-                                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-                                    <span>XP: {user.xp}</span>
-                                    <span>Next Level in {1000 - (user.xp % 1000)} XP</span>
+            <div className="grid lg:grid-cols-12 gap-8">
+                {/* Sidebar Navigation */}
+                <div className="lg:col-span-3 flex lg:flex-col overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 gap-2 scrollbar-hide">
+                    {tabs.map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`flex-shrink-0 lg:w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all text-sm whitespace-nowrap ${activeTab === tab.id
+                                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                                : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                                }`}
+                        >
+                            <tab.icon size={18} strokeWidth={2.5} />
+                            {tab.label}
+                        </button>
+                    ))}
+
+                    <div className="hidden lg:block pt-8 mt-8 border-t border-border">
+                        <div className="bg-gradient-to-br from-primary/10 to-primary/5 p-6 rounded-2xl border border-primary/10">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-2">Your Status</p>
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="p-2 bg-background rounded-lg text-primary shadow-sm">
+                                    <Zap size={20} fill="currentColor" />
                                 </div>
-                                <div className="h-2 bg-background/20 rounded-full overflow-hidden">
-                                    <div className="h-full bg-background transition-all duration-1000" style={{ width: `${(user.xp % 1000) / 10}%` }} />
+                                <div>
+                                    <p className="font-black text-lg leading-none">Level {user.level}</p>
+                                    <p className="text-xs font-bold text-muted-foreground">{user.xp} XP</p>
                                 </div>
                             </div>
-                        </div>
-                        <Zap className="absolute -right-4 -bottom-4 w-24 h-24 opacity-10 -rotate-12" />
-                    </div>
-
-                    <div className="brilliant-card bg-card p-8 border-2 border-primary/10 flex items-center justify-between">
-                        <div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Current Streak</p>
-                            <h4 className="text-3xl font-black mt-1">{user.currentStreak} Days</h4>
-                        </div>
-                        <div className={`p-4 rounded-2xl ${user.currentStreak > 0 ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20" : "bg-muted text-muted-foreground"}`}>
-                            <Flame size={24} fill={user.currentStreak > 0 ? "currentColor" : "none"} />
+                            <div className="h-1.5 bg-background rounded-full overflow-hidden">
+                                <div className="h-full bg-primary" style={{ width: `${(user.xp % 1000) / 10}%` }} />
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Main Content */}
-                <div className="lg:col-span-2 space-y-8">
-                    {/* Account Section */}
-                    <div className="brilliant-card bg-card p-8 space-y-8 border border-border/40">
-                        <div className="flex items-center gap-3 border-b border-border/40 pb-6">
-                            <User className="text-primary w-5 h-5" />
-                            <h3 className="text-xl font-bold">Personal Profile</h3>
-                        </div>
+                {/* Main Content Area */}
+                <div className="lg:col-span-9">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={activeTab}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.2 }}
+                            className="bg-card border border-border/50 rounded-3xl p-8 md:p-10 shadow-sm min-h-[500px]"
+                        >
+                            {activeTab === "general" && (
+                                <div className="space-y-8">
+                                    <h2 className="text-2xl font-bold flex items-center gap-3">
+                                        <User className="text-primary" /> General Information
+                                    </h2>
 
-                        <div className="grid md:grid-cols-2 gap-8">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Display Name</label>
-                                <input
-                                    type="text"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                                    className="w-full h-14 bg-muted/30 border-2 border-transparent focus:border-primary rounded-xl px-4 font-bold outline-none transition-all"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Registered Email</label>
-                                <div className="w-full h-14 bg-muted/10 border-2 border-transparent rounded-xl px-4 flex items-center gap-3 opacity-60">
-                                    <Mail size={16} />
-                                    <span className="font-bold text-sm">{user.email}</span>
+                                    <div className="grid md:grid-cols-2 gap-8">
+                                        <div className="space-y-3">
+                                            <div className="w-24 h-24 rounded-full bg-accent flex items-center justify-center text-4xl font-serif font-black mx-auto md:mx-0 border-4 border-background shadow-xl">
+                                                {user.name?.[0] || "S"}
+                                            </div>
+                                            <div className="flex gap-3 justify-center md:justify-start">
+                                                <button className="px-4 py-2 bg-primary/10 text-primary rounded-lg text-xs font-bold hover:bg-primary/20 transition-colors">Change Avatar</button>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-6">
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Full Name</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.name}
+                                                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                                                    className="w-full p-4 bg-muted/30 border border-transparent focus:border-primary rounded-xl font-bold outline-none transition-all"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Email Address</label>
+                                                <div className="w-full p-4 bg-muted/10 border border-transparent rounded-xl flex items-center gap-3 text-muted-foreground cursor-not-allowed">
+                                                    <Mail size={16} />
+                                                    <span className="font-medium">{user.email}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Academic Goals */}
-                    <div className="brilliant-card bg-card p-8 space-y-8 border border-border/40">
-                        <div className="flex items-center gap-3 border-b border-border/40 pb-6">
-                            <GraduationCap className="text-primary w-5 h-5" />
-                            <h3 className="text-xl font-bold">Academic Targeting</h3>
-                        </div>
-
-                        <div className="grid md:grid-cols-2 gap-8">
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Education Stream</label>
-                                <select
-                                    value={formData.stream}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, stream: e.target.value }))}
-                                    className="w-full h-14 bg-muted/30 border-2 border-transparent focus:border-primary rounded-xl px-4 font-bold outline-none transition-all appearance-none"
-                                >
-                                    <option value="SCIENCE">Science (PCM/PCB)</option>
-                                    <option value="COMMERCE">Commerce</option>
-                                    <option value="HUMANITIES">Humanities / Arts</option>
-                                </select>
-                            </div>
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Daily Practice Goal</label>
-                                <div className="flex items-center gap-4">
-                                    <input
-                                        type="number"
-                                        value={formData.dailyGoal}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, dailyGoal: parseInt(e.target.value) }))}
-                                        className="w-24 h-14 bg-muted/30 border-2 border-transparent focus:border-primary rounded-xl px-4 font-bold outline-none transition-all text-center"
-                                    />
-                                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-tighter">Questions / Day</p>
-                                </div>
-                            </div>
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                                    <Target size={12} /> Target University
-                                </label>
-                                <input
-                                    type="text"
-                                    value={formData.targetUniversity}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, targetUniversity: e.target.value }))}
-                                    placeholder="e.g. Delhi University"
-                                    className="w-full h-14 bg-muted/30 border-2 border-transparent focus:border-primary rounded-xl px-4 font-bold outline-none transition-all"
-                                />
-                            </div>
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                                    <Sparkles size={12} /> Desired Course
-                                </label>
-                                <input
-                                    type="text"
-                                    value={formData.targetCourse}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, targetCourse: e.target.value }))}
-                                    placeholder="e.g. B.Com (Hons)"
-                                    className="w-full h-14 bg-muted/30 border-2 border-transparent focus:border-primary rounded-xl px-4 font-bold outline-none transition-all"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* App Settings */}
-                    <div className="brilliant-card bg-card p-8 space-y-8 border border-border/40">
-                        <div className="flex items-center gap-3 border-b border-border/40 pb-6">
-                            <Palette className="text-primary w-5 h-5" />
-                            <h3 className="text-xl font-bold">App Preferences</h3>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="font-bold text-lg">Interface Theme</p>
-                                <p className="text-sm text-muted-foreground font-medium">Switch between light and dark mode</p>
-                            </div>
-                            <ThemeToggle />
-                        </div>
-                    </div>
-
-                    {/* Elite Status Card */}
-                    <div className={`brilliant-card p-10 relative overflow-hidden group border-2 ${user.isPremium ? "bg-emerald-950 border-emerald-500/30" : "bg-amber-950 border-amber-500/30"}`}>
-                        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                            <div className="flex gap-6 items-center flex-col md:flex-row text-center md:text-left">
-                                <div className={`w-20 h-20 rounded-3xl flex items-center justify-center border-2 ${user.isPremium ? "bg-emerald-500 text-white border-emerald-400/50 shadow-2xl shadow-emerald-500/40" : "bg-amber-500 text-white border-amber-400/50"}`}>
-                                    <Shield size={32} strokeWidth={2.5} />
-                                </div>
-                                <div className="space-y-1">
-                                    <p className={`text-[10px] font-black uppercase tracking-widest ${user.isPremium ? "text-emerald-400" : "text-amber-400"}`}>Account Authority</p>
-                                    <h3 className="text-3xl font-serif font-black text-white">{user.isPremium ? 'North Campus Elite' : 'Standard Access'}</h3>
-                                    <p className="text-sm font-medium text-white/60">
-                                        {user.isPremium ? "All premium features unlocked forever." : "Upgrade to unlock full potential."}
-                                    </p>
-                                </div>
-                            </div>
-                            {!user.isPremium && (
-                                <Link href="/checkout" className="px-10 py-5 bg-amber-500 text-white rounded-2xl font-black text-lg hover:scale-105 transition-all shadow-xl shadow-amber-500/20">
-                                    Become Elite
-                                </Link>
                             )}
-                        </div>
-                    </div>
 
-                    {/* Danger Zone */}
-                    <div className="space-y-6 pt-8 border-t border-border/40">
-                        <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-8 bg-rose-500/5 rounded-[2.5rem] border-2 border-dashed border-rose-500/20">
-                            <div>
-                                <h4 className="text-xl font-black text-rose-500">Reset Training Progress</h4>
-                                <p className="text-sm font-medium text-muted-foreground">Clear all history, levels, and statistics. This cannot be undone.</p>
-                            </div>
-                            <button
-                                onClick={handleReset}
-                                disabled={isResetting}
-                                className="px-8 py-4 bg-rose-500 text-white rounded-2xl font-black text-sm flex items-center gap-2 hover:bg-rose-600 transition-all disabled:opacity-50"
-                            >
-                                {isResetting ? <Loader2 className="animate-spin w-4 h-4" /> : <RefreshCw size={18} />}
-                                Factory Reset
-                            </button>
-                        </div>
+                            {activeTab === "academic" && (
+                                <div className="space-y-8">
+                                    <h2 className="text-2xl font-bold flex items-center gap-3">
+                                        <GraduationCap className="text-primary" /> Academic Goals
+                                    </h2>
 
-                        <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-4">
-                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest max-w-[300px]">
-                                Padhobadho ID: {user.email?.split('@')[0]} <br />
-                                Registered {new Date().toLocaleDateString()}
-                            </p>
-                            <button
-                                onClick={() => signOut()}
-                                className="flex items-center gap-2 px-8 py-4 text-rose-500 font-black text-sm hover:bg-rose-500/10 rounded-2xl transition-all"
-                            >
-                                <LogOut size={18} strokeWidth={3} /> Absolute Sign Out
-                            </button>
-                        </div>
-                    </div>
+                                    <div className="grid md:grid-cols-2 gap-8">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Stream / Domain</label>
+                                            <select
+                                                value={formData.stream}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, stream: e.target.value }))}
+                                                className="w-full p-4 bg-muted/30 border border-transparent focus:border-primary rounded-xl font-bold outline-none transition-all appearance-none"
+                                            >
+                                                <option value="SCIENCE">Science (PCM/PCB)</option>
+                                                <option value="COMMERCE">Commerce</option>
+                                                <option value="HUMANITIES">Humanities / Arts</option>
+                                            </select>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Daily Goal (Questions)</label>
+                                            <input
+                                                type="number"
+                                                value={formData.dailyGoal}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, dailyGoal: parseInt(e.target.value) }))}
+                                                className="w-full p-4 bg-muted/30 border border-transparent focus:border-primary rounded-xl font-bold outline-none transition-all"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Target University</label>
+                                            <input
+                                                type="text"
+                                                value={formData.targetUniversity}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, targetUniversity: e.target.value }))}
+                                                className="w-full p-4 bg-muted/30 border border-transparent focus:border-primary rounded-xl font-bold outline-none transition-all"
+                                                placeholder="e.g. Delhi University"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Target Course</label>
+                                            <input
+                                                type="text"
+                                                value={formData.targetCourse}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, targetCourse: e.target.value }))}
+                                                className="w-full p-4 bg-muted/30 border border-transparent focus:border-primary rounded-xl font-bold outline-none transition-all"
+                                                placeholder="e.g. B.Com Hons"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === "preferences" && (
+                                <div className="space-y-8">
+                                    <h2 className="text-2xl font-bold flex items-center gap-3">
+                                        <Palette className="text-primary" /> App Experience
+                                    </h2>
+
+                                    <div className="space-y-6">
+                                        <div className="flex items-center justify-between p-6 bg-muted/20 rounded-2xl">
+                                            <div>
+                                                <p className="font-bold">Theme Mode</p>
+                                                <p className="text-sm text-muted-foreground">Toggle between light and dark themes</p>
+                                            </div>
+                                            <ThemeToggle />
+                                        </div>
+
+                                        <div className="flex items-center justify-between p-6 bg-muted/20 rounded-2xl opacity-60 cursor-not-allowed">
+                                            <div>
+                                                <p className="font-bold">Notifications</p>
+                                                <p className="text-sm text-muted-foreground">Email digests and study reminders</p>
+                                            </div>
+                                            <div className="h-6 w-10 bg-muted rounded-full relative">
+                                                <div className="h-6 w-6 bg-muted-foreground/50 rounded-full absolute left-0" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === "security" && (
+                                <div className="space-y-8">
+                                    <h2 className="text-2xl font-bold flex items-center gap-3">
+                                        <Shield className="text-primary" /> Security & Account
+                                    </h2>
+
+                                    <div className="space-y-6">
+                                        <div className="p-6 bg-muted/20 rounded-2xl space-y-4">
+                                            <div className="flex items-start gap-4">
+                                                <Lock className="mt-1 text-primary" />
+                                                <div className="flex-1">
+                                                    <h4 className="font-bold">Password</h4>
+                                                    <p className="text-sm text-muted-foreground mb-4">Last changed 3 months ago</p>
+                                                    <button className="text-sm font-bold text-primary hover:underline">Change Password</button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="p-6 border-2 border-dashed border-rose-500/20 bg-rose-500/5 rounded-2xl space-y-6">
+                                            <h4 className="font-bold text-rose-600 flex items-center gap-2">
+                                                <Trash2 size={18} /> Danger Zone
+                                            </h4>
+
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="font-bold text-sm">Reset Progress</p>
+                                                    <p className="text-xs text-muted-foreground">Clear all XP and stats</p>
+                                                </div>
+                                                <button onClick={handleReset} className="px-4 py-2 bg-rose-500/10 text-rose-600 rounded-lg text-xs font-bold hover:bg-rose-500/20">
+                                                    Reset
+                                                </button>
+                                            </div>
+
+                                            <div className="flex items-center justify-between border-t border-rose-500/10 pt-4">
+                                                <div>
+                                                    <p className="font-bold text-sm">Sign Out</p>
+                                                    <p className="text-xs text-muted-foreground">Log out of this device</p>
+                                                </div>
+                                                <button onClick={() => signOut()} className="px-4 py-2 text-rose-600 rounded-lg text-xs font-bold hover:bg-rose-500/10 border border-rose-500/20">
+                                                    Sign Out
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </motion.div>
+                    </AnimatePresence>
                 </div>
             </div>
         </div>

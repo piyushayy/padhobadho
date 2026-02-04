@@ -16,7 +16,11 @@ export default async function SubjectsPage() {
         orderBy: { name: "asc" }
     })
 
+    const courses = await prisma.course.findMany({
+        orderBy: { name: "asc" }
+    })
+
     return (
-        <SubjectListClient initialSubjects={subjects as any} />
+        <SubjectListClient initialSubjects={subjects as any} courses={courses} />
     )
 }

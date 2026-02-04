@@ -1,35 +1,37 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
+    const baseUrl = 'https://padhobadho.com'
+
     return [
         {
-            url: 'https://padhobadho.com',
+            url: baseUrl,
             lastModified: new Date(),
-            changeFrequency: 'yearly',
+            changeFrequency: 'daily',
             priority: 1,
         },
         {
-            url: 'https://padhobadho.com/about',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.8,
-        },
-        {
-            url: 'https://padhobadho.com/practice',
+            url: `${baseUrl}/practice`,
             lastModified: new Date(),
             changeFrequency: 'weekly',
             priority: 0.8,
         },
         {
-            url: 'https://padhobadho.com/auth/sign-in',
+            url: `${baseUrl}/mock-test`,
             lastModified: new Date(),
-            changeFrequency: 'yearly',
+            changeFrequency: 'weekly',
+            priority: 0.8,
+        },
+        {
+            url: `${baseUrl}/auth/sign-in`,
+            lastModified: new Date(),
+            changeFrequency: 'monthly',
             priority: 0.5,
         },
         {
-            url: 'https://padhobadho.com/auth/sign-up',
+            url: `${baseUrl}/auth/sign-up`,
             lastModified: new Date(),
-            changeFrequency: 'yearly',
+            changeFrequency: 'monthly',
             priority: 0.5,
         },
     ]

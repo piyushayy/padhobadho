@@ -24,9 +24,14 @@ model User {
   onboardingCompleted Boolean                  @default(false)
   dailyGoal           Int                      @default(20)
   stream              String?
-  targetCourse        String?
+  // targetCourse was a string, we will keep it for legacy/display but use relation for logic if needed
+  targetCourse        String?                  
   targetUniversity    String?
   targetExamId        String?
+
+  // New Relation
+  courseId            String?
+  selectedCourse      Course?                  @relation(fields: [courseId], references: [id])
 
   // Gamification
   xp                  Int                      @default(0)
@@ -96,6 +101,16 @@ model Exam {
   users       User[]
 }
 
+model Course {
+  id          String    @id @default(cuid())
+  name        String    @unique // e.g. "Science Stream", "Commerce", "B.A. English Hons"
+  description String?
+  subjects    Subject[] @relation("CourseToSubject")
+  users       User[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
 model Subject {
   id                   String                   @id @default(cuid())
   name                 String                   @unique
@@ -109,6 +124,7 @@ model Subject {
   resources            Resource[]
   students             User[]                   @relation("SubjectToUser")
   exams                Exam[]                   @relation("ExamToSubject")
+  courses              Course[]                 @relation("CourseToSubject")
 }
 
 model Topic {

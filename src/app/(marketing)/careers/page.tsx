@@ -7,16 +7,6 @@ export default async function CareersPage() {
 
     return (
         <div className="min-h-screen bg-background">
-            <header className="h-20 border-b flex items-center px-6 glass sticky top-0 z-50">
-                <Link href="/" className="text-2xl font-serif font-black text-primary">
-                    padhobadho
-                </Link>
-                <div className="ml-auto">
-                    <Link href="/" className="flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors">
-                        <ArrowLeft size={16} /> Back to Home
-                    </Link>
-                </div>
-            </header>
 
             <main className="container mx-auto px-6 py-24 max-w-5xl">
                 <div className="text-center mb-20 space-y-4">

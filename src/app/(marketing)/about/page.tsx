@@ -3,12 +3,6 @@ import Link from "next/link";
 export default function AboutPage() {
     return (
         <div className="min-h-screen bg-background">
-            {/* Header */}
-            <header className="h-20 border-b flex items-center px-6 glass sticky top-0 z-50">
-                <Link href="/" className="text-2xl font-serif font-black text-primary">
-                    padhobadho
-                </Link>
-            </header>
 
             {/* Main */}
             <main className="container mx-auto px-6 py-24 max-w-3xl">

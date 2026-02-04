@@ -26,8 +26,9 @@ export default function StatsGrid({ examReadiness, totalAttempted, totalSessions
                     key={i}
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
+                    whileHover={{ y: -5, borderColor: "var(--primary)" }}
                     transition={{ delay: 0.2 + (i * 0.1) }}
-                    className="brilliant-card bg-card p-8 flex flex-col justify-between group h-full"
+                    className="brilliant-card bg-card p-8 flex flex-col justify-between group h-full border border-border hover:shadow-xl transition-all"
                 >
                     <div className="flex items-center justify-between mb-6">
                         <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{stat.label}</span>

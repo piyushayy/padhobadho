@@ -28,7 +28,7 @@ export default function DashboardHero({ examCode, targetUniversity, totalAttempt
                         y: [0, -30, 0]
                     }}
                     transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute -top-[20%] -right-[10%] w-[60%] h-[80%] bg-primary/20 blur-[120px] rounded-full"
+                    className="absolute -top-[20%] -right-[10%] w-[60%] h-[80%] bg-primary/20 blur-[120px] rounded-full will-change-transform"
                 />
                 <motion.div
                     animate={{
@@ -38,7 +38,7 @@ export default function DashboardHero({ examCode, targetUniversity, totalAttempt
                         y: [0, 40, 0]
                     }}
                     transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute -bottom-[20%] -left-[10%] w-[50%] h-[70%] bg-blue-500/10 blur-[100px] rounded-full"
+                    className="absolute -bottom-[20%] -left-[10%] w-[50%] h-[70%] bg-blue-500/10 blur-[100px] rounded-full will-change-transform"
                 />
             </div>
 

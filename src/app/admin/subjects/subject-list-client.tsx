@@ -19,10 +19,11 @@ interface Subject {
     _count: { questions: number }
 }
 
-export default function SubjectListClient({ initialSubjects }: { initialSubjects: Subject[] }) {
+export default function SubjectListClient({ initialSubjects, courses }: { initialSubjects: Subject[], courses: any[] }) {
     const [subjects, setSubjects] = useState(initialSubjects)
     const [isAddingSubject, setIsAddingSubject] = useState(false)
     const [newSubject, setNewSubject] = useState({ name: "", description: "" })
+    const [newSubjectCourses, setNewSubjectCourses] = useState<string[]>([])
 
     const [activeSubjectForTopic, setActiveSubjectForTopic] = useState<string | null>(null)
     const [newTopicName, setNewTopicName] = useState("")
@@ -30,10 +31,11 @@ export default function SubjectListClient({ initialSubjects }: { initialSubjects
     const handleAddSubject = async (e: React.FormEvent) => {
         e.preventDefault()
         try {
-            const res = await createSubject(newSubject)
+            const res = await createSubject({ ...newSubject, courseIds: newSubjectCourses })
             setSubjects([...subjects, { ...res, topics: [], _count: { questions: 0 } } as any])
             setIsAddingSubject(false)
             setNewSubject({ name: "", description: "" })
+            setNewSubjectCourses([])
             toast.success("Subject added!")
         } catch (err) {
             toast.error("Failed to add subject")
@@ -120,6 +122,28 @@ export default function SubjectListClient({ initialSubjects }: { initialSubjects
                                     onChange={e => setNewSubject({ ...newSubject, description: e.target.value })}
                                     placeholder="Brief overview..."
                                 />
+                            </div>
+                            <div className="col-span-1 md:col-span-2 space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Assign Courses</label>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    {courses.map(course => (
+                                        <label key={course.id} className="flex items-center gap-2 p-3 border rounded-xl cursor-pointer hover:bg-muted/50 transition-colors">
+                                            <input
+                                                type="checkbox"
+                                                className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                                checked={newSubjectCourses.includes(course.id)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setNewSubjectCourses([...newSubjectCourses, course.id])
+                                                    } else {
+                                                        setNewSubjectCourses(newSubjectCourses.filter(id => id !== course.id))
+                                                    }
+                                                }}
+                                            />
+                                            <span className="text-sm font-bold">{course.name}</span>
+                                        </label>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                         <button className="w-full h-16 bg-primary text-white rounded-2xl font-black text-xl hover:opacity-90 transition-all shadow-lg shadow-primary/20">

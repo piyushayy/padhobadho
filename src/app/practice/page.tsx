@@ -3,9 +3,11 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { ArrowRight, Sparkles, BookOpen, BrainCircuit } from "lucide-react"
+import { ArrowRight, Sparkles, BookOpen, BrainCircuit, RotateCcw } from "lucide-react"
 import { PracticeSkeleton } from "@/components/skeletons"
 import AppLayout from "@/components/app-layout"
+import CourseSelector from "@/components/practice/course-selector"
+import { updateUserCourse } from "@/actions/user-course"
 
 async function PracticeSelectionContent() {
     const session = await auth()
@@ -13,13 +15,20 @@ async function PracticeSelectionContent() {
 
     const user = await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { targetExamId: true }
+        select: { courseId: true, selectedCourse: true }
     })
 
+    // If user hasn't selected a course, show the selector
+    if (!user?.courseId) {
+        const courses = await prisma.course.findMany({ orderBy: { name: "asc" } })
+        return <CourseSelector courses={courses} />
+    }
+
+    // Fetch subjects linked to the selected course
     const subjects = await prisma.subject.findMany({
         where: {
-            exams: {
-                some: { id: user?.targetExamId || "" }
+            courses: {
+                some: { id: user.courseId }
             }
         },
         include: {
@@ -31,25 +40,37 @@ async function PracticeSelectionContent() {
 
     return (
         <div className="space-y-16 animate-in fade-in duration-700">
-            <div className="text-center space-y-6">
-                <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest">
-                    <Sparkles className="w-4 h-4" /> New adaptive trial available
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border/40 pb-8">
+                <div className="space-y-4">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest">
+                        <Sparkles className="w-3 h-3" /> Targeted Practice
+                    </div>
+                    <div>
+                        <h2 className="text-4xl md:text-5xl font-serif font-black tracking-tight text-foreground leading-[1.1] mb-2">
+                            {user.selectedCourse?.name || "Your Course"}
+                        </h2>
+                        <p className="text-lg text-muted-foreground font-medium">
+                            Master the subjects required for your goal.
+                        </p>
+                    </div>
                 </div>
-                <h2 className="text-5xl md:text-6xl font-serif font-black tracking-tight text-foreground leading-[1.1]">
-                    What do you want to <br />
-                    <span className="text-primary italic">master</span> today?
-                </h2>
-                <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium">
-                    Choose a subject to start a 15-question adaptive practice session.
-                </p>
+
+                <form action={async () => {
+                    "use server"
+                    await updateUserCourse("") // Reset course
+                }}>
+                    <button className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
+                        <RotateCcw size={14} /> Change Course
+                    </button>
+                </form>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {subjects.length === 0 ? (
                     <div className="col-span-full py-24 border-2 border-dashed border-border rounded-[3rem] text-center bg-accent/20">
                         <BookOpen className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-6 opacity-40 text-muted-foreground" />
-                        <p className="font-bold text-muted-foreground">No subjects added yet.</p>
-                        <p className="text-sm text-muted-foreground mt-2">Contact admin to populate the question bank.</p>
+                        <p className="font-bold text-muted-foreground">No subjects found for this course.</p>
+                        <p className="text-sm text-muted-foreground mt-2">Subjects are being mapped by the admin.</p>
                     </div>
                 ) : (
                     subjects.map((subject) => (

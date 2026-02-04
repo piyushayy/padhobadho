@@ -10,25 +10,25 @@ const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
   title: {
-    default: "padhobadho | Precision Exam Preparation Ecosystem",
+    default: "padhobadho | Master Your CUET Journey",
     template: "%s | padhobadho"
   },
-  description: "The premium AI-driven platform for CAT, GATE, NDA, and CUET aspirants. Practice with precision, track your mastery, and conquer your career goals with luxury engineering.",
-  keywords: ["CAT 2026", "GATE Prep", "NDA Exam", "CUET 2026", "Competitive Exam Practice", "Mock Tests", "Study Material", "Elite Education"],
+  description: "The premium AI-driven platform for CUET aspirants. Personalized practice, smart analytics, and adaptive learning to secure your dream college.",
+  keywords: ["CUET 2026", "CUET Prep", "Common University Entrance Test", "CUET Mock Tests", "CUET Practice", "Study Material", "College Admission"],
   authors: [{ name: "padhobadho Team" }],
   creator: "padhobadho",
   openGraph: {
     type: "website",
     locale: "en_IN",
     url: "https://padhobadho.com",
-    title: "padhobadho | Excellence in Exam Preparation",
-    description: "Padhega India. Badhega India. Personalized AI-powered practice for CAT, GATE, NDA, and CUET. Join the Elite.",
+    title: "padhobadho | Master Your CUET Journey",
+    description: "Padhega India. Badhega India. Personalized AI-powered practice for CUET. Secure your dream college today.",
     siteName: "padhobadho",
   },
   twitter: {
     card: "summary_large_image",
-    title: "padhobadho | Excellence in Exam Preparation",
-    description: "Personalized AI-powered practice for tier-1 competitive exams.",
+    title: "padhobadho | Master Your CUET Journey",
+    description: "Personalized AI-powered practice for CUET. Secure your dream college today.",
     creator: "@padhobadho",
   },
   robots: {

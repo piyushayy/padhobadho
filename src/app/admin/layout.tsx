@@ -64,6 +64,11 @@ export default async function AdminLayout({
                             <FileUp className="w-5 h-5" /> CSV Upload Questions
                         </div>
                     </Link>
+                    <Link href="/admin/courses" className="flex items-center justify-between px-4 py-3.5 text-muted-foreground hover:bg-muted rounded-2xl font-semibold transition-all hover:text-foreground">
+                        <div className="flex items-center gap-3">
+                            <Library className="w-5 h-5" /> Courses
+                        </div>
+                    </Link>
                     <Link href="/admin/careers" className="flex items-center justify-between px-4 py-3.5 text-muted-foreground hover:bg-muted rounded-2xl font-semibold transition-all hover:text-foreground">
                         <div className="flex items-center gap-3">
                             <Briefcase className="w-5 h-5" /> Careers

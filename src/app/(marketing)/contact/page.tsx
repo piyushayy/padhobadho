@@ -4,9 +4,6 @@ import { Mail, MessageSquare, MapPin, Send } from "lucide-react";
 export default function ContactPage() {
     return (
         <div className="min-h-screen bg-background">
-            <header className="h-20 border-b flex items-center px-6 glass sticky top-0 z-50">
-                <Link href="/" className="text-2xl font-serif font-black text-primary">padhobadho</Link>
-            </header>
             <main className="container mx-auto px-6 py-24 max-w-5xl">
                 <div className="text-center mb-20 space-y-4">
                     <h1 className="text-5xl md:text-7xl font-serif font-black tracking-tight">Let's Connect.</h1>

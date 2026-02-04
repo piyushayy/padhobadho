@@ -1,9 +1,8 @@
 import { prisma } from "@/lib/prisma"
-import ExamSwitcher from "@/components/exam-switcher"
 import Link from "next/link"
-import { LayoutDashboard, BookOpen, Trophy, Zap, Star, Check, Library } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { LayoutDashboard, BookOpen, Trophy, Zap, Star, Library } from "lucide-react"
 import { FeedbackWidget } from "@/components/feedback-widget"
+import { AppHeader } from "@/components/app-header"
 
 export default async function AppLayout({ children, session }: { children: React.ReactNode, session: any }) {
     if (!session?.user?.id) {
@@ -58,24 +57,7 @@ export default async function AppLayout({ children, session }: { children: React
             {/* Main Content */}
             <main className="lg:ml-64">
                 {/* Header */}
-                <header className="sticky top-0 z-50 flex h-24 items-center justify-between border-b border-border/40 bg-background/80 px-10 backdrop-blur-3xl">
-                    <div className="flex items-center gap-8">
-                        <h1 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground/50 hidden md:block border-r border-border/50 pr-8">Student Portal</h1>
-                        <ExamSwitcher currentExam={user?.targetExam || null} allExams={allExams} />
-                    </div>
-                    <div className="flex items-center gap-6">
-                        <ThemeToggle />
-                        <Link href="/profile/settings" className="flex items-center gap-5 hover:bg-muted/50 p-2.5 rounded-[1.5rem] transition-all group">
-                            <div className="text-right hidden md:block">
-                                <p className="text-sm font-black tracking-tight">{userName}</p>
-                                <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Student</p>
-                            </div>
-                            <div className="h-12 w-12 rounded-2xl bg-foreground text-background flex items-center justify-center font-black text-xl relative group-hover:scale-105 transition-transform">
-                                {userInitials}
-                            </div>
-                        </Link>
-                    </div>
-                </header>
+                <AppHeader user={user} allExams={allExams} userName={userName} userInitials={userInitials} />
 
                 <div className="p-8 lg:p-12 space-y-12 max-w-7xl mx-auto">
                     {children}

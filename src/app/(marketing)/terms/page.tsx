@@ -3,9 +3,6 @@ import Link from "next/link";
 export default function TermsPage() {
     return (
         <div className="min-h-screen bg-background">
-            <header className="h-20 border-b flex items-center px-6 glass sticky top-0 z-50">
-                <Link href="/" className="text-2xl font-serif font-black text-primary">padhobadho</Link>
-            </header>
             <main className="container mx-auto px-6 py-24 max-w-3xl">
                 <h1 className="text-5xl font-serif font-black mb-8">Terms of Service</h1>
                 <div className="prose prose-lg dark:prose-invert space-y-8 text-muted-foreground leading-relaxed">
