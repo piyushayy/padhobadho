@@ -20,7 +20,6 @@ interface SettingsProps {
     user: {
         name: string | null
         email: string | null
-        username: string | null
         stream: string | null
         targetUniversity: string | null
         targetCourse: string | null
@@ -39,7 +38,6 @@ export default function SettingsClient({ user }: SettingsProps) {
 
     const [formData, setFormData] = useState({
         name: user.name || "",
-        username: user.username || "",
         stream: user.stream || "",
         targetUniversity: user.targetUniversity || "",
         targetCourse: user.targetCourse || "",
@@ -167,13 +165,6 @@ export default function SettingsClient({ user }: SettingsProps) {
                                         </div>
 
                                         <div className="space-y-6">
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Username</label>
-                                                <div className="w-full p-4 bg-muted/10 border border-transparent rounded-xl flex items-center gap-3 text-muted-foreground cursor-not-allowed">
-                                                    <span className="font-bold">@</span>
-                                                    <span className="font-medium">{user.username || "not set"}</span>
-                                                </div>
-                                            </div>
                                             <div className="space-y-2">
                                                 <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Full Name</label>
                                                 <input

@@ -13,7 +13,6 @@ export default async function SettingsPage() {
         select: {
             name: true,
             email: true,
-            username: true,
             stream: true,
             targetUniversity: true,
             targetCourse: true,

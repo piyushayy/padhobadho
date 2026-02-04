@@ -18,7 +18,6 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
         take: 20,
         select: {
             id: true,
-            username: true,
             name: true,
             image: true,
             xp: true,
@@ -40,7 +39,7 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
         return {
             rank: index + 1,
             userId: user.id,
-            name: (user.username && user.username.length > 0) ? `@${user.username}` : (user.name || "Anonymous Aspirant"),
+            name: user.name || "Anonymous Aspirant",
             image: user.image,
             score: user.xp,
             level: user.level,

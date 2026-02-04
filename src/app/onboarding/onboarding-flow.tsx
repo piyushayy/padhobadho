@@ -2,46 +2,22 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Sparkles, Loader2, User, School, Calendar, AtSign, Check, X, AlertCircle } from "lucide-react"
-import { submitOnboarding, checkUsername } from "@/actions/onboarding"
+import { Sparkles, Loader2, User, School, Calendar, AlertCircle } from "lucide-react"
+import { submitOnboarding } from "@/actions/onboarding"
 import { toast } from "sonner"
 
 export default function OnboardingFlow() {
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [isCheckingUsername, setIsCheckingUsername] = useState(false)
-    const [usernameStatus, setUsernameStatus] = useState<'idle' | 'available' | 'taken'>('idle')
     const [serverError, setServerError] = useState<string | null>(null)
 
     const [formData, setFormData] = useState({
         name: "",
-        username: "",
         age: "" as string | number,
         school: "",
     })
 
-    const handleUsernameChange = async (val: string) => {
-        const cleanVal = val.toLowerCase().replace(/[^a-z0-9_]/g, '')
-        setFormData(p => ({ ...p, username: cleanVal }))
-        setServerError(null)
-
-        if (cleanVal.length < 3) {
-            setUsernameStatus('idle')
-            return
-        }
-
-        setIsCheckingUsername(true)
-        try {
-            const taken = await checkUsername(cleanVal)
-            setUsernameStatus(taken ? 'taken' : 'available')
-        } catch (err) {
-            setUsernameStatus('idle')
-        } finally {
-            setIsCheckingUsername(false)
-        }
-    }
-
     async function handleComplete() {
-        if (!formData.name || !formData.username || !formData.age || !formData.school) {
+        if (!formData.name || !formData.age || !formData.school) {
             toast.error("Please complete all fields.")
             return
         }
@@ -111,29 +87,6 @@ export default function OnboardingFlow() {
 
                             <div className="space-y-2">
                                 <label className="text-xs uppercase font-black tracking-widest text-primary flex items-center gap-2">
-                                    <AtSign size={14} /> Unique Username
-                                </label>
-                                <div className="relative">
-                                    <input
-                                        placeholder="username"
-                                        value={formData.username}
-                                        onChange={(e) => handleUsernameChange(e.target.value)}
-                                        className={`w-full h-14 rounded-xl border-2 px-4 bg-background outline-none transition-all font-bold placeholder:font-normal ${usernameStatus === 'available' ? 'border-emerald-500 ring-4 ring-emerald-500/5' :
-                                                usernameStatus === 'taken' ? 'border-rose-500 ring-4 ring-rose-500/5' :
-                                                    'focus:border-primary'
-                                            }`}
-                                    />
-                                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                                        {isCheckingUsername ? <Loader2 size={16} className="animate-spin text-muted-foreground" /> :
-                                            usernameStatus === 'available' ? <Check size={16} className="text-emerald-500" /> :
-                                                usernameStatus === 'taken' ? <X size={16} className="text-rose-500" /> : null}
-                                    </div>
-                                </div>
-                                {usernameStatus === 'taken' && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-wider pl-1">This username is already taken</p>}
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-xs uppercase font-black tracking-widest text-primary flex items-center gap-2">
                                     <Calendar size={14} /> Your Age
                                 </label>
                                 <input
@@ -148,7 +101,7 @@ export default function OnboardingFlow() {
                                 />
                             </div>
 
-                            <div className="space-y-2">
+                            <div className="space-y-2 md:col-span-2">
                                 <label className="text-xs uppercase font-black tracking-widest text-primary flex items-center gap-2">
                                     <School size={14} /> School Name
                                 </label>
@@ -166,7 +119,7 @@ export default function OnboardingFlow() {
 
                         <div className="flex flex-col items-center gap-6 pt-4">
                             <button
-                                disabled={!formData.name || !formData.username || !formData.age || !formData.school || usernameStatus !== 'available' || isSubmitting}
+                                disabled={!formData.name || !formData.age || !formData.school || isSubmitting}
                                 onClick={handleComplete}
                                 className="h-20 w-full rounded-full font-black text-2xl gap-3 shadow-2xl shadow-primary/20 bg-primary text-background flex items-center justify-center hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
                             >
