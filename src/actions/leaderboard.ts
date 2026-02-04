@@ -8,6 +8,7 @@ export async function getLeaderboard() {
         take: 20,
         select: {
             id: true,
+            username: true,
             name: true,
             image: true,
             xp: true,
@@ -29,7 +30,7 @@ export async function getLeaderboard() {
         return {
             rank: index + 1,
             userId: user.id,
-            name: user.name || "Anonymous Aspirant",
+            name: user.username || user.name || "Anonymous",
             image: user.image,
             score: user.xp,
             level: user.level,
