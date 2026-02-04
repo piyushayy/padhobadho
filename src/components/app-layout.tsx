@@ -4,6 +4,8 @@ import { LayoutDashboard, BookOpen, Trophy, Zap, Star, Library } from "lucide-re
 import { FeedbackWidget } from "@/components/feedback-widget"
 import { AppHeader } from "@/components/app-header"
 
+import { serialize } from "@/lib/utils"
+
 export default async function AppLayout({ children, session }: { children: React.ReactNode, session: any }) {
     if (!session?.user?.id) {
         return <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-8">
@@ -14,17 +16,27 @@ export default async function AppLayout({ children, session }: { children: React
         </div>
     }
 
-    const [user, allExams] = await Promise.all([
-        prisma.user.findUnique({
-            where: { id: session.user.id },
-            include: { targetExam: true }
-        }).catch(() => null),
-        prisma.exam.findMany({ orderBy: { code: "asc" } }).catch(() => [])
-    ])
+    let user: any = null
+    let allExams: any[] = []
 
-    // Sanitize data for client components (remove Date objects)
-    const sanitizedUser = user ? JSON.parse(JSON.stringify(user)) : null
-    const sanitizedExams = JSON.parse(JSON.stringify(allExams))
+    try {
+        const [userData, examsData] = await Promise.all([
+            prisma.user.findUnique({
+                where: { id: session.user.id },
+                include: { targetExam: true }
+            }),
+            prisma.exam.findMany({ orderBy: { code: "asc" } })
+        ])
+        user = userData
+        allExams = examsData || []
+    } catch (error) {
+        console.error("Critical: Admin Layout Data Fetch Failed", error)
+        // We allow the layout to render even if data fails, using defaults to prevent white screen
+    }
+
+    // Sanitize data for client components
+    const sanitizedUser = user ? serialize(user) : null
+    const sanitizedExams = serialize(allExams)
 
     const userName = session.user.name || "Student"
     const userInitials = userName[0]?.toUpperCase() || "S"
