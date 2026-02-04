@@ -38,12 +38,18 @@ export const {
     ],
     callbacks: {
         ...authConfig.callbacks,
+        async session({ session, token }) {
+            if (session.user) {
+                if (token.sub) session.user.id = token.sub;
+                if (token.role) session.user.role = token.role as "ADMIN" | "STUDENT";
+            }
+            return session;
+        },
         async jwt({ token, user, trigger, session }) {
             if (user) {
                 token.role = user.role
             }
 
-            // Always refresh role from DB if we have a sub
             if (token.sub) {
                 const existingUser = await prisma.user.findUnique({
                     where: { id: token.sub },
