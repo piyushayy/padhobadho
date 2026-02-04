@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { deleteUser } from "@/actions/admin"
+import { deleteUser, resetUserProgress } from "@/actions/admin"
 import { toast } from "sonner"
-import { Target, Trash2, Search, X } from "lucide-react"
+import { Target, Trash2, Search, X, RotateCcw } from "lucide-react"
 
 interface Student {
     id: string
@@ -35,6 +35,17 @@ export default function StudentListClient({ initialStudents }: { initialStudents
             toast.success("Student deleted")
         } catch (err) {
             toast.error("Failed to delete student")
+        }
+    }
+
+    const handleReset = async (id: string) => {
+        if (!confirm("Reset this student's progress? They will lose all solved questions and XP, but stay logged in.")) return
+        try {
+            await resetUserProgress(id)
+            setStudents(students.map(s => s.id === id ? { ...s, _count: { ...s._count, questionHistory: 0 } } : s))
+            toast.success("Progress reset")
+        } catch (err) {
+            toast.error("Failed to reset progress")
         }
     }
 
@@ -115,12 +126,22 @@ export default function StudentListClient({ initialStudents }: { initialStudents
                                             </div>
                                         </td>
                                         <td className="px-6 py-5 text-right">
-                                            <button
-                                                onClick={() => handleDelete(student.id)}
-                                                className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors border border-transparent hover:border-rose-500/20"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
+                                            <div className="flex items-center justify-end gap-2">
+                                                <button
+                                                    onClick={() => handleReset(student.id)}
+                                                    className="p-2 text-amber-500 hover:bg-amber-500/10 rounded-lg transition-colors border border-transparent hover:border-amber-500/20"
+                                                    title="Reset Progress"
+                                                >
+                                                    <RotateCcw size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(student.id)}
+                                                    className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors border border-transparent hover:border-rose-500/20"
+                                                    title="Delete User"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))

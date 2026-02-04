@@ -446,6 +446,40 @@ export async function deleteUser(id: string) {
     return { success: true }
 }
 
+export async function resetUserProgress(id: string) {
+    const session = await auth()
+    if (session?.user?.role !== "ADMIN") throw new Error("Unauthorized")
+
+    // Delete all progress related data
+    await prisma.userQuestionHistory.deleteMany({ where: { userId: id } })
+    await prisma.sessionQuestion.deleteMany({
+        where: {
+            OR: [
+                { practiceSession: { userId: id } },
+                { mockSession: { userId: id } }
+            ]
+        }
+    })
+    await prisma.practiceSession.deleteMany({ where: { userId: id } })
+    await prisma.mockSession.deleteMany({ where: { userId: id } })
+    await prisma.userPerformanceSummary.deleteMany({ where: { userId: id } })
+
+    // Reset stats on user object
+    await prisma.user.update({
+        where: { id },
+        data: {
+            xp: 0,
+            level: 1,
+            currentStreak: 0,
+            longestStreak: 0,
+            onboardingCompleted: true // Keep them onboarded
+        }
+    })
+
+    revalidatePath("/admin/students")
+    return { success: true }
+}
+
 export async function exportSubjectPopularityCSV() {
     const session = await auth()
     if (session?.user?.role !== "ADMIN") throw new Error("Unauthorized")
