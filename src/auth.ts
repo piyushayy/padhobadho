@@ -37,29 +37,23 @@ export const {
         }),
     ],
     callbacks: {
-        async session({ session, token }) {
-            if (token.sub && session.user) {
-                session.user.id = token.sub
+        ...authConfig.callbacks,
+        async jwt({ token, user, trigger, session }) {
+            if (user) {
+                token.role = user.role
             }
-            if (token.role && session.user) {
-                session.user.role = token.role as "ADMIN" | "STUDENT"
+
+            // Always refresh role from DB if we have a sub
+            if (token.sub) {
+                const existingUser = await prisma.user.findUnique({
+                    where: { id: token.sub },
+                    select: { role: true }
+                })
+                if (existingUser) {
+                    token.role = existingUser.role
+                }
             }
-            if (typeof token.isPremium === "boolean" && session.user) {
-                session.user.isPremium = token.isPremium
-            }
-            return session
-        },
-        async jwt({ token }) {
-            if (!token.sub) return token
 
-            const existingUser = await prisma.user.findUnique({
-                where: { id: token.sub },
-            })
-
-            if (!existingUser) return token
-
-            token.role = existingUser.role
-            token.isPremium = existingUser.isPremium
             return token
         },
     },

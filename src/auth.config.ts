@@ -18,12 +18,23 @@ export default {
     ],
     secret: process.env.AUTH_SECRET,
     callbacks: {
+        async session({ session, token }) {
+            if (token.role && session.user) {
+                session.user.role = token.role as "ADMIN" | "STUDENT"
+            }
+            return session
+        },
+        async jwt({ token, user }) {
+            if (user) {
+                token.role = user.role
+            }
+            return token
+        },
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user
             const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth")
             const isPublicRoute = ["/", "/about", "/contact", "/privacy-policy", "/terms-and-conditions"].includes(nextUrl.pathname)
             const isAuthRoute = ["/auth/sign-in", "/auth/sign-up", "/auth/forgot-password", "/auth/new-password", "/auth/verify"].includes(nextUrl.pathname)
-
             const isAdminRoute = nextUrl.pathname.startsWith("/admin")
 
             if (isApiAuthRoute) return true
@@ -35,7 +46,8 @@ export default {
                 return true
             }
 
-            if (!isLoggedIn && !isPublicRoute) {
+            if (!isLoggedIn) {
+                if (isPublicRoute) return true
                 return false
             }
 
