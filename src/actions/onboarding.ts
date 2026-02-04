@@ -23,7 +23,7 @@ export async function submitOnboarding(data: {
     username: string
     age: number
     school: string
-    stream: string
+    stream?: string
 }) {
     const session = await auth()
     if (!session?.user?.id) throw new Error("Authentication failed. Please sign in again.")
@@ -46,20 +46,17 @@ export async function submitOnboarding(data: {
         }
 
         // 3. Update User Profile
-        // We'll also set a default targetExamId if it's currently null, 
-        // to prevent dashboard crashes that expect an exam context.
         const currentUser = await prisma.user.findUnique({
             where: { id: session.user.id },
             select: { targetExamId: true }
         })
 
-        // Default to CUET if no exam is set
         const updateData: any = {
             name: data.name,
             username: data.username,
             age: data.age,
             school: data.school,
-            stream: data.stream,
+            stream: data.stream || null,
             onboardingCompleted: true,
         }
 
