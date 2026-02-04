@@ -73,7 +73,14 @@ async function DashboardContent() {
         })
     ])
 
-    if (!user?.onboardingCompleted) redirect("/onboarding")
+    if (!user) {
+        console.error("User record not found for session:", session.user.id)
+        redirect("/onboarding")
+    }
+
+    if (!user.onboardingCompleted) {
+        redirect("/onboarding")
+    }
 
     return (
         <div className="space-y-12 animate-in fade-in duration-700">
@@ -88,7 +95,7 @@ async function DashboardContent() {
                 totalAttempted={totalAttempted}
                 totalSessions={totalSessions}
                 solvedToday={solvedToday}
-                dailyGoal={user.dailyGoal || 20}
+                dailyGoal={user?.dailyGoal || 20}
             />
 
             {/* Subject & Progress Row */}
@@ -145,13 +152,13 @@ async function DashboardContent() {
                                 <h4 className="text-4xl font-serif font-black">Level {user?.level || 1}</h4>
                                 <div className="space-y-2 mt-6">
                                     <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-                                        <span>XP: {user?.xp || 0} ✨</span>
-                                        <span>{1000 - ((user?.xp || 0) % 1000)} to Level Up</span>
+                                        <span>XP: {user?.xp ?? 0} ✨</span>
+                                        <span>{1000 - ((user?.xp ?? 0) % 1000)} to Level Up</span>
                                     </div>
                                     <div className="h-1.5 bg-background/20 rounded-full overflow-hidden">
                                         <div
                                             className="h-full bg-background transition-all duration-1000"
-                                            style={{ width: `${((user?.xp || 0) % 1000) / 10}%` }}
+                                            style={{ width: `${((user?.xp ?? 0) % 1000) / 10}%` }}
                                         />
                                     </div>
                                 </div>

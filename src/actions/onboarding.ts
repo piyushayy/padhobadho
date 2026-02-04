@@ -26,14 +26,22 @@ export async function submitOnboarding(data: {
     stream?: string
 }) {
     const session = await auth()
-    if (!session?.user?.id) throw new Error("Authentication failed. Please sign in again.")
+    if (!session?.user?.id) {
+        throw new Error("Authentication failed. Please sign in again.")
+    }
 
-    // 1. Initial Name/Username validation
-    if (!data.username || data.username.length < 3) throw new Error("Username must be at least 3 characters.")
+    if (!data.username || data.username.length < 3) {
+        throw new Error("Username must be at least 3 characters.")
+    }
 
     try {
-        // 2. Double check username uniqueness (server-side)
-        const existing = await prisma.user.findFirst({
+        // 1. Check if user already exists
+        const existingUser = await prisma.user.findUnique({
+            where: { id: session.user.id }
+        })
+
+        // 2. Check if username is taken by ANOTHER user
+        const taken = await prisma.user.findFirst({
             where: {
                 username: { equals: data.username, mode: 'insensitive' },
                 id: { not: session.user.id }
@@ -41,38 +49,44 @@ export async function submitOnboarding(data: {
             select: { id: true }
         })
 
-        if (existing) {
+        if (taken) {
             throw new Error("This username is already taken. Please choose another one.")
         }
 
-        // 3. Update User Profile
-        const currentUser = await prisma.user.findUnique({
-            where: { id: session.user.id },
-            select: { targetExamId: true }
-        })
+        // 3. Find a default exam if none is set
+        let targetExamId = existingUser?.targetExamId
+        if (!targetExamId) {
+            const firstExam = await prisma.exam.findFirst({ select: { id: true } })
+            targetExamId = firstExam?.id || null
+        }
 
-        const updateData: any = {
+        const commonData = {
             name: data.name,
-            username: data.username,
+            username: data.username.toLowerCase(), // Store as lowercase for consistency
             age: data.age,
             school: data.school,
             stream: data.stream || null,
             onboardingCompleted: true,
+            targetExamId: targetExamId
         }
 
-        if (!currentUser?.targetExamId) {
-            const firstExam = await prisma.exam.findFirst({ select: { id: true } })
-            if (firstExam) {
-                updateData.targetExamId = firstExam.id
-            }
+        if (existingUser) {
+            await prisma.user.update({
+                where: { id: session.user.id },
+                data: commonData
+            })
+        } else {
+            // Social logins might not have created the user in DB yet if the sync lagged
+            await prisma.user.create({
+                data: {
+                    id: session.user.id,
+                    email: session.user.email,
+                    ...commonData
+                }
+            })
         }
 
-        await prisma.user.update({
-            where: { id: session.user.id },
-            data: updateData
-        })
-
-        console.log(`Onboarding completed for user: ${session.user.id}`)
+        console.log(`[ONBOARDING] Success for user: ${session.user.id} (@${data.username})`)
 
         revalidatePath("/")
         revalidatePath("/dashboard")
@@ -81,8 +95,8 @@ export async function submitOnboarding(data: {
     } catch (error: any) {
         console.error("Submit Onboarding Critical Error:", error)
         if (error.code === 'P2002') {
-            throw new Error("Username already exists in our system.")
+            throw new Error("Username already exists in our system. Please try a different one.")
         }
-        throw new Error(error.message || "Failed to save your profile. Internal Server Error.")
+        throw new Error(error.message || "Failed to save your profile. Please try again.")
     }
 }

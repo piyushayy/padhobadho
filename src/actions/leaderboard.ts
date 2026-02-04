@@ -19,7 +19,7 @@ export async function getLeaderboard() {
                     totalAttempted: true
                 }
             }
-        }
+        } as any
     })
 
     return users.map((user, index) => {

@@ -1,0 +1,1 @@
+id, name, email, username, phoneNumber, emailVerified, phoneVerified, image, password, role, isPremium, createdAt, updatedAt, onboardingCompleted, dailyGoal, age, school, stream, targetCourse, targetUniversity, targetExamId, courseId, xp, level, currentStreak, longestStreak, lastActiveDate
