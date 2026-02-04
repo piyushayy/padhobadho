@@ -20,7 +20,6 @@ interface SettingsProps {
     user: {
         name: string | null
         email: string | null
-        isPremium: boolean
         stream: string | null
         targetUniversity: string | null
         targetCourse: string | null
