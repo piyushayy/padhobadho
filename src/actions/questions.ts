@@ -82,12 +82,23 @@ export async function deleteQuestions(ids: string[]) {
     if (session?.user?.role !== "ADMIN") return { error: "Unauthorized" }
 
     try {
+        // 1. Cleanup dependencies
+        await prisma.userQuestionHistory.deleteMany({
+            where: { questionId: { in: ids } }
+        })
+        await prisma.sessionQuestion.deleteMany({
+            where: { questionId: { in: ids } }
+        })
+
+        // 2. Delete questions
         await prisma.question.deleteMany({
             where: { id: { in: ids } }
         })
+
         revalidatePath("/admin/questions")
         return { success: `Deleted ${ids.length} questions` }
     } catch (error) {
+        console.error("Delete Questions Error:", error)
         return { error: "Failed to delete questions" }
     }
 }
@@ -97,10 +108,17 @@ export async function deleteAllQuestions() {
     if (session?.user?.role !== "ADMIN") return { error: "Unauthorized" }
 
     try {
+        // 1. Cleanup all dependencies
+        await prisma.userQuestionHistory.deleteMany({})
+        await prisma.sessionQuestion.deleteMany({})
+
+        // 2. Delete all questions
         await prisma.question.deleteMany({})
+
         revalidatePath("/admin/questions")
         return { success: "All questions deleted successfully" }
     } catch (error) {
+        console.error("Delete All Questions Error:", error)
         return { error: "Failed to delete all questions" }
     }
 }

@@ -305,24 +305,103 @@ export async function deleteSubject(id: string) {
     const session = await auth()
     if (session?.user?.role !== "ADMIN") throw new Error("Unauthorized")
 
-    await prisma.subject.delete({
-        where: { id }
-    })
+    try {
+        // 1. Delete all dependencies for all questions in this subject
+        const questions = await prisma.question.findMany({
+            where: { subjectId: id },
+            select: { id: true }
+        })
+        const questionIds = questions.map(q => q.id)
 
-    revalidatePath("/admin/subjects")
-    return { success: true }
+        if (questionIds.length > 0) {
+            await prisma.userQuestionHistory.deleteMany({
+                where: { questionId: { in: questionIds } }
+            })
+            await prisma.sessionQuestion.deleteMany({
+                where: { questionId: { in: questionIds } }
+            })
+        }
+
+        // 2. Delete entries in UserPerformanceSummary
+        await prisma.userPerformanceSummary.deleteMany({
+            where: { subjectId: id }
+        })
+
+        // 3. Delete resources and topics
+        await prisma.resource.deleteMany({
+            where: { subjectId: id }
+        })
+
+        // 4. Delete sessions associated with the subject
+        await prisma.mockSession.deleteMany({
+            where: { subjectId: id }
+        })
+
+        await prisma.practiceSession.deleteMany({
+            where: { subjectId: id }
+        })
+
+        // 5. Delete questions and topics
+        await prisma.question.deleteMany({
+            where: { subjectId: id }
+        })
+        await prisma.topic.deleteMany({
+            where: { subjectId: id }
+        })
+
+        // 6. Finally delete the subject
+        await prisma.subject.delete({
+            where: { id }
+        })
+
+        revalidatePath("/admin/subjects")
+        revalidatePath("/practice")
+        revalidatePath("/dashboard")
+        return { success: true }
+    } catch (error: any) {
+        console.error("Delete Subject Error:", error)
+        throw new Error(`Failed to delete subject: ${error.message}`)
+    }
 }
 
 export async function deleteTopic(id: string) {
     const session = await auth()
     if (session?.user?.role !== "ADMIN") throw new Error("Unauthorized")
 
-    await prisma.topic.delete({
-        where: { id }
-    })
+    try {
+        // 1. Handle question dependencies first
+        const questions = await prisma.question.findMany({
+            where: { topicId: id },
+            select: { id: true }
+        })
+        const questionIds = questions.map(q => q.id)
 
-    revalidatePath("/admin/subjects")
-    return { success: true }
+        if (questionIds.length > 0) {
+            await prisma.userQuestionHistory.deleteMany({
+                where: { questionId: { in: questionIds } }
+            })
+            await prisma.sessionQuestion.deleteMany({
+                where: { questionId: { in: questionIds } }
+            })
+        }
+
+        // 2. Delete questions, resources, and finally topic
+        await prisma.question.deleteMany({
+            where: { topicId: id }
+        })
+        await prisma.resource.deleteMany({
+            where: { topicId: id }
+        })
+        await prisma.topic.delete({
+            where: { id }
+        })
+
+        revalidatePath("/admin/subjects")
+        return { success: true }
+    } catch (error: any) {
+        console.error("Delete Topic Error:", error)
+        throw new Error(`Failed to delete topic: ${error.message}`)
+    }
 }
 
 export async function createSubject(data: { name: string, description?: string, courseIds?: string[] }) {

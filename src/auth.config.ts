@@ -24,6 +24,8 @@ export default {
             const isPublicRoute = ["/", "/about", "/contact", "/privacy-policy", "/terms-and-conditions"].includes(nextUrl.pathname)
             const isAuthRoute = ["/auth/sign-in", "/auth/sign-up", "/auth/forgot-password", "/auth/new-password", "/auth/verify"].includes(nextUrl.pathname)
 
+            const isAdminRoute = nextUrl.pathname.startsWith("/admin")
+
             if (isApiAuthRoute) return true
 
             if (isAuthRoute) {
@@ -35,6 +37,10 @@ export default {
 
             if (!isLoggedIn && !isPublicRoute) {
                 return false
+            }
+
+            if (isAdminRoute && auth?.user?.role !== "ADMIN") {
+                return Response.redirect(new URL("/dashboard", nextUrl))
             }
 
             return true
