@@ -516,3 +516,26 @@ export async function exportAccuracyAnalyticsCSV() {
 
     return header + rows
 }
+
+export async function getFeedback() {
+    const session = await auth()
+    if (session?.user?.role !== "ADMIN") throw new Error("Unauthorized")
+
+    return await prisma.feedback.findMany({
+        include: {
+            user: {
+                select: { name: true, email: true, image: true }
+            }
+        },
+        orderBy: { createdAt: 'desc' }
+    })
+}
+
+export async function getContactSubmissions() {
+    const session = await auth()
+    if (session?.user?.role !== "ADMIN") throw new Error("Unauthorized")
+
+    return await prisma.contactSubmission.findMany({
+        orderBy: { createdAt: 'desc' }
+    })
+}
