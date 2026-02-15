@@ -26,10 +26,19 @@ export default async function AdminDonationsPage() {
                         </p>
                     </div>
 
-                    <div className="bg-muted p-4 rounded-xl space-y-2">
-                        <p className="text-xs font-bold uppercase text-muted-foreground">Active UPI ID</p>
-                        <div className="flex items-center gap-2 font-mono font-bold text-lg select-all">
-                            9205608772@ybl
+                    <div className="bg-muted p-4 rounded-xl space-y-4">
+                        <div>
+                            <p className="text-xs font-bold uppercase text-muted-foreground mb-2">Active UPI ID</p>
+                            <div className="flex items-center gap-2 font-mono font-bold text-lg select-all bg-background border border-border p-3 rounded-lg">
+                                piyushkaushik121@oksbi
+                            </div>
+                        </div>
+
+                        <div>
+                            <p className="text-xs font-bold uppercase text-muted-foreground mb-2">QR Code Preview</p>
+                            <div className="w-32 h-32 bg-white rounded-lg border border-border p-2 flex items-center justify-center">
+                                <img src="/upi-qr.png" alt="QR" className="w-full h-full object-contain" />
+                            </div>
                         </div>
                     </div>
 

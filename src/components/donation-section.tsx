@@ -6,7 +6,7 @@ import { toast } from "sonner"
 
 export function DonationSection() {
     const [copied, setCopied] = useState(false)
-    const upiId = "piyushkaushik121@okicici" // Replace with actual UPI ID if different
+    const upiId = "piyushkaushik121@oksbi"
 
     const handleCopy = () => {
         navigator.clipboard.writeText(upiId)
@@ -33,14 +33,26 @@ export function DonationSection() {
 
                     <div className="p-8 relative z-10">
                         <div className="mb-6 flex flex-col items-center">
-                            <div className="w-20 h-20 bg-background rounded-2xl flex items-center justify-center shadow-inner mb-4 border border-border">
-                                <QrCode className="w-10 h-10 text-foreground/80" />
+                            {/* QR Code container - User should add public/upi-qr.png */}
+                            <div className="w-48 h-48 bg-white rounded-2xl flex items-center justify-center shadow-inner mb-6 border border-border p-2">
+                                <img
+                                    src="/upi-qr.png"
+                                    alt="UPI QR Code"
+                                    className="w-full h-full object-contain"
+                                    onError={(e) => {
+                                        // Fallback if image doesn't exist
+                                        e.currentTarget.style.display = 'none';
+                                        e.currentTarget.parentElement?.classList.add('hidden');
+                                    }}
+                                />
+                                {/* Fallback icon if image fails to load (script handles hiding image) */}
+                                <QrCode className="w-10 h-10 text-foreground/80 hidden" />
                             </div>
-                            <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Direct UPI Transfer</p>
+                            <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Scan to Donate</p>
                         </div>
 
                         <div className="flex items-center gap-2 bg-background border border-border p-2 pr-2 pl-4 rounded-xl shadow-sm mb-6">
-                            <code className="text-lg font-mono font-bold text-foreground flex-1 text-center truncate">
+                            <code className="text-lg font-mono font-bold text-foreground flex-1 text-center truncate select-all">
                                 {upiId}
                             </code>
                             <button
