@@ -1,7 +1,7 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { LayoutDashboard, BookOpen, Layers, PlusCircle, LogOut, ShieldCheck, ChevronRight, Library, Briefcase, FileUp } from "lucide-react"
+import { LayoutDashboard, BookOpen, Layers, PlusCircle, LogOut, ShieldCheck, ChevronRight, Library, Briefcase, FileUp, DollarSign, MessageSquare } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 export default async function AdminLayout({
@@ -72,6 +72,16 @@ export default async function AdminLayout({
                     <Link href="/admin/careers" className="flex items-center justify-between px-4 py-3.5 text-muted-foreground hover:bg-muted rounded-2xl font-semibold transition-all hover:text-foreground">
                         <div className="flex items-center gap-3">
                             <Briefcase className="w-5 h-5" /> Careers
+                        </div>
+                    </Link>
+                    <Link href="/admin/donations" className="flex items-center justify-between px-4 py-3.5 text-muted-foreground hover:bg-muted rounded-2xl font-semibold transition-all hover:text-foreground">
+                        <div className="flex items-center gap-3">
+                            <DollarSign className="w-5 h-5" /> Donations
+                        </div>
+                    </Link>
+                    <Link href="/admin/feedback" className="flex items-center justify-between px-4 py-3.5 text-muted-foreground hover:bg-muted rounded-2xl font-semibold transition-all hover:text-foreground">
+                        <div className="flex items-center gap-3">
+                            <MessageSquare className="w-5 h-5" /> Feedback
                         </div>
                     </Link>
                 </nav>
