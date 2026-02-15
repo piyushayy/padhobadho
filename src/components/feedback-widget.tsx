@@ -80,6 +80,16 @@ export function FeedbackWidget() {
                                 />
                             </div>
 
+                            {/* Honeypot field */}
+                            <div className="hidden" aria-hidden="true">
+                                <input
+                                    type="text"
+                                    name="website"
+                                    tabIndex={-1}
+                                    autoComplete="off"
+                                />
+                            </div>
+
                             <div className="pt-2 flex justify-end">
                                 <button
                                     type="submit"

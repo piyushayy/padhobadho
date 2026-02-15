@@ -13,6 +13,7 @@ export const metadata: Metadata = {
     default: "padhobadho | Master Your CUET Journey",
     template: "%s | padhobadho"
   },
+  metadataBase: new URL('https://padhobadho.com'),
   description: "The premium AI-driven platform for CUET aspirants. Personalized practice, smart analytics, and adaptive learning to secure your dream college.",
   keywords: ["CUET 2026", "CUET Prep", "Common University Entrance Test", "CUET Mock Tests", "CUET Practice", "Study Material", "College Admission"],
   authors: [{ name: "padhobadho Team" }],

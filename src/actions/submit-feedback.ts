@@ -24,6 +24,11 @@ export async function submitFeedback(formData: FormData) {
         type: formData.get("type") ?? "GENERAL",
     }
 
+    // 🛡️ Honeypot Check
+    if (formData.get("website")) {
+        return { error: "Spam detected." }
+    }
+
     const result = feedbackSchema.safeParse(rawData)
 
     // ✅ FIX: use `issues` instead of `errors`

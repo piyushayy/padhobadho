@@ -1,256 +1,204 @@
-import { Suspense } from "react"
 import { auth } from "@/auth"
-import { redirect } from "next/navigation"
-import { Trophy, Medal, Star, TrendingUp, Shield } from "lucide-react"
-import { getLeaderboard } from "@/actions/leaderboard"
-import AppLayout from "@/components/app-layout"
-import { Skeleton } from "@/components/skeletons"
+import { prisma } from "@/lib/prisma"
+import { Metadata } from "next"
+import Image from "next/image"
+import { Crown, Trophy, Medal, Star } from "lucide-react"
 
-/* ----------------------------------
-   Helpers (CRITICAL FIX)
------------------------------------ */
-
-function getInitial(name: unknown) {
-    if (typeof name === "string" && name.length > 0) {
-        return name.charAt(0).toUpperCase()
-    }
-    return "?"
+export const metadata: Metadata = {
+    title: "Leaderboard | PadhoBadho",
+    description: "See the top performers on PadhoBadho."
 }
-
-function getName(name: unknown) {
-    if (typeof name === "string" && name.length > 0) {
-        return name
-    }
-    return "Anonymous"
-}
-
-/* ----------------------------------
-   Skeleton
------------------------------------ */
-
-function LeaderboardSkeleton() {
-    return (
-        <div className="space-y-12 animate-in fade-in duration-500">
-            <div className="text-center space-y-4">
-                <Skeleton className="h-10 w-64 mx-auto rounded-xl" />
-                <Skeleton className="h-4 w-96 mx-auto rounded-lg" />
-            </div>
-            <div className="brilliant-card bg-card p-0 overflow-hidden">
-                {[1, 2, 3, 4, 5].map(i => (
-                    <div
-                        key={i}
-                        className="p-8 border-b border-border flex items-center justify-between"
-                    >
-                        <div className="flex items-center gap-6">
-                            <Skeleton className="w-8 h-8 rounded-lg" />
-                            <Skeleton className="w-12 h-12 rounded-xl" />
-                            <Skeleton className="h-6 w-48" />
-                        </div>
-                        <Skeleton className="h-8 w-24 rounded-lg" />
-                    </div>
-                ))}
-            </div>
-        </div>
-    )
-}
-
-/* ----------------------------------
-   Content
------------------------------------ */
-
-async function LeaderboardContent() {
-    const leaderboard = await getLeaderboard()
-
-    return (
-        <div className="space-y-12 animate-in fade-in duration-700">
-            {/* Header */}
-            <div className="text-center space-y-4">
-                <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-primary/10 text-primary text-xs font-black uppercase tracking-widest">
-                    <Star className="w-4 h-4 fill-current" />
-                    Aspirant Elite
-                </div>
-                <h1 className="text-5xl font-serif font-black tracking-tight">
-                    Global Leaderboard
-                </h1>
-                <p className="text-muted-foreground font-medium text-lg mx-auto max-w-xl">
-                    Compete with the top ambitious aspirants across India. Your
-                    rank is updated after every practice session.
-                </p>
-            </div>
-
-            {/* ----------------------------------
-               Podium (Top 3)
-            ----------------------------------- */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-end pb-8">
-                {[1, 0, 2].map((index, i) => {
-                    const podiumUser = leaderboard[index]
-                    if (!podiumUser) return null
-
-                    const colors = [
-                        "bg-amber-500",
-                        "bg-slate-400",
-                        "bg-amber-700"
-                    ]
-
-                    return (
-                        <div
-                            key={i}
-                            className={`brilliant-card bg-card p-8 text-center flex flex-col items-center space-y-4 ${index === 0
-                                ? "scale-110 border-primary ring-4 ring-primary/10 -translate-y-4"
-                                : "opacity-80"
-                                }`}
-                        >
-                            <div
-                                className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-2 font-serif font-black text-2xl border-4 ${colors[podiumUser.rank - 1]} bg-background`}
-                            >
-                                {podiumUser.rank}
-                            </div>
-
-                            <div className="w-20 h-20 rounded-[2.5rem] bg-accent flex items-center justify-center font-black text-3xl border-2 border-border relative">
-                                {getInitial(podiumUser.name)}
-                                <div
-                                    className={`absolute -top-3 -right-3 w-8 h-8 rounded-full flex items-center justify-center text-background ${colors[podiumUser.rank - 1]}`}
-                                >
-                                    <Trophy size={16} strokeWidth={3} />
-                                </div>
-                            </div>
-
-                            <div>
-                                <h3 className="text-xl font-black truncate max-w-[150px]">
-                                    {getName(podiumUser.name)}
-                                </h3>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center justify-center gap-1">
-                                    <Shield size={10} /> Level {podiumUser.level}
-                                </p>
-                            </div>
-
-                            <div className="text-3xl font-serif font-black text-primary">
-                                {podiumUser.score.toLocaleString()}{" "}
-                                <span className="text-xs uppercase tracking-tighter">
-                                    XP
-                                </span>
-                            </div>
-                        </div>
-                    )
-                })}
-            </div>
-
-            {/* ----------------------------------
-               Table
-            ----------------------------------- */}
-            <div className="brilliant-card bg-card p-0 overflow-hidden shadow-2xl">
-                <div className="bg-foreground text-background p-6 flex items-center gap-2">
-                    <TrendingUp size={18} className="text-primary" />
-                    <span className="text-sm font-black uppercase tracking-widest">
-                        Rankings updated live
-                    </span>
-                </div>
-
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead>
-                            <tr className="border-b border-border text-left">
-                                <th className="p-8 text-[10px] font-black uppercase tracking-widest text-muted-foreground w-20">
-                                    Rank
-                                </th>
-                                <th className="p-8 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                                    Student
-                                </th>
-                                <th className="p-8 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-center">
-                                    Mastery
-                                </th>
-                                <th className="p-8 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-right font-serif">
-                                    Authority
-                                </th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {leaderboard.map(user => (
-                                <tr
-                                    key={user.userId}
-                                    className="border-b border-border last:border-none group hover:bg-accent/30 transition-colors"
-                                >
-                                    <td className="p-8">
-                                        <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-sm font-black group-hover:bg-primary group-hover:text-background transition-all">
-                                            {user.rank}
-                                        </div>
-                                    </td>
-
-                                    <td className="p-8">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center font-black relative">
-                                                {getInitial(user.name)}
-                                                {user.rank <= 3 && (
-                                                    <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
-                                                        <Star
-                                                            size={8}
-                                                            fill="white"
-                                                            className="text-white"
-                                                        />
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div>
-                                                <span className="font-bold text-lg block">
-                                                    {getName(user.name)}
-                                                </span>
-                                                <span className="text-[10px] font-black text-muted-foreground uppercase">
-                                                    Level {user.level} Scholar
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </td>
-
-                                    <td className="p-8 text-center">
-                                        <div className="inline-flex flex-col items-center">
-                                            <span className="text-xl font-serif font-black">
-                                                {user.accuracy}%
-                                            </span>
-                                            <div className="h-1 w-12 bg-muted rounded-full overflow-hidden mt-1">
-                                                <div
-                                                    className="h-full bg-primary"
-                                                    style={{
-                                                        width: `${user.accuracy}%`
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-                                    </td>
-
-                                    <td className="p-8 text-right">
-                                        <div className="inline-flex flex-col items-end">
-                                            <span className="text-2xl font-serif font-black text-primary">
-                                                {user.score.toLocaleString()}
-                                            </span>
-                                            <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">
-                                                Mastery XP
-                                            </span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    )
-}
-
-/* ----------------------------------
-   Page
------------------------------------ */
 
 export default async function LeaderboardPage() {
     const session = await auth()
-    if (!session) redirect("/auth/sign-in")
+    const currentUserId = session?.user?.id
+
+    const topUsers = await prisma.user.findMany({
+        orderBy: { xp: 'desc' },
+        take: 50,
+        select: {
+            id: true,
+            name: true,
+            image: true,
+            xp: true,
+            level: true,
+        }
+    })
+
+    // Find current user's rank if not in top 50, or just to know
+    let currentUserRank = -1
+    let currentUserData = null
+
+    if (currentUserId) {
+        const index = topUsers.findIndex(u => u.id === currentUserId)
+        if (index !== -1) {
+            currentUserRank = index + 1
+            currentUserData = topUsers[index]
+        } else {
+            // Fetch user rank if outside top 50
+            const user = await prisma.user.findUnique({
+                where: { id: currentUserId },
+                select: { xp: true, level: true, name: true, image: true }
+            })
+            if (user) {
+                const count = await prisma.user.count({
+                    where: { xp: { gt: user.xp } }
+                })
+                currentUserRank = count + 1
+                currentUserData = { ...user, id: currentUserId }
+            }
+        }
+    }
+
+    const topThree = topUsers.slice(0, 3)
+    const restUsers = topUsers.slice(3)
 
     return (
-        <AppLayout session={session}>
-            <Suspense fallback={<LeaderboardSkeleton />}>
-                <LeaderboardContent />
-            </Suspense>
-        </AppLayout>
+        <div className="min-h-screen bg-background pb-20">
+            {/* Header */}
+            <div className="bg-primary/5 border-b border-border py-12 text-center relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent opacity-60 pointer-events-none" />
+                <h1 className="text-4xl md:text-5xl font-serif font-black tracking-tight mb-4 relative z-10">Hall of Fame</h1>
+                <p className="text-muted-foreground font-medium max-w-lg mx-auto relative z-10">
+                    The most dedicated students on PadhoBadho. Keep learning to climb the ranks!
+                </p>
+            </div>
+
+            <main className="container mx-auto px-4 -mt-8 relative z-20 max-w-4xl">
+                {/* Top 3 Podium */}
+                <div className="flex flex-col md:flex-row justify-center items-end gap-4 mb-12">
+                    {/* 2nd Place */}
+                    {topThree[1] && (
+                        <div className="order-2 md:order-1 flex flex-col items-center">
+                            <div className="w-20 h-20 rounded-full border-4 border-slate-300 bg-card overflow-hidden relative shadow-lg mb-[-10px] z-10">
+                                <Image
+                                    src={topThree[1].image || "/placeholder-avatar.png"}
+                                    alt={topThree[1].name || "User"}
+                                    width={80}
+                                    height={80}
+                                    className="object-cover w-full h-full"
+                                />
+                            </div>
+                            <div className="bg-card w-32 h-32 rounded-t-2xl border border-border shadow-xl flex flex-col items-center justify-start pt-4 relative">
+                                <div className="absolute top-[-15px] bg-slate-300 text-slate-800 text-xs font-black px-2 py-0.5 rounded-full border border-slate-400">#2</div>
+                                <p className="font-bold text-sm text-center px-2 line-clamp-1">{topThree[1].name}</p>
+                                <p className="text-xs text-muted-foreground font-bold">{topThree[1].xp} XP</p>
+                                <Medal className="w-8 h-8 text-slate-300 mt-2 opacity-50" />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 1st Place */}
+                    {topThree[0] && (
+                        <div className="order-1 md:order-2 flex flex-col items-center">
+                            <div className="absolute -mt-10 animate-bounce">
+                                <Crown className="w-8 h-8 text-yellow-500 fill-yellow-500" />
+                            </div>
+                            <div className="w-24 h-24 rounded-full border-4 border-yellow-400 bg-card overflow-hidden relative shadow-lg shadow-yellow-500/20 mb-[-10px] z-10">
+                                <Image
+                                    src={topThree[0].image || "/placeholder-avatar.png"}
+                                    alt={topThree[0].name || "User"}
+                                    width={96}
+                                    height={96}
+                                    className="object-cover w-full h-full"
+                                />
+                            </div>
+                            <div className="bg-gradient-to-b from-yellow-50 via-card to-card w-40 h-40 rounded-t-2xl border border-yellow-200 shadow-2xl flex flex-col items-center justify-start pt-5 relative">
+                                <div className="absolute top-[-15px] bg-yellow-400 text-yellow-900 text-sm font-black px-3 py-0.5 rounded-full border border-yellow-500 shadow-sm">#1</div>
+                                <p className="font-bold text-base text-center px-2 line-clamp-1">{topThree[0].name}</p>
+                                <p className="text-sm text-yellow-600 font-black">{topThree[0].xp} XP</p>
+                                <Trophy className="w-10 h-10 text-yellow-400 mt-2" />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 3rd Place */}
+                    {topThree[2] && (
+                        <div className="order-3 md:order-3 flex flex-col items-center">
+                            <div className="w-20 h-20 rounded-full border-4 border-amber-600 bg-card overflow-hidden relative shadow-lg mb-[-10px] z-10">
+                                <Image
+                                    src={topThree[2].image || "/placeholder-avatar.png"}
+                                    alt={topThree[2].name || "User"}
+                                    width={80}
+                                    height={80}
+                                    className="object-cover w-full h-full"
+                                />
+                            </div>
+                            <div className="bg-card w-32 h-28 rounded-t-2xl border border-border shadow-xl flex flex-col items-center justify-start pt-4 relative">
+                                <div className="absolute top-[-15px] bg-amber-600 text-white text-xs font-black px-2 py-0.5 rounded-full border border-amber-700">#3</div>
+                                <p className="font-bold text-sm text-center px-2 line-clamp-1">{topThree[2].name}</p>
+                                <p className="text-xs text-muted-foreground font-bold">{topThree[2].xp} XP</p>
+                                <Medal className="w-8 h-8 text-amber-600 mt-2 opacity-50" />
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* List View */}
+                <div className="bg-card rounded-2xl border border-border shadow-xl overflow-hidden">
+                    <div className="grid grid-cols-12 gap-4 p-4 border-b border-border bg-muted/40 text-xs font-black uppercase text-muted-foreground tracking-widest">
+                        <div className="col-span-2 md:col-span-1 text-center">Rank</div>
+                        <div className="col-span-6 md:col-span-7">Student</div>
+                        <div className="col-span-2 md:col-span-2 text-right">XP</div>
+                        <div className="col-span-2 md:col-span-2 text-center">Level</div>
+                    </div>
+
+                    {restUsers.map((user, index) => (
+                        <div
+                            key={user.id}
+                            className={`grid grid-cols-12 gap-4 p-4 items-center border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors ${user.id === currentUserId ? 'bg-primary/5' : ''}`}
+                        >
+                            <div className="col-span-2 md:col-span-1 text-center font-black text-muted-foreground">
+                                #{index + 4}
+                            </div>
+                            <div className="col-span-6 md:col-span-7 flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-muted overflow-hidden">
+                                    {user.image ? (
+                                        <Image src={user.image} alt={user.name || "User"} width={32} height={32} />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary font-bold text-xs">
+                                            {user.name?.[0]}
+                                        </div>
+                                    )}
+                                </div>
+                                <span className={`font-semibold ${user.id === currentUserId ? 'text-primary' : ''}`}>
+                                    {user.name} {user.id === currentUserId && "(You)"}
+                                </span>
+                            </div>
+                            <div className="col-span-2 md:col-span-2 text-right font-bold font-mono text-foreground/80">
+                                {user.xp.toLocaleString()}
+                            </div>
+                            <div className="col-span-2 md:col-span-2 text-center">
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary text-secondary-foreground">
+                                    Lvl {user.level}
+                                </span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </main>
+
+            {/* Sticky Current User Rank (if not in view/top) */}
+            {currentUserId && currentUserData && (
+                <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-lg border-t border-border p-4 z-50">
+                    <div className="container mx-auto max-w-4xl flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="flex flex-col items-center">
+                                <span className="text-[10px] font-black uppercase text-muted-foreground">Your Rank</span>
+                                <span className="text-xl font-black text-primary">#{currentUserRank}</span>
+                            </div>
+                            <div className="hidden md:block w-px h-8 bg-border mx-2"></div>
+                            <div className="hidden md:flex flex-col">
+                                <span className="font-bold">{currentUserData.name}</span>
+                                <span className="text-xs text-muted-foreground">{currentUserData.xp.toLocaleString()} XP • Level {currentUserData.level}</span>
+                            </div>
+                        </div>
+                        <div className="text-sm font-medium text-muted-foreground">
+                            Top {(currentUserRank / (topUsers.length || 1) * 100).toFixed(0)}%
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     )
 }

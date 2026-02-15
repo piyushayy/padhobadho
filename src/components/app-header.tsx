@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { Menu, X, LayoutDashboard, BookOpen, Trophy, Zap, Library, Star } from "lucide-react"
+import { Menu, X, LayoutDashboard, BookOpen, Trophy, Zap, Library, Star, MessageSquare, Target } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import ExamSwitcher from "@/components/exam-switcher"
 import { motion, AnimatePresence } from "framer-motion"
@@ -77,12 +77,22 @@ export function AppHeader({ user, allExams, userName, userInitials }: AppHeaderP
                                 <NavLink href="/practice" icon={BookOpen} label="Practice" onClick={() => setIsMobileMenuOpen(false)} />
                                 <NavLink href="/mock-test" icon={Zap} label="Mock Tests" onClick={() => setIsMobileMenuOpen(false)} />
                                 <NavLink href="/resources" icon={Library} label="Library" onClick={() => setIsMobileMenuOpen(false)} />
+                                <NavLink href="/community" icon={MessageSquare} label="Community" onClick={() => setIsMobileMenuOpen(false)} />
                                 <NavLink href="/leaderboard" icon={Trophy} label="Ranking" onClick={() => setIsMobileMenuOpen(false)} />
+                                <NavLink href="/analytics" icon={Target} label="Analytics" onClick={() => setIsMobileMenuOpen(false)} />
                                 <NavLink href="/achievements" icon={Star} label="Badges" onClick={() => setIsMobileMenuOpen(false)} />
                             </nav>
 
                             <div className="mt-8 pt-8 border-t border-border">
                                 <div className="flex items-center justify-between">
+                                    <Link href="/practice" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                                        Practice
+                                    </Link>
+                                    <Link href="/leaderboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                                        Leaderboard
+                                    </Link>
+                                </div>
+                                <div className="flex items-center justify-between mt-4">
                                     <span className="text-sm font-medium text-muted-foreground">Theme</span>
                                     <ThemeToggle />
                                 </div>

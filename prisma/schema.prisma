@@ -52,6 +52,8 @@ model User {
   targetedSubjects    Subject[]                @relation("SubjectToUser")
   targetExam          Exam?                     @relation(fields: [targetExamId], references: [id])
   feedback            Feedback[]
+  discussions         Discussion[]
+  comments            Comment[]
 
   @@index([xp(sort: Desc)])
   @@index([role])
@@ -127,6 +129,7 @@ model Subject {
   students             User[]                   @relation("SubjectToUser")
   exams                Exam[]                   @relation("ExamToSubject")
   courses              Course[]                 @relation("CourseToSubject")
+  discussions          Discussion[]
 }
 
 model Topic {
@@ -298,4 +301,38 @@ enum VerificationType {
   EMAIL
   PHONE
   PASSWORD_RESET
+}
+
+model ContactSubmission {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+  status    String   @default("PENDING") // PENDING, REPLIED, ARCHIVED
+}
+
+model Discussion {
+  id        String    @id @default(cuid())
+  title     String
+  content   String
+  userId    String
+  subjectId String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  user      User      @relation(fields: [userId], references: [id])
+  subject   Subject?  @relation(fields: [subjectId], references: [id])
+  comments  Comment[]
+}
+
+model Comment {
+  id           String     @id @default(cuid())
+  content      String
+  userId       String
+  discussionId String
+  createdAt    DateTime   @default(now())
+  
+  user         User       @relation(fields: [userId], references: [id])
+  discussion   Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
 }

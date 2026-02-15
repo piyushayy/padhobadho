@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
-import { LayoutDashboard, BookOpen, Trophy, Zap, Star, Library } from "lucide-react"
+import { LayoutDashboard, BookOpen, Trophy, Zap, Star, Library, MessageSquare, Target } from "lucide-react"
 import { FeedbackWidget } from "@/components/feedback-widget"
 import { AppHeader } from "@/components/app-header"
 
@@ -58,8 +58,14 @@ export default async function AppLayout({ children, session }: { children: React
                     <Link href="/mock-test" className="flex items-center gap-4 rounded-[1.25rem] px-6 py-4 text-sm font-black uppercase tracking-[0.15em] text-muted-foreground/60 hover:bg-muted/50 hover:text-foreground transition-all">
                         <Zap size={18} strokeWidth={3} /> Mock Tests
                     </Link>
+                    <Link href="/analytics" className="flex items-center gap-4 rounded-[1.25rem] px-6 py-4 text-sm font-black uppercase tracking-[0.15em] text-muted-foreground/60 hover:bg-muted/50 hover:text-foreground transition-all">
+                        <Target size={18} strokeWidth={3} /> Analytics
+                    </Link>
                     <Link href="/resources" className="flex items-center gap-4 rounded-[1.25rem] px-6 py-4 text-sm font-black uppercase tracking-[0.15em] text-muted-foreground/60 hover:bg-muted/50 hover:text-foreground transition-all">
                         <Library size={18} strokeWidth={3} /> Library
+                    </Link>
+                    <Link href="/community" className="flex items-center gap-4 rounded-[1.25rem] px-6 py-4 text-sm font-black uppercase tracking-[0.15em] text-muted-foreground/60 hover:bg-muted/50 hover:text-foreground transition-all">
+                        <MessageSquare size={18} strokeWidth={3} /> Community
                     </Link>
                     <Link href="/leaderboard" className="flex items-center gap-4 rounded-[1.25rem] px-6 py-4 text-sm font-black uppercase tracking-[0.15em] text-muted-foreground/60 hover:bg-muted/50 hover:text-foreground transition-all">
                         <Trophy size={18} strokeWidth={3} /> Ranking

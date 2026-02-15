@@ -78,6 +78,16 @@ export default function SignUpPage() {
                             className="w-full h-12 rounded-lg border px-4 focus:ring-2 focus:ring-primary outline-none"
                         />
 
+                        {/* Honeypot field - invisible to real users */}
+                        <div style={{ opacity: 0, position: 'absolute', top: 0, left: 0, height: 0, width: 0, zIndex: -1 }}>
+                            <input
+                                type="text"
+                                name="confirm_email"
+                                tabIndex={-1}
+                                autoComplete="off"
+                            />
+                        </div>
+
                         <button
                             disabled={isLoading}
                             className="w-full h-12 bg-primary text-primary-foreground rounded-lg font-semibold flex items-center justify-center gap-2 hover:opacity-90"

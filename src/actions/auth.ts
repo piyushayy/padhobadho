@@ -44,6 +44,13 @@ export async function login(formData: FormData) {
 }
 
 export async function signUp(formData: FormData) {
+    // 🛡️ Honeypot Check
+    const honeypot = formData.get("confirm_email")
+    if (honeypot) {
+        // Silently fail or return an error. Returning error for now.
+        return { error: "Spam detected. Please try again." }
+    }
+
     const name = formData.get("name") as string
     const email = formData.get("email") as string
     const password = formData.get("password") as string
