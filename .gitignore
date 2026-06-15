@@ -60,3 +60,10 @@ keys*
 # neon directory
 .neon
 .neon/
+
+.neon
+make-admin.js
+seed-users.ts
+seed.ts
+scripts/
+next-env.d.ts
