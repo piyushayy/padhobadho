@@ -48,3 +48,15 @@ next-env.d.ts
 debug-*
 keys*
 
+# scripts and utility files
+/scripts/check-columns.ts
+/scripts/list-ids.ts
+/scripts/list-subjects.js
+/scripts/list-users.ts
+/scripts/verify-db.ts
+/seed-users.ts
+/make-admin.js
+
+# neon directory
+.neon
+.neon/
