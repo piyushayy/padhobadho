@@ -80,3 +80,26 @@ Open [http://localhost:3000](http://localhost:3000)
 ---
 
 ## Project Structure
+
+src/
+├── app/          # Next.js App Router pages
+├── components/   # Reusable UI components
+├── lib/          # Prisma client, auth config, utilities
+prisma/
+└── schema.prisma # Database schema
+---
+
+## Roadmap
+
+- [ ] Mock test series with timer
+- [ ] Detailed performance analytics
+- [ ] Subject-wise weak area detection
+- [ ] Leaderboard among friends
+- [ ] Mobile app (React Native)
+
+---
+
+## Author
+
+**Piyush** — MCA Student  
+[GitHub](https://github.com/piyushayy) · [padhobadho.in](https://www.padhobadho.in)
