@@ -25,6 +25,10 @@ who want more than static PDFs and YouTube playlists.
 - 👤 Onboarding flow with stream and target university selection
 - 🛡️ Role-based access (Student / Admin)
 - 📱 Responsive UI across devices
+<img width="1912" height="737" alt="image" src="https://github.com/user-attachments/assets/dbc4c770-03cb-48c3-8783-32c926fe13c5" />
+<img width="1893" height="718" alt="image" src="https://github.com/user-attachments/assets/a4e816f1-7e46-4390-a01d-9339b3c37c2c" />
+<img width="1891" height="845" alt="image" src="https://github.com/user-attachments/assets/111ebdc9-afa5-4ca2-9681-ae378bdbd57a" />
+<img width="1902" height="835" alt="image" src="https://github.com/user-attachments/assets/f541ed58-a727-4dae-bea8-058b7ca9d08e" />
 
 ---
 
