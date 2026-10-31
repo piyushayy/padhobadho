@@ -2,7 +2,8 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { Metadata } from "next"
 import Image from "next/image"
-import { Crown, Trophy, Medal, Star } from "lucide-react"
+import Link from "next/link"
+import { Crown, Trophy, Medal, Star, ArrowRight } from "lucide-react"
 
 export const metadata: Metadata = {
     title: "Leaderboard | PadhoBadho",
@@ -67,7 +68,23 @@ export default async function LeaderboardPage() {
             </div>
 
             <main className="container mx-auto px-4 -mt-8 relative z-20 max-w-4xl">
-                {/* Top 3 Podium */}
+                {topUsers.length === 0 ? (
+                    <div className="bg-card rounded-3xl border border-dashed border-border/80 p-12 text-center shadow-sm">
+                        <div className="w-16 h-16 rounded-3xl bg-yellow-400/10 text-yellow-500 flex items-center justify-center mx-auto mb-4">
+                            <Trophy className="w-8 h-8" />
+                        </div>
+                        <h2 className="text-2xl font-serif font-black mb-2">The Podium is Waiting</h2>
+                        <p className="text-muted-foreground max-w-md mx-auto mb-6 text-sm">
+                            No students have earned XP on this board yet. Complete your first practice drill and claim the #1 spot!
+                        </p>
+                        <Link href="/practice" className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-white font-bold text-sm shadow-lg shadow-primary/20 hover:scale-105 transition-all">
+                            <span>Start Practicing Now</span>
+                            <ArrowRight size={16} />
+                        </Link>
+                    </div>
+                ) : (
+                    <>
+                        {/* Top 3 Podium */}
                 <div className="flex flex-col md:flex-row justify-center items-end gap-4 mb-12">
                     {/* 2nd Place */}
                     {topThree[1] && (
@@ -178,6 +195,8 @@ export default async function LeaderboardPage() {
                         </div>
                     ))}
                 </div>
+                    </>
+                )}
             </main>
 
             {/* Sticky Current User Rank (if not in view/top) */}

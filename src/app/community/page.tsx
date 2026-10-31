@@ -53,7 +53,7 @@ export default async function CommunityPage() {
                         <div className="text-center py-20 bg-card rounded-2xl border border-dashed border-border">
                             <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
                             <h3 className="text-xl font-bold">No discussions yet</h3>
-                            <p className="text-muted-foreground">Be the first to start a conversation!</p>
+                            <p className="text-muted-foreground text-sm max-w-md mx-auto">Have a question about CUET, domain subjects, or exam prep strategies? Ask fellow aspirants and get answers fast.</p>
                         </div>
                     ) : (
                         discussions.map((discussion) => (

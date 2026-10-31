@@ -1,7 +1,8 @@
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
-import { TrendingUp, Clock, Target, Calendar, CheckCircle2 } from "lucide-react"
+import Link from "next/link"
+import { TrendingUp, Clock, Target, Calendar, CheckCircle2, ArrowRight, Sparkles, BookOpen } from "lucide-react"
 import dayjs from "dayjs"
 
 export const dynamic = "force-dynamic"
@@ -87,7 +88,17 @@ export default async function AnalyticsPage() {
                         </h2>
 
                         {performance.length === 0 ? (
-                            <p className="text-muted-foreground text-center py-10">No data available yet. Start practicing!</p>
+                            <div className="py-12 px-6 text-center border border-dashed border-border/80 rounded-2xl bg-muted/20">
+                                <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
+                                    <Target className="w-6 h-6" />
+                                </div>
+                                <h3 className="font-bold text-base mb-1">No Subject Mastery Data Yet</h3>
+                                <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-6">Complete your first chapter practice drill to see your accuracy breakdown and topic mastery curve.</p>
+                                <Link href="/practice" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold uppercase tracking-wider hover:bg-emerald-600 transition-all shadow-md shadow-primary/20">
+                                    <span>Start a Practice Drill</span>
+                                    <ArrowRight size={14} />
+                                </Link>
+                            </div>
                         ) : (
                             <div className="space-y-6">
                                 {performance.map((p) => (
@@ -99,7 +110,7 @@ export default async function AnalyticsPage() {
                                         <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
                                             <div
                                                 className={`h-full rounded-full transition-all duration-1000 ${p.totalAccuracy >= 80 ? 'bg-emerald-500' :
-                                                        p.totalAccuracy >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+                                                    p.totalAccuracy >= 50 ? 'bg-yellow-500' : 'bg-red-500'
                                                     }`}
                                                 style={{ width: `${p.totalAccuracy}%` }}
                                             />
@@ -117,7 +128,14 @@ export default async function AnalyticsPage() {
                         </h2>
 
                         {recentSessions.length === 0 ? (
-                            <p className="text-muted-foreground text-center py-10">No recent sessions.</p>
+                            <div className="py-10 px-4 text-center border border-dashed border-border/80 rounded-2xl bg-muted/20">
+                                <Clock className="w-8 h-8 text-muted-foreground/50 mx-auto mb-3" />
+                                <p className="text-sm font-semibold mb-1">No Recent Sessions</p>
+                                <p className="text-xs text-muted-foreground mb-4">Your completed drills and mock tests will appear here.</p>
+                                <Link href="/practice" className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline">
+                                    Practice Now <ArrowRight size={12} />
+                                </Link>
+                            </div>
                         ) : (
                             <div className="space-y-4">
                                 {recentSessions.map((session) => (

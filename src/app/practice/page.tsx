@@ -73,6 +73,14 @@ async function PracticeSelectionContent() {
                         <BookOpen className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-6 opacity-40 text-muted-foreground" />
                         <p className="font-bold text-muted-foreground">No subjects found for this course.</p>
                         <p className="text-sm text-muted-foreground mt-2">Subjects are being mapped by the admin.</p>
+                        <form action={async () => {
+                            "use server"
+                            await updateUserCourse("")
+                        }} className="mt-6">
+                            <button className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-white font-bold text-xs uppercase tracking-wider hover:bg-emerald-600 transition-all shadow-md shadow-primary/20">
+                                <RotateCcw size={14} /> Choose Another Course
+                            </button>
+                        </form>
                     </div>
                 ) : (
                     subjects.map((subject) => (
