@@ -36,9 +36,6 @@ export function SiteHeader() {
                             <Link href="/auth/sign-in" className="hover:text-primary transition-colors">
                                 Login
                             </Link>
-                            <Link href="/#donate" className="hover:text-primary transition-colors text-emerald-500">
-                                Donate
-                            </Link>
                         </nav>
 
                         <div className="hidden md:block">
@@ -77,7 +74,6 @@ export function SiteHeader() {
                                 <Link href="/about" onClick={() => setMenuOpen(false)}>About</Link>
                                 <Link href="/practice" onClick={() => setMenuOpen(false)}>Practice</Link>
                                 <Link href="/auth/sign-in" onClick={() => setMenuOpen(false)}>Login</Link>
-                                <Link href="/#donate" onClick={() => setMenuOpen(false)} className="text-emerald-500">Donate</Link>
                                 <Link href="/auth/sign-up" onClick={() => setMenuOpen(false)} className="text-primary">Get Started</Link>
                             </nav>
                         </motion.div>

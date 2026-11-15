@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { Menu, X, LayoutDashboard, BookOpen, Trophy, Zap, Library, Star, MessageSquare, Target, Heart } from "lucide-react"
+import { Menu, X, LayoutDashboard, BookOpen, Trophy, Zap, Library, Star, MessageSquare, Target } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import ExamSwitcher from "@/components/exam-switcher"
 import { motion, AnimatePresence } from "framer-motion"
@@ -81,7 +81,6 @@ export function AppHeader({ user, allExams, userName, userInitials }: AppHeaderP
                                 <NavLink href="/leaderboard" icon={Trophy} label="Ranking" onClick={() => setIsMobileMenuOpen(false)} />
                                 <NavLink href="/analytics" icon={Target} label="Analytics" onClick={() => setIsMobileMenuOpen(false)} />
                                 <NavLink href="/achievements" icon={Star} label="Badges" onClick={() => setIsMobileMenuOpen(false)} />
-                                <NavLink href="/#donate" icon={Heart} label="Donate" onClick={() => setIsMobileMenuOpen(false)} />
                             </nav>
 
                             <div className="mt-8 pt-8 border-t border-border">
@@ -91,9 +90,6 @@ export function AppHeader({ user, allExams, userName, userInitials }: AppHeaderP
                                     </Link>
                                     <Link href="/leaderboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                                         Leaderboard
-                                    </Link>
-                                    <Link href="/#donate" className="text-sm font-bold text-emerald-500 hover:text-emerald-600 transition-colors">
-                                        Donate
                                     </Link>
                                 </div>
                                 <div className="flex items-center justify-between mt-4">

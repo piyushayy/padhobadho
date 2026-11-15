@@ -3,7 +3,7 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { ArrowRight, Sparkles, BookOpen, BrainCircuit, RotateCcw } from "lucide-react"
+import { ArrowRight, Sparkles, BookOpen, BrainCircuit, RotateCcw, Flame } from "lucide-react"
 import { PracticeSkeleton } from "@/components/skeletons"
 import AppLayout from "@/components/app-layout"
 import CourseSelector from "@/components/practice/course-selector"
@@ -63,6 +63,41 @@ async function PracticeSelectionContent() {
                         <RotateCcw size={14} /> Change Course
                     </button>
                 </form>
+            </div>
+
+            {/* Habit & Revision Banners */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Link
+                    href="/practice/daily"
+                    className="p-5 rounded-2xl bg-card border border-border/80 hover:border-orange-500/50 transition-all flex items-center justify-between group shadow-sm"
+                >
+                    <div className="flex items-center gap-3.5">
+                        <div className="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
+                            <Flame className="w-5 h-5 fill-current" />
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-foreground text-sm group-hover:text-orange-500 transition-colors">Daily Challenge</h4>
+                            <p className="text-xs text-muted-foreground">Keep your streak alive · +50 XP</p>
+                        </div>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
+                </Link>
+
+                <Link
+                    href="/practice/mistakes"
+                    className="p-5 rounded-2xl bg-card border border-border/80 hover:border-rose-500/50 transition-all flex items-center justify-between group shadow-sm"
+                >
+                    <div className="flex items-center gap-3.5">
+                        <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center shrink-0">
+                            <RotateCcw className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-foreground text-sm group-hover:text-rose-500 transition-colors">Mistake Bank</h4>
+                            <p className="text-xs text-muted-foreground">Spaced repetition review drill</p>
+                        </div>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
+                </Link>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">

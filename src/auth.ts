@@ -66,6 +66,6 @@ export const {
     pages: {
         signIn: "/auth/sign-in",
     },
-    secret: process.env.AUTH_SECRET,
+    secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "padhobadho_local_dev_secret_key_8e7f9a12c4b56d3e8f01a7b9c2d3e4f5",
     trustHost: true,
 })

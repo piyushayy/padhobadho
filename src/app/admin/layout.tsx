@@ -74,11 +74,6 @@ export default async function AdminLayout({
                             <Briefcase className="w-5 h-5" /> Careers
                         </div>
                     </Link>
-                    <Link href="/admin/donations" className="flex items-center justify-between px-4 py-3.5 text-muted-foreground hover:bg-muted rounded-2xl font-semibold transition-all hover:text-foreground">
-                        <div className="flex items-center gap-3">
-                            <DollarSign className="w-5 h-5" /> Donations
-                        </div>
-                    </Link>
                     <Link href="/admin/feedback" className="flex items-center justify-between px-4 py-3.5 text-muted-foreground hover:bg-muted rounded-2xl font-semibold transition-all hover:text-foreground">
                         <div className="flex items-center gap-3">
                             <MessageSquare className="w-5 h-5" /> Feedback

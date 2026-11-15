@@ -48,8 +48,8 @@ export function DiscussionComments({
         if (result.error) {
             toast.error(result.error)
         } else {
-            toast.success("Comment posted!")
-                (e.target as HTMLFormElement).reset()
+            toast.success("Comment posted!");
+            (e.target as HTMLFormElement).reset();
             router.refresh()
             // Optimistic update could be added here, but refresh is safer for ID syncing
         }

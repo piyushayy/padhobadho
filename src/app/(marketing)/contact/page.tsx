@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Mail, MessageSquare, MapPin } from "lucide-react";
 import { ContactForm } from "@/components/contact-form";
-import { DonationSection } from "@/components/donation-section";
 
 export default function ContactPage() {
     return (
@@ -56,8 +55,6 @@ export default function ContactPage() {
                     </div>
                 </div>
             </main>
-
-            <DonationSection />
         </div>
     );
 }

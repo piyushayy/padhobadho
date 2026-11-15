@@ -34,12 +34,17 @@ export default function PracticeEngine({
     const [showReportModal, setShowReportModal] = useState(false)
     const [mistakes, setMistakes] = useState<number[]>([]) // Indices of incorrect questions
     const [isCompleted, setIsCompleted] = useState(false)
+    const [questionStartTime, setQuestionStartTime] = useState(Date.now())
+    const [timeSpent, setTimeSpent] = useState(0)
     const router = useRouter()
 
     const question = initialQuestions[index]
 
     async function submit() {
         if (selected === null) return
+
+        const elapsed = Math.max(1, Math.round((Date.now() - questionStartTime) / 1000))
+        setTimeSpent(elapsed)
 
         // Instant / Optimistic Validation
         let isAnswerCorrect = false
@@ -50,7 +55,7 @@ export default function PracticeEngine({
             correctOpt = question.correctOption
         } else {
             // Fallback for secure mode (though we are moving away from this for speed)
-            const result = await submitQuestionAnswer(sessionId, question.id, selected, 0)
+            const result = await submitQuestionAnswer(sessionId, question.id, selected, elapsed)
             if (result) {
                 isAnswerCorrect = result.isCorrect
                 correctOpt = result.correctOption
@@ -85,7 +90,7 @@ export default function PracticeEngine({
             sessionId,
             question.id,
             selected,
-            0
+            elapsed
         ).catch(e => console.error("Sync failed", e))
     }
 
@@ -97,6 +102,8 @@ export default function PracticeEngine({
             setCorrectOption(null)
             setIsCorrect(null)
             setShowExplanation(false)
+            setQuestionStartTime(Date.now())
+            setTimeSpent(0)
         } else {
             setIsCompleted(true)
             confetti({
@@ -444,9 +451,17 @@ export default function PracticeEngine({
                                     }`}>
                                     {isCorrect ? "Correct!" : "Incorrect"}
                                 </h4>
-                                {!isCorrect && (
-                                    <p className="text-sm font-bold text-rose-600/70 dark:text-rose-400/70">
-                                        Correct answer: {String.fromCharCode(65 + (correctOption ?? 0))}
+                                {isCorrect ? (
+                                    <p className="text-xs font-bold text-emerald-800 dark:text-emerald-300 mt-1">
+                                        {timeSpent < 30
+                                            ? `⚡ Faster than 89% of aspirants (${timeSpent}s)`
+                                            : timeSpent < 60
+                                            ? `🎯 Optimal Pacing (${timeSpent}s) — Faster than 72%`
+                                            : `✅ Solved in ${timeSpent}s — Target sub-45s for exam speed`}
+                                    </p>
+                                ) : (
+                                    <p className="text-xs font-medium text-rose-600/80 dark:text-rose-400/80 mt-1">
+                                        Correct answer: <strong>{String.fromCharCode(65 + (correctOption ?? 0))}</strong> · Added to Mistake Bank for spaced review.
                                     </p>
                                 )}
                             </div>

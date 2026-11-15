@@ -13,6 +13,9 @@ import {
     Flame,
     Star,
     Trophy,
+    Sparkles,
+    RotateCcw,
+    ArrowRight,
 } from "lucide-react"
 import { getTopicMastery, getExamReadiness } from "@/actions/analytics"
 import { getUserRank } from "@/actions/leaderboard"
@@ -33,7 +36,7 @@ async function DashboardContent() {
         today.setHours(0, 0, 0, 0)
 
         // Fetch dynamic analytics and stats
-        const [user, topicMastery, examReadiness, totalSessions, totalAttempted, solvedToday, globalRank, achievements] = await Promise.all([
+        const [user, topicMastery, examReadiness, totalSessions, totalAttempted, solvedToday, globalRank, achievements, mistakeCount] = await Promise.all([
             prisma.user.findUnique({
                 where: { id: session.user.id },
                 select: {
@@ -71,6 +74,9 @@ async function DashboardContent() {
                 include: { achievement: true },
                 take: 5,
                 orderBy: { unlockedAt: "desc" }
+            }),
+            prisma.userQuestionHistory.count({
+                where: { userId: session.user.id, isCorrect: false }
             })
         ])
 
@@ -90,6 +96,64 @@ async function DashboardContent() {
                     targetUniversity={user?.targetUniversity}
                     totalAttempted={totalAttempted}
                 />
+
+                {/* LeetCode + Brilliant Habit & Mastery Row */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Problem of the Day (LeetCode Loop) */}
+                    <Link
+                        href="/practice/daily"
+                        className="md:col-span-2 brilliant-card bg-gradient-to-br from-card via-card to-primary/5 p-8 border border-border/80 rounded-3xl hover:border-primary/50 transition-all group relative overflow-hidden"
+                    >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                            <div className="flex items-center gap-2">
+                                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-orange-500/10 text-orange-500 border border-orange-500/20">
+                                    <Flame className="w-3.5 h-3.5 fill-current" /> Daily Challenge
+                                </span>
+                                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary">
+                                    <Sparkles className="w-3.5 h-3.5" /> +50 XP
+                                </span>
+                            </div>
+                            <span className="text-xs text-muted-foreground font-mono">Resets every 00:00 IST</span>
+                        </div>
+
+                        <div className="space-y-2">
+                            <h3 className="text-2xl font-serif font-black tracking-tight text-foreground group-hover:text-primary transition-colors flex items-center gap-2">
+                                Problem of the Day <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                            </h3>
+                            <p className="text-muted-foreground text-sm max-w-xl">
+                                Maintain your {user?.currentStreak || 0}-day streak. Solve today's curated conceptual question with instant performance telemetry.
+                            </p>
+                        </div>
+                    </Link>
+
+                    {/* Mistake Bank (Brilliant Spaced Repetition) */}
+                    <Link
+                        href="/practice/mistakes"
+                        className="brilliant-card bg-card p-8 border border-border/80 rounded-3xl hover:border-rose-500/40 transition-all group flex flex-col justify-between"
+                    >
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="w-10 h-10 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center">
+                                <RotateCcw className="w-5 h-5" />
+                            </div>
+                            <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                                mistakeCount > 0 ? "bg-rose-500/10 text-rose-500" : "bg-emerald-500/10 text-emerald-500"
+                            }`}>
+                                {mistakeCount > 0 ? `${mistakeCount} Pending` : "Mastered"}
+                            </span>
+                        </div>
+
+                        <div className="space-y-1">
+                            <h4 className="text-xl font-serif font-black tracking-tight text-foreground group-hover:text-rose-500 transition-colors">
+                                Mistake Bank
+                            </h4>
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                                {mistakeCount > 0
+                                    ? "Re-solve concepts you missed until you achieve 100% accuracy."
+                                    : "Zero missed questions! Your mastery index is at peak."}
+                            </p>
+                        </div>
+                    </Link>
+                </div>
 
                 <StatsGrid
                     examReadiness={examReadiness}

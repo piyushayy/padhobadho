@@ -52,6 +52,28 @@ export async function submitMockTest(subjectId: string, answers: Record<string, 
             isCorrect,
             timeSpent: 0 // Could potentially track per-question time in future
         })
+
+        // Seamlessly update UserQuestionHistory so mock mistakes land in Mistake Bank
+        await prisma.userQuestionHistory.upsert({
+            where: {
+                userId_questionId: {
+                    userId: session.user.id,
+                    questionId: qId
+                }
+            },
+            update: {
+                isCorrect,
+                lastAttempted: new Date(),
+                occurrences: { increment: 1 }
+            },
+            create: {
+                userId: session.user.id,
+                questionId: qId,
+                isCorrect,
+                lastAttempted: new Date(),
+                occurrences: 1
+            }
+        }).catch(err => console.error("History sync error:", err))
     }
 
     // 3. Batch create session questions

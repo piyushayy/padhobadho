@@ -40,7 +40,7 @@ export default function proxy(req: NextRequest, event: any) {
     }
 
     // 2. NextAuth session check/redirection for page routes
-    return auth(req, event);
+    return (auth as any)(req, event);
 }
 
 export const config = {

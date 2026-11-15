@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { toast } from "react-hot-toast"
+import { toast } from "sonner"
 import { ArrowRight, ChevronLeft, Timer, ShieldAlert, Flag, Loader2 } from "lucide-react"
 import { submitMockTest } from "@/actions/mock-test"
 import { useRouter } from "next/navigation"

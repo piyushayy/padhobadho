@@ -6,7 +6,6 @@ import { ArrowRight, Sparkles, Quote, MoveRight, CheckCircle2, Zap, Target, Book
 import { motion, useScroll, useTransform } from "framer-motion"
 import { FAQ } from "@/components/landing/faq"
 import { StaggerTestimonials } from "@/components/landing/stagger-testimonials"
-import { DonationSection } from "@/components/donation-section"
 
 function FloatingBadge({ children, className, delay = 0 }: any) {
     return (
@@ -398,11 +397,6 @@ export default function LandingPage() {
                 categories={faqCategories}
                 faqData={faqData}
             />
-
-            {/* DONATION SECTION */}
-            <div id="donate">
-                <DonationSection />
-            </div>
 
             {/* CTA */}
             <section className="py-24 md:py-32 relative overflow-hidden bg-foreground text-background text-center">
