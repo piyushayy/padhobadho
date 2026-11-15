@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: padhobadho-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: padho_user
+      POSTGRES_PASSWORD: padho_password
+      POSTGRES_DB: padhobadho
+    ports:
+      - "5433:5432"
+    volumes:
+      - padhobadho_pgdata:/var/lib/postgresql/data
+
+volumes:
+  padhobadho_pgdata:
+    driver: local
