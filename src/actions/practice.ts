@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma"
 
 export async function createPracticeSession(subjectId?: string, topicId?: string) {
     const session = await auth()
-    if (!session?.user?.id) throw new Error("Unauthorized")
+    if (!session?.user?.id) return "guest-session"
 
     const newSession = await prisma.practiceSession.create({
         data: {
@@ -25,19 +25,28 @@ export async function submitQuestionAnswer(
     timeSpent: number
 ) {
     const session = await auth()
-    if (!session?.user?.id) throw new Error("Unauthorized")
 
     const question = await prisma.question.findUnique({
         where: { id: questionId },
         select: {
             correctOption: true,
-            subjectId: true
+            subjectId: true,
+            explanation: true
         }
     })
 
     if (!question) throw new Error("Question not found")
 
     const isCorrect = question.correctOption === answerIndex
+
+    // Guest response: validate and return without persisting to DB
+    if (!session?.user?.id) {
+        return {
+            isCorrect,
+            correctOption: question.correctOption,
+            explanation: question.explanation
+        }
+    }
 
     await prisma.sessionQuestion.create({
         data: {

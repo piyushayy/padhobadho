@@ -7,39 +7,35 @@ import { AppHeader } from "@/components/app-header"
 import { serialize } from "@/lib/utils"
 
 export default async function AppLayout({ children, session }: { children: React.ReactNode, session: any }) {
-    if (!session?.user?.id) {
-        return <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-8">
-            <div className="text-center space-y-4">
-                <h2 className="text-2xl font-serif font-bold">Session Expired</h2>
-                <Link href="/auth/sign-in" className="text-primary hover:underline font-bold">Please sign in to continue.</Link>
-            </div>
-        </div>
-    }
+    const isGuest = !session?.user?.id
 
     let user: any = null
     let allExams: any[] = []
 
     try {
-        const [userData, examsData] = await Promise.all([
-            prisma.user.findUnique({
-                where: { id: session.user.id },
-                include: { targetExam: true }
-            }),
-            prisma.exam.findMany({ orderBy: { code: "asc" } })
-        ])
-        user = userData
-        allExams = examsData || []
+        if (!isGuest) {
+            const [userData, examsData] = await Promise.all([
+                prisma.user.findUnique({
+                    where: { id: session.user.id },
+                    include: { targetExam: true }
+                }),
+                prisma.exam.findMany({ orderBy: { code: "asc" } })
+            ])
+            user = userData
+            allExams = examsData || []
+        } else {
+            allExams = await prisma.exam.findMany({ orderBy: { code: "asc" } })
+        }
     } catch (error) {
-        console.error("Critical: Admin Layout Data Fetch Failed", error)
-        // We allow the layout to render even if data fails, using defaults to prevent white screen
+        console.error("Layout Data Fetch Failed", error)
     }
 
     // Sanitize data for client components
     const sanitizedUser = user ? serialize(user) : null
     const sanitizedExams = serialize(allExams)
 
-    const userName = session.user.name || "Student"
-    const userInitials = userName[0]?.toUpperCase() || "S"
+    const userName = session?.user?.name || (isGuest ? "Guest" : "Student")
+    const userInitials = userName[0]?.toUpperCase() || (isGuest ? "G" : "S")
 
     return (
         <div className="min-h-screen bg-background text-foreground pb-24 lg:pb-0">

@@ -1,13 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import Link from "next/link"
 import { submitQuestionAnswer } from "@/actions/practice"
 import { toast } from "sonner"
-import { ArrowRight, CheckCircle2, XCircle, Sparkles, X, Flag } from "lucide-react"
+import { ArrowRight, CheckCircle2, XCircle, Sparkles, X, Flag, Lock, Zap } from "lucide-react"
 import confetti from "canvas-confetti"
 import { submitTicket } from "@/actions/support"
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts"
 import { useRouter } from "next/navigation"
+import { motion, AnimatePresence } from "framer-motion"
 
 interface Question {
     id: string
@@ -15,6 +17,15 @@ interface Question {
     options: string[]
     explanation?: string
     correctOption?: number
+}
+
+interface PracticeEngineProps {
+    sessionId: string
+    initialQuestions: Question[]
+    subjectId?: string
+    subjectName?: string
+    isGuest?: boolean
+    freeLimit?: number
 }
 
 function playAudioFeedback(isCorrect: boolean) {
@@ -68,11 +79,13 @@ function playAudioFeedback(isCorrect: boolean) {
 
 export default function PracticeEngine({
     sessionId,
-    initialQuestions
-}: {
-    sessionId: string,
-    initialQuestions: Question[]
-}) {
+    initialQuestions,
+    subjectId,
+    subjectName,
+    isGuest = false,
+    freeLimit = 5
+}: PracticeEngineProps) {
+    const FREE_LIMIT = freeLimit
     const [index, setIndex] = useState(0)
     const [selected, setSelected] = useState<number | null>(null)
     const [submitted, setSubmitted] = useState(false)
@@ -81,16 +94,26 @@ export default function PracticeEngine({
     const [showExplanation, setShowExplanation] = useState(false)
     const [showQuitModal, setShowQuitModal] = useState(false)
     const [showReportModal, setShowReportModal] = useState(false)
+    const [showGuestPaywall, setShowGuestPaywall] = useState(false)
     const [mistakes, setMistakes] = useState<number[]>([]) // Indices of incorrect questions
     const [isCompleted, setIsCompleted] = useState(false)
     const [questionStartTime, setQuestionStartTime] = useState(Date.now())
     const [timeSpent, setTimeSpent] = useState(0)
     const router = useRouter()
 
+    useEffect(() => {
+        if (isGuest) {
+            const stored = parseInt(localStorage.getItem("pb_guest_questions_attempted") || "0", 10)
+            if (stored >= FREE_LIMIT) {
+                setShowGuestPaywall(true)
+            }
+        }
+    }, [isGuest, FREE_LIMIT])
+
     const question = initialQuestions[index]
 
     async function submit() {
-        if (selected === null) return
+        if (selected === null || showGuestPaywall) return
 
         const elapsed = Math.max(1, Math.round((Date.now() - questionStartTime) / 1000))
         setTimeSpent(elapsed)
@@ -103,7 +126,7 @@ export default function PracticeEngine({
             isAnswerCorrect = selected === question.correctOption
             correctOpt = question.correctOption
         } else {
-            // Fallback for secure mode (though we are moving away from this for speed)
+            // Fallback for secure mode
             const result = await submitQuestionAnswer(sessionId, question.id, selected, elapsed)
             if (result) {
                 isAnswerCorrect = result.isCorrect
@@ -115,6 +138,12 @@ export default function PracticeEngine({
         setIsCorrect(isAnswerCorrect)
         setCorrectOption(correctOpt)
         setSubmitted(true)
+
+        // Update guest attempts in localStorage
+        if (isGuest) {
+            const current = parseInt(localStorage.getItem("pb_guest_questions_attempted") || "0", 10)
+            localStorage.setItem("pb_guest_questions_attempted", (current + 1).toString())
+        }
 
         // Play Sound with Web Audio API (zero 404s, 0ms latency)
         playAudioFeedback(isAnswerCorrect)
@@ -142,6 +171,12 @@ export default function PracticeEngine({
     }
 
     function next() {
+        // Gated Testbook Experience: If guest has completed the free questions, trigger conversion paywall
+        if (isGuest && index >= FREE_LIMIT - 1) {
+            setShowGuestPaywall(true)
+            return
+        }
+
         if (index < initialQuestions.length - 1) {
             setIndex(prev => prev + 1)
             setSelected(null)
@@ -259,25 +294,59 @@ export default function PracticeEngine({
                     </div>
 
                     {/* Improvements / Upsell */}
-                    <div className="bg-card border rounded-[2rem] p-8 h-fit shadow-xl sticky top-8">
-                        <h2 className="text-2xl font-serif font-black mb-6 text-foreground dark:text-white">Mastery Insights</h2>
-                        <ul className="space-y-4 text-muted-foreground dark:text-zinc-400">
-                            <li className="flex gap-3">
-                                <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0" />
-                                <span>Consistency is key. You've practiced for <strong>{initialQuestions.length} questions</strong> today.</span>
-                            </li>
-                            <li className="flex gap-3">
-                                <ArrowRight className="w-6 h-6 text-primary shrink-0" />
-                                <span>Review the explanations on the left to close your knowledge gaps.</span>
-                            </li>
-                            <li className="flex gap-3">
-                                <Sparkles className="w-6 h-6 text-yellow-500 shrink-0" />
-                                <span>Try a Mock Test next to simulate exam pressure.</span>
-                            </li>
-                        </ul>
-                        <button onClick={() => router.push('/dashboard')} className="w-full mt-8 py-4 bg-primary text-background font-black rounded-xl hover:opacity-90 transition-opacity">
-                            Continue
-                        </button>
+                    <div className="bg-card border-2 border-border/80 rounded-[2rem] p-8 h-fit shadow-xl sticky top-8">
+                        {isGuest ? (
+                            <div className="space-y-6">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest">
+                                    <Sparkles className="w-3.5 h-3.5" /> Free Trial Complete
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl font-serif font-black text-foreground dark:text-white leading-tight">
+                                        Attempt More Questions
+                                    </h2>
+                                    <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+                                        You completed all <span className="font-bold text-foreground">{FREE_LIMIT} free questions</span>. Join thousands of students on padhobadho and unlock unlimited questions, real-time mock tests, and streak tracking!
+                                    </p>
+                                </div>
+
+                                <div className="space-y-3 pt-2">
+                                    <Link
+                                        href={`/auth/sign-up?callbackUrl=${encodeURIComponent(subjectId ? `/practice/${subjectId}` : '/practice')}`}
+                                        className="w-full py-4 bg-primary text-background font-black text-sm uppercase tracking-wider rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 text-center shadow-lg shadow-primary/25"
+                                    >
+                                        <span>Create Free Account</span>
+                                        <ArrowRight className="w-4 h-4" />
+                                    </Link>
+                                    <Link
+                                        href={`/auth/sign-in?callbackUrl=${encodeURIComponent(subjectId ? `/practice/${subjectId}` : '/practice')}`}
+                                        className="w-full py-3.5 bg-muted/70 hover:bg-muted text-foreground font-black text-xs uppercase tracking-wider rounded-xl transition-colors block text-center"
+                                    >
+                                        Already registered? Sign In
+                                    </Link>
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                <h2 className="text-2xl font-serif font-black mb-6 text-foreground dark:text-white">Mastery Insights</h2>
+                                <ul className="space-y-4 text-muted-foreground dark:text-zinc-400">
+                                    <li className="flex gap-3">
+                                        <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0" />
+                                        <span>Consistency is key. You've practiced for <strong>{initialQuestions.length} questions</strong> today.</span>
+                                    </li>
+                                    <li className="flex gap-3">
+                                        <ArrowRight className="w-6 h-6 text-primary shrink-0" />
+                                        <span>Review the explanations on the left to close your knowledge gaps.</span>
+                                    </li>
+                                    <li className="flex gap-3">
+                                        <Sparkles className="w-6 h-6 text-yellow-500 shrink-0" />
+                                        <span>Try a Mock Test next to simulate exam pressure.</span>
+                                    </li>
+                                </ul>
+                                <button onClick={() => router.push('/dashboard')} className="w-full mt-8 py-4 bg-primary text-background font-black rounded-xl hover:opacity-90 transition-opacity">
+                                    Continue
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
@@ -286,6 +355,82 @@ export default function PracticeEngine({
 
     return (
         <div className="max-w-3xl mx-auto px-4 pb-32">
+
+            {/* Testbook-style Free Trial Paywall Modal */}
+            <AnimatePresence>
+                {showGuestPaywall && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[120] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.92, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.92, opacity: 0, y: 20 }}
+                            className="w-full max-w-lg bg-card border border-border shadow-2xl rounded-3xl p-6 sm:p-8 text-center relative overflow-hidden"
+                        >
+                            <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center text-3xl">
+                                <Lock className="w-8 h-8 text-primary" strokeWidth={2.5} />
+                            </div>
+
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest mb-3">
+                                <Sparkles className="w-3 h-3" /> Free Practice Limit Reached
+                            </div>
+
+                            <h3 className="text-2xl sm:text-3xl font-serif font-black text-foreground mb-3 leading-tight">
+                                Want to attempt more questions?
+                            </h3>
+
+                            <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+                                You have completed your <span className="font-bold text-foreground">{FREE_LIMIT} free trial questions</span> for {subjectName || "this subject"}. Sign up for free to unlock unlimited practice questions, full mock tests, and save your streak!
+                            </p>
+
+                            <div className="bg-muted/40 rounded-2xl p-4 mb-6 text-left space-y-2.5 border border-border/50 text-xs font-semibold">
+                                <div className="flex items-center gap-2.5 text-foreground">
+                                    <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                                    <span>Access 10,000+ curated exam questions</span>
+                                </div>
+                                <div className="flex items-center gap-2.5 text-foreground">
+                                    <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                                    <span>Full-length NTA CBT-style mock tests</span>
+                                </div>
+                                <div className="flex items-center gap-2.5 text-foreground">
+                                    <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                                    <span>Instant solutions, mistake bank & daily XP</span>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <Link
+                                    href={`/auth/sign-up?callbackUrl=${encodeURIComponent(subjectId ? `/practice/${subjectId}` : '/practice')}`}
+                                    className="w-full py-4 bg-primary text-background font-black text-sm uppercase tracking-wider rounded-xl hover:opacity-90 transition-all shadow-xl shadow-primary/25 flex items-center justify-center gap-2 group"
+                                >
+                                    <span>Sign Up Free to Unlock More</span>
+                                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                </Link>
+
+                                <Link
+                                    href={`/auth/sign-in?callbackUrl=${encodeURIComponent(subjectId ? `/practice/${subjectId}` : '/practice')}`}
+                                    className="w-full py-3 bg-muted/60 hover:bg-muted text-foreground font-black text-xs uppercase tracking-wider rounded-xl transition-colors block text-center"
+                                >
+                                    Already have an account? Sign In
+                                </Link>
+                            </div>
+
+                            <div className="mt-4">
+                                <Link
+                                    href="/practice"
+                                    className="text-xs text-muted-foreground hover:text-foreground underline transition-colors"
+                                >
+                                    Back to Practice Catalog
+                                </Link>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Header / Quit Button */}
             <div className="absolute top-6 left-6 z-40">
@@ -363,6 +508,25 @@ export default function PracticeEngine({
                             </p>
                         </form>
                     </div>
+                </div>
+            )}
+
+            {/* Guest Trial Header Badge */}
+            {isGuest && (
+                <div className="mb-6 p-3.5 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+                    <div className="flex items-center gap-2.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
+                        <div>
+                            <span className="font-black text-xs uppercase tracking-wider text-primary mr-2">Free Guest Mode:</span>
+                            <span className="text-xs text-muted-foreground font-semibold">Question {index + 1} of {FREE_LIMIT}</span>
+                        </div>
+                    </div>
+                    <Link
+                        href={`/auth/sign-up?callbackUrl=${encodeURIComponent(subjectId ? `/practice/${subjectId}` : '/practice')}`}
+                        className="text-[11px] font-black uppercase tracking-wider text-primary hover:underline flex items-center gap-1"
+                    >
+                        Sign in for unlimited questions <ArrowRight size={12} />
+                    </Link>
                 </div>
             )}
 

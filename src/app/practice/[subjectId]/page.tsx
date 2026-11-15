@@ -10,8 +10,7 @@ export default async function PracticeSessionPage({
     params: Promise<{ subjectId: string }>
 }) {
     const session = await auth()
-    if (!session) redirect("/auth/sign-in")
-
+    const isGuest = !session?.user?.id
     const { subjectId } = await params
 
     try {
@@ -21,77 +20,56 @@ export default async function PracticeSessionPage({
         })
         if (!subject) redirect("/practice")
 
-        // 2. Strict Random Logic as requested
-        // "User should not see questions they attempted once correctly"
-        // "Give them randomly questions"
+        // 2. Questions filtering
+        let excludeIds: string[] = []
 
-        // A. Examples of IDs to EXCLUDE (Already solved correctly)
-        const mastered = await prisma.userQuestionHistory.findMany({
-            where: {
-                userId: session.user.id,
-                isCorrect: true, // STRICT: If ever solved correctly, exclude it.
-                // removed date filter
-            },
-            select: { questionId: true }
-        })
-        const excludeIds = mastered.map(m => m.questionId)
+        if (!isGuest) {
+            const mastered = await prisma.userQuestionHistory.findMany({
+                where: {
+                    userId: session.user.id,
+                    isCorrect: true,
+                },
+                select: { questionId: true }
+            })
+            excludeIds = mastered.map(m => m.questionId)
+        }
 
-        // B. Fetch Random Questions 
-        // Since Prisma doesn't support random well, we used raw SQL or map-and-shuffle.
-        // For large datasets, raw SQL is better. For small/medium, fetching ID list then random sampling is okay.
-        // We'll use a pragmatic approach: Fetch candidate questions (excluding mastered) and shuffle in JS. 
-        // Why in JS? Because `NOT IN` with raw SQL and UUIDs can be tricky with Prisma typed raw queries.
-
-        // Step 1: Count available questions
-        const count = await prisma.question.count({
-            where: {
-                subjectId,
-                id: { notIn: excludeIds }
-            }
-        })
-
-        const TAKE_COUNT = 15;
-
-        // Step 2: Fetch efficient implementation
-        // If we have many questions, random offset is decent.
-        // const skip = Math.max(0, Math.floor(Math.random() * (count - TAKE_COUNT)));
-
-        // However, the user wants TRUE random, not just a random block.
-        // Let's fetch the available IDs first, shuffle them, then slice.
+        // Limit to 5 free trial questions for guests, 15 for registered users
+        const TAKE_COUNT = isGuest ? 5 : 15
 
         const candidateQuestions = await prisma.question.findMany({
             where: {
                 subjectId,
-                id: { notIn: excludeIds }
+                id: excludeIds.length > 0 ? { notIn: excludeIds } : undefined
             },
             select: { id: true },
-            take: 1000 // Limit to avoid memory issues, assuming <1000 active questions per practice session
+            take: 500
         })
 
         // Shuffle IDs
         const shuffledIds = candidateQuestions
             .map(q => q.id)
             .sort(() => 0.5 - Math.random())
-            .slice(0, TAKE_COUNT);
+            .slice(0, TAKE_COUNT)
 
         // Fetch full data for these IDs
-        const freshContent = await prisma.question.findMany({
+        const initialQuestions = await prisma.question.findMany({
             where: { id: { in: shuffledIds } }
         })
 
-
-        const initialQuestions = freshContent
-
-        // Create a session in DB
-        const sessionId = await createPracticeSession(subjectId)
+        // Create a session in DB for logged-in user, or use guest token
+        let sessionId = "guest-session"
+        if (!isGuest) {
+            sessionId = await createPracticeSession(subjectId)
+        }
 
         if (initialQuestions.length === 0) {
             return (
                 <div className="min-h-screen flex items-center justify-center p-8 text-center text-muted-foreground">
                     <div>
                         <h2 className="text-2xl font-serif font-bold mb-2">No Questions Found</h2>
-                        <p>You have mastered all available questions for this subject!</p>
-                        <p className="text-sm mt-2">Check back later for new content.</p>
+                        <p>{isGuest ? "No questions available for this subject yet." : "You have mastered all available questions for this subject!"}</p>
+                        <p className="text-sm mt-2">Check back later or choose another subject.</p>
                     </div>
                 </div>
             )
@@ -101,6 +79,10 @@ export default async function PracticeSessionPage({
             <div className="min-h-screen bg-slate-50 dark:bg-black py-10">
                 <PracticeEngine
                     sessionId={sessionId}
+                    subjectId={subjectId}
+                    subjectName={subject.name}
+                    isGuest={isGuest}
+                    freeLimit={5}
                     initialQuestions={initialQuestions.map(q => ({
                         id: q.id,
                         content: q.content,

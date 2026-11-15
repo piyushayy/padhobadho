@@ -76,8 +76,13 @@ export default {
 
             // 3. Logic for non-logged in users
             if (!isLoggedIn) {
-                // Allow public routes, redirect others to sign-in
-                if (isPublicRoute || pathname === "/practice") return true
+                // Allow public routes and public practice questions (free trial), redirect others to sign-in
+                const isPracticeFreeTrial = pathname === "/practice" || (
+                    pathname.startsWith("/practice/") &&
+                    !pathname.startsWith("/practice/daily") &&
+                    !pathname.startsWith("/practice/mistakes")
+                )
+                if (isPublicRoute || isPracticeFreeTrial) return true
                 return false
             }
 

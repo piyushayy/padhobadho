@@ -58,19 +58,36 @@ export function AppHeader({ user, allExams, userName, userInitials }: AppHeaderP
                 <ExamSwitcher currentExam={user?.targetExam || null} allExams={allExams} />
             </div>
 
-            <div className="flex items-center gap-4 md:gap-6">
+            <div className="flex items-center gap-3 md:gap-6">
                 <div className="hidden md:block">
                     <ThemeToggle />
                 </div>
-                <Link href="/profile/settings" className="flex items-center gap-3 md:gap-5 hover:bg-muted/50 p-1.5 md:p-2.5 rounded-[1.5rem] transition-all group">
-                    <div className="text-right hidden md:block">
-                        <p className="text-sm font-black tracking-tight">{userName}</p>
-                        <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Student</p>
+                {user ? (
+                    <Link href="/profile/settings" className="flex items-center gap-3 md:gap-5 hover:bg-muted/50 p-1.5 md:p-2.5 rounded-[1.5rem] transition-all group">
+                        <div className="text-right hidden md:block">
+                            <p className="text-sm font-black tracking-tight">{userName}</p>
+                            <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Student</p>
+                        </div>
+                        <div className="h-8 w-8 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-foreground text-background flex items-center justify-center font-black text-sm md:text-xl relative group-hover:scale-105 transition-transform">
+                            {userInitials}
+                        </div>
+                    </Link>
+                ) : (
+                    <div className="flex items-center gap-2">
+                        <Link
+                            href="/auth/sign-in"
+                            className="px-3 py-1.5 md:px-4 md:py-2 text-xs font-black uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                            Sign In
+                        </Link>
+                        <Link
+                            href="/auth/sign-up"
+                            className="px-3.5 py-1.5 md:px-4 md:py-2 text-xs font-black uppercase tracking-wider bg-primary text-background rounded-xl hover:opacity-90 transition-all shadow-md shadow-primary/20"
+                        >
+                            Join Free
+                        </Link>
                     </div>
-                    <div className="h-8 w-8 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-foreground text-background flex items-center justify-center font-black text-sm md:text-xl relative group-hover:scale-105 transition-transform">
-                        {userInitials}
-                    </div>
-                </Link>
+                )}
             </div>
 
             {/* Mobile Menu Rendered in Body Portal to eliminate containing block clipping */}
@@ -127,21 +144,40 @@ export function AppHeader({ user, allExams, userName, userInitials }: AppHeaderP
                                         <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Theme</span>
                                         <ThemeToggle />
                                     </div>
-                                    <Link
-                                        href="/profile/settings"
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className="flex items-center justify-between p-3 rounded-xl bg-muted/40 hover:bg-muted transition-colors"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-8 w-8 rounded-lg bg-foreground text-background flex items-center justify-center font-black text-xs">
-                                                {userInitials}
+                                    {user ? (
+                                        <Link
+                                            href="/profile/settings"
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className="flex items-center justify-between p-3 rounded-xl bg-muted/40 hover:bg-muted transition-colors"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-8 w-8 rounded-lg bg-foreground text-background flex items-center justify-center font-black text-xs">
+                                                    {userInitials}
+                                                </div>
+                                                <div className="text-left">
+                                                    <p className="text-xs font-black leading-none">{userName}</p>
+                                                    <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">Account & Preferences</p>
+                                                </div>
                                             </div>
-                                            <div className="text-left">
-                                                <p className="text-xs font-black leading-none">{userName}</p>
-                                                <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">Account & Preferences</p>
-                                            </div>
+                                        </Link>
+                                    ) : (
+                                        <div className="flex gap-2">
+                                            <Link
+                                                href="/auth/sign-in"
+                                                onClick={() => setIsMobileMenuOpen(false)}
+                                                className="flex-1 text-center py-2.5 rounded-xl border border-border text-xs font-black uppercase tracking-wider hover:bg-muted transition-colors"
+                                            >
+                                                Sign In
+                                            </Link>
+                                            <Link
+                                                href="/auth/sign-up"
+                                                onClick={() => setIsMobileMenuOpen(false)}
+                                                className="flex-1 text-center py-2.5 rounded-xl bg-primary text-background text-xs font-black uppercase tracking-wider hover:opacity-90 transition-opacity shadow-md shadow-primary/20"
+                                            >
+                                                Join Free
+                                            </Link>
                                         </div>
-                                    </Link>
+                                    )}
                                 </div>
                             </motion.div>
                         </>
