@@ -10,26 +10,26 @@ const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
   title: {
-    default: "padhobadho | Master Your CUET Journey",
-    template: "%s | padhobadho"
+    default: "PadhoBadho | 100% Free Exam Prep for Class 12, JEE, NEET, CUET, SSC & DSSSB",
+    template: "%s | PadhoBadho"
   },
   metadataBase: new URL('https://padhobadho.com'),
-  description: "The premium AI-driven platform for CUET aspirants. Personalized practice, smart analytics, and adaptive learning to secure your dream college.",
-  keywords: ["CUET 2026", "CUET Prep", "Common University Entrance Test", "CUET Mock Tests", "CUET Practice", "Study Material", "College Admission"],
-  authors: [{ name: "padhobadho Team" }],
-  creator: "padhobadho",
+  description: "Padhega India, Badhega India. 100% free practice questions, NTA CBT mock tests, and curated PYQ vaults for Class 12 Boards, JEE, NEET, CUET, SSC & DSSSB.",
+  keywords: ["Free Mock Tests", "Class 12 Boards", "JEE Main", "NEET-UG", "CUET 2026", "SSC CGL", "DSSSB", "PYQ Papers", "Free Practice", "PadhoBadho"],
+  authors: [{ name: "PadhoBadho Team" }],
+  creator: "PadhoBadho",
   openGraph: {
     type: "website",
     locale: "en_IN",
     url: "https://padhobadho.com",
-    title: "padhobadho | Master Your CUET Journey",
-    description: "Padhega India. Badhega India. Personalized AI-powered practice for CUET. Secure your dream college today.",
-    siteName: "padhobadho",
+    title: "PadhoBadho | 100% Free Exam Prep for Class 12, JEE, NEET, CUET, SSC & DSSSB",
+    description: "Padhega India, Badhega India. 100% free practice drills, official pattern mock tests, and past year question papers.",
+    siteName: "PadhoBadho",
   },
   twitter: {
     card: "summary_large_image",
-    title: "padhobadho | Master Your CUET Journey",
-    description: "Personalized AI-powered practice for CUET. Secure your dream college today.",
+    title: "PadhoBadho | 100% Free Exam Prep",
+    description: "100% free practice questions, CBT mock tests, and PYQs for all major Indian exams.",
     creator: "@padhobadho",
   },
   robots: {

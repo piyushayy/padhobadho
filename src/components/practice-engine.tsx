@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { submitQuestionAnswer } from "@/actions/practice"
 import { toast } from "sonner"
-import { ArrowRight, CheckCircle2, XCircle, Sparkles, X, Flag, Lock, Zap } from "lucide-react"
+import { ArrowRight, CheckCircle2, XCircle, Sparkles, X, Flag, Lock, Zap, Share2 } from "lucide-react"
 import confetti from "canvas-confetti"
 import { submitTicket } from "@/actions/support"
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts"
@@ -294,7 +294,24 @@ export default function PracticeEngine({
                     </div>
 
                     {/* Improvements / Upsell */}
-                    <div className="bg-card border-2 border-border/80 rounded-[2rem] p-8 h-fit shadow-xl sticky top-8">
+                    <div className="bg-card border-2 border-border/80 rounded-[2rem] p-8 h-fit shadow-xl sticky top-8 space-y-6">
+                        {/* WhatsApp Viral Score Share */}
+                        <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-center space-y-3">
+                            <p className="text-xs font-bold text-foreground">
+                                Challenged a classmate yet? Share your score:
+                            </p>
+                            <a
+                                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                                    `🎯 I just scored ${initialQuestions.length - mistakes.length}/${initialQuestions.length} on ${subjectName || "Practice Drill"} on PadhoBadho! 🔥\nCan you beat my score? Attempt 100% free practice drills here: https://padhobadho.com/practice${subjectId ? `/${subjectId}` : ''}`
+                                )}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-md shadow-emerald-600/25 flex items-center justify-center gap-2"
+                            >
+                                <Share2 size={15} /> Share on WhatsApp
+                            </a>
+                        </div>
+
                         {isGuest ? (
                             <div className="space-y-6">
                                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest">
@@ -342,7 +359,7 @@ export default function PracticeEngine({
                                         <span>Try a Mock Test next to simulate exam pressure.</span>
                                     </li>
                                 </ul>
-                                <button onClick={() => router.push('/dashboard')} className="w-full mt-8 py-4 bg-primary text-background font-black rounded-xl hover:opacity-90 transition-opacity">
+                                <button onClick={() => router.push('/dashboard')} className="w-full mt-4 py-4 bg-primary text-background font-black rounded-xl hover:opacity-90 transition-opacity">
                                     Continue
                                 </button>
                             </>

@@ -2,7 +2,7 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { Trophy, ArrowRight, CheckCircle2, XCircle, Clock, Zap } from "lucide-react"
+import { Trophy, ArrowRight, CheckCircle2, XCircle, Clock, Zap, Share2 } from "lucide-react"
 
 export default async function MockTestResults({
     params
@@ -60,12 +60,22 @@ export default async function MockTestResults({
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                    <Link href="/dashboard" className="px-12 py-5 bg-black text-white rounded-full font-black text-xl hover:scale-105 transition-all dark:bg-white dark:text-black shadow-2xl">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a
+                        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                            `🎯 I scored ${mockSession.score} points with ${accuracy.toFixed(0)}% accuracy on ${mockSession.subject.name} Mock Test on PadhoBadho! 🔥\nCan you beat my score? Attempt 100% free mock tests here: https://padhobadho.com/practice`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full sm:w-auto px-8 py-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-black text-lg transition-all shadow-xl hover:scale-105 flex items-center justify-center gap-3"
+                    >
+                        <Share2 size={20} /> Share on WhatsApp
+                    </a>
+                    <Link href="/dashboard" className="w-full sm:w-auto px-10 py-5 bg-black text-white rounded-full font-black text-lg hover:scale-105 transition-all dark:bg-white dark:text-black shadow-xl text-center">
                         Go to Dashboard
                     </Link>
-                    <Link href="/practice" className="px-12 py-5 bg-slate-200 text-black rounded-full font-black text-xl hover:bg-slate-300 transition-all dark:bg-white/10 dark:text-white shadow-xl">
-                        Review Sub-topics
+                    <Link href="/practice" className="w-full sm:w-auto px-10 py-5 bg-slate-200 text-black rounded-full font-black text-lg hover:bg-slate-300 transition-all dark:bg-white/10 dark:text-white shadow-lg text-center">
+                        Review Practice
                     </Link>
                 </div>
 
