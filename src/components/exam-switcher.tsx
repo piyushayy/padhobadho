@@ -68,7 +68,7 @@ export default function ExamSwitcher({
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-3 px-3.5 py-2 rounded-xl bg-card border border-border hover:border-primary/40 hover:bg-accent transition-all duration-200 cursor-pointer text-left shadow-xs group"
+                className="flex items-center gap-3 px-3.5 py-2 rounded-xl bg-card border border-border hover:border-primary/40 hover:bg-accent transition-all duration-200 cursor-pointer text-left shadow-xs group focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none active:scale-[0.98]"
                 aria-haspopup="listbox"
                 aria-expanded={isOpen}
             >
@@ -113,7 +113,7 @@ export default function ExamSwitcher({
                                         key={exam.id}
                                         type="button"
                                         onClick={() => handleSelect(exam)}
-                                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 text-left ${
+                                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 text-left focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none ${
                                             isCurrent
                                                 ? "bg-primary/10 text-primary"
                                                 : "text-foreground hover:bg-muted"

@@ -30,6 +30,10 @@ interface PracticeEngineProps {
 
 function playAudioFeedback(isCorrect: boolean) {
     try {
+        // Haptic touch feedback on mobile
+        if (typeof navigator !== "undefined" && navigator.vibrate) {
+            navigator.vibrate(isCorrect ? 15 : [25, 40, 25])
+        }
         const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
         if (!AudioCtx) return
         const ctx = new AudioCtx()
@@ -109,6 +113,36 @@ export default function PracticeEngine({
             }
         }
     }, [isGuest, FREE_LIMIT])
+
+    // Keyboard shortcuts (1-4 / A-D to select, Enter/Space to submit or advance)
+    useEffect(() => {
+        function handleKeyDown(e: KeyboardEvent) {
+            if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+            if (showGuestPaywall || isCompleted || showQuitModal) return
+
+            if (!submitted) {
+                if (e.key === "1" || e.key.toUpperCase() === "A") {
+                    setSelected(0)
+                } else if (e.key === "2" || e.key.toUpperCase() === "B") {
+                    setSelected(1)
+                } else if (e.key === "3" || e.key.toUpperCase() === "C") {
+                    setSelected(2)
+                } else if (e.key === "4" || e.key.toUpperCase() === "D") {
+                    setSelected(3)
+                } else if (e.key === "Enter" && selected !== null) {
+                    submit()
+                }
+            } else {
+                if (e.key === "Enter" || e.key === " " || e.key === "ArrowRight") {
+                    e.preventDefault()
+                    next()
+                }
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown)
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [submitted, selected, showGuestPaywall, isCompleted, showQuitModal, index])
 
     const question = initialQuestions[index]
 
@@ -582,20 +616,25 @@ export default function PracticeEngine({
                                     key={i}
                                     disabled={submitted}
                                     onClick={() => setSelected(i)}
-                                    className={`w-full p-4 rounded-xl border-2 text-left transition-all flex items-center gap-3 group ${isSelected
-                                        ? "border-primary bg-primary/5 ring-4 ring-primary/10"
+                                    className={`w-full p-4 rounded-xl border-2 text-left transition-all duration-150 flex items-center justify-between gap-3 group focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none active:scale-[0.99] ${isSelected
+                                        ? "border-primary bg-primary/5 ring-4 ring-primary/10 shadow-xs"
                                         : "border-border/40 hover:border-primary/30 hover:bg-muted/30"
                                         } ${isRight ? "border-emerald-500 bg-emerald-500/10" : ""
                                         } ${isWrong ? "border-rose-500 bg-rose-500/10" : ""
                                         }`}
                                 >
-                                    <span className={`w-8 h-8 rounded-lg border-2 flex items-center justify-center text-xs font-black transition-all ${isSelected ? "bg-primary text-background border-primary" : "text-muted-foreground border-border group-hover:border-primary/40"
-                                        }`}>
-                                        {String.fromCharCode(65 + i)}
+                                    <div className="flex items-center gap-3">
+                                        <span className={`w-8 h-8 rounded-lg border-2 flex items-center justify-center text-xs font-black transition-all ${isSelected ? "bg-primary text-background border-primary shadow-xs" : "text-muted-foreground border-border group-hover:border-primary/40"
+                                            }`}>
+                                            {String.fromCharCode(65 + i)}
+                                        </span>
+                                        <span className={`text-base font-bold ${isRight ? "text-emerald-700 dark:text-emerald-600" :
+                                            isWrong ? "text-rose-700 dark:text-rose-600" : "text-foreground"
+                                            }`}>{option}</span>
+                                    </div>
+                                    <span className="hidden md:inline-block text-[10px] font-bold text-muted-foreground/40 group-hover:text-muted-foreground/80 transition-colors uppercase tracking-wider px-1.5 py-0.5 rounded border border-border/40">
+                                        {i + 1}
                                     </span>
-                                    <span className={`text-base font-bold ${isRight ? "text-emerald-700 dark:text-emerald-600" :
-                                        isWrong ? "text-rose-700 dark:text-rose-600" : "text-foreground"
-                                        }`}>{option}</span>
                                 </button>
                             )
                         })}
