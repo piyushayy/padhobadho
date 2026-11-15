@@ -103,7 +103,6 @@ export default function PracticeEngine({
     const [isCompleted, setIsCompleted] = useState(false)
     const [questionStartTime, setQuestionStartTime] = useState(Date.now())
     const [timeSpent, setTimeSpent] = useState(0)
-    const [fontSize, setFontSize] = useState<"normal" | "large">("normal")
     const router = useRouter()
 
     useEffect(() => {
@@ -494,39 +493,11 @@ export default function PracticeEngine({
                     <X size={24} className="text-muted-foreground" />
                 </button>
 
-                <div className="flex items-center gap-3 pointer-events-auto">
-                    {subjectName && (
-                        <span className="hidden sm:inline-block px-3 py-1 rounded-full bg-card/80 border border-border/60 text-[10px] font-black uppercase tracking-widest text-muted-foreground shadow-xs">
-                            {subjectName}
-                        </span>
-                    )}
-                    <div className="flex items-center gap-1 bg-card/90 border border-border/70 rounded-xl p-1 shadow-xs">
-                        <button
-                            type="button"
-                            onClick={() => setFontSize("normal")}
-                            className={`px-2 py-0.5 rounded-lg text-xs font-black transition-all ${
-                                fontSize === "normal"
-                                    ? "bg-primary text-background"
-                                    : "text-muted-foreground hover:text-foreground"
-                            }`}
-                            title="Standard Font Size"
-                        >
-                            A
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setFontSize("large")}
-                            className={`px-2 py-0.5 rounded-lg text-xs font-black transition-all ${
-                                fontSize === "large"
-                                    ? "bg-primary text-background"
-                                    : "text-muted-foreground hover:text-foreground"
-                            }`}
-                            title="Large Font Size"
-                        >
-                            A+
-                        </button>
-                    </div>
-                </div>
+                {subjectName && (
+                    <span className="hidden sm:inline-block px-3 py-1 rounded-full bg-card/80 border border-border/60 text-[10px] font-black uppercase tracking-widest text-muted-foreground shadow-xs pointer-events-auto">
+                        {subjectName}
+                    </span>
+                )}
             </div>
 
             {/* Quit Confirmation Modal */}
@@ -638,7 +609,7 @@ export default function PracticeEngine({
             {/* Question Card */}
             <div className="brilliant-card flex flex-col py-6 px-8 bg-card relative overflow-hidden mb-2 border border-border/40 shadow-xl shadow-primary/5 rounded-[2rem]">
                 <div className="relative z-10 flex-1 flex flex-col">
-                    <h2 className={`${fontSize === "large" ? "text-2xl md:text-4xl" : "text-xl md:text-3xl"} font-serif font-black mb-6 leading-tight text-foreground tracking-tight transition-all duration-150`}>
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-serif font-black mb-6 leading-tight text-foreground tracking-tight">
                         {question.content}
                     </h2>
 
