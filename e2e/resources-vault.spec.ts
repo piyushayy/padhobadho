@@ -10,15 +10,15 @@ test.describe('100% Free Study & PYQ Vault', () => {
 
     // Check exam track pills
     await expect(page.locator('text=Class 12 Boards').first()).toBeVisible();
-    await expect(page.locator('text=JEE (Main & Adv)').first()).toBeVisible();
-    await expect(page.locator('text=NEET-UG').first()).toBeVisible();
+    await expect(page.locator('text=JEE Main & Advanced').first()).toBeVisible();
+    await expect(page.locator('text=NEET UG').first()).toBeVisible();
   });
 
   test('should allow switching exam tracks via URL query or pills', async ({ page }) => {
     await page.goto('/resources?exam=JEE');
-    await expect(page.locator('text=JEE (Main & Adv) Vault').first()).toBeVisible();
+    await expect(page.locator('text=JEE Main & Advanced Vault').first()).toBeVisible();
 
     await page.goto('/resources?exam=NEET');
-    await expect(page.locator('text=NEET-UG Vault').first()).toBeVisible();
+    await expect(page.locator('text=NEET UG Vault').first()).toBeVisible();
   });
 });

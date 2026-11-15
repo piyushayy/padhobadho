@@ -109,8 +109,7 @@ export function AppHeader({ user, allExams, userName, userInitials }: AppHeaderP
                                 animate={{ x: 0 }}
                                 exit={{ x: "-100%" }}
                                 transition={{ type: "spring", damping: 25, stiffness: 280 }}
-                                className="fixed inset-y-0 left-0 z-[101] w-4/5 max-w-xs h-full bg-card border-r border-border shadow-2xl p-6 flex flex-col justify-between overflow-y-auto lg:hidden"
-                                style={{ backgroundColor: "var(--color-card, #ffffff)" }}
+                                className="fixed inset-y-0 left-0 z-[101] w-4/5 max-w-xs h-full bg-white dark:bg-[#141414] border-r border-border shadow-2xl p-6 flex flex-col justify-between overflow-y-auto lg:hidden"
                             >
                                 <div>
                                     <div className="flex items-center justify-between mb-8 pb-4 border-b border-border/50">

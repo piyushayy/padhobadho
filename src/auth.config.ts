@@ -46,11 +46,16 @@ export default {
                 "/",
                 "/about",
                 "/contact",
+                "/privacy",
                 "/privacy-policy",
+                "/terms",
                 "/terms-and-conditions",
+                "/careers",
+                "/checkout",
+                "/resources",
                 "/auth/sign-in",
                 "/auth/sign-up"
-            ].includes(pathname)
+            ].includes(pathname) || pathname.startsWith("/resources")
 
             // Auth specific routes
             const isAuthRoute = [

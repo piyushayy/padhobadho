@@ -9,6 +9,7 @@ export default function ToasterProvider() {
             richColors
             expand
             closeButton
+            duration={3000}
             toastOptions={{
                 style: {
                     borderRadius: "1.25rem",

@@ -16,8 +16,8 @@ test.describe('Mobile Viewport & Drawer Layering', () => {
     await expect(closeButton).toBeVisible();
 
     // Drawer links must be visible
-    await expect(page.locator('text=Mock Tests').first()).toBeVisible();
-    await expect(page.locator('text=Library').first()).toBeVisible();
+    await expect(page.locator('a:has-text("Mock Tests"):visible').first()).toBeVisible();
+    await expect(page.locator('a:has-text("Library"):visible').first()).toBeVisible();
 
     // Click close button
     await closeButton.click();

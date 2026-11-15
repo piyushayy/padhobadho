@@ -6,19 +6,19 @@ test.describe('Landing Page & Public Flow', () => {
 
     // Title and branding
     await expect(page).toHaveTitle(/PadhoBadho/i);
-    await expect(page.locator('text=pb.').first()).toBeVisible();
+    await expect(page.locator('text=padhobadho').first()).toBeVisible();
 
     // CTA button to practice
-    const practiceLink = page.locator('a[href="/practice"]').first();
+    const practiceLink = page.locator('a[href="/practice"]:visible').first();
     await expect(practiceLink).toBeVisible();
 
-    // Target Exams section
-    await expect(page.locator('text=Target Exams').first()).toBeVisible();
+    // Value proposition heading
+    await expect(page.locator('text=Padhega India').first()).toBeVisible();
   });
 
   test('should navigate from landing to free practice catalog', async ({ page }) => {
     await page.goto('/');
-    const practiceLink = page.locator('a[href="/practice"]').first();
+    const practiceLink = page.locator('a[href="/practice"]:visible').first();
     await practiceLink.click();
     await expect(page).toHaveURL(/\/practice/);
     await expect(page.locator('text=Free Trial Mode').first()).toBeVisible();

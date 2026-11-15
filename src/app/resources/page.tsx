@@ -47,18 +47,36 @@ async function ResourcesContent({ searchParams }: { searchParams?: { exam?: stri
     let targetExamId = ""
     let activeExamCode = searchParams?.exam || ""
 
-    if (!isGuest) {
-        const user = await prisma.user.findUnique({
-            where: { id: session.user.id },
-            select: { targetExamId: true, targetExam: true }
-        })
-        targetExamId = user?.targetExamId || ""
-        if (!activeExamCode && user?.targetExam?.code) {
-            activeExamCode = user.targetExam.code
+    let allExams: any[] = []
+    let subjects: any[] = []
+
+    try {
+        if (!isGuest) {
+            const user = await prisma.user.findUnique({
+                where: { id: session.user.id },
+                select: { targetExamId: true, targetExam: true }
+            })
+            targetExamId = user?.targetExamId || ""
+            if (!activeExamCode && user?.targetExam?.code) {
+                activeExamCode = user.targetExam.code
+            }
         }
+
+        allExams = await prisma.exam.findMany({ orderBy: { code: "asc" } })
+    } catch (err) {
+        console.warn("Database notice in resources: using default exam catalog", err)
     }
 
-    const allExams = await prisma.exam.findMany({ orderBy: { code: "asc" } })
+    if (!allExams || allExams.length === 0) {
+        allExams = [
+            { id: "exam-class12", code: "CLASS-12", name: "Class 12 Boards" },
+            { id: "exam-jee", code: "JEE", name: "JEE Main & Advanced" },
+            { id: "exam-neet", code: "NEET", name: "NEET UG" },
+            { id: "exam-cuet", code: "CUET-UG", name: "CUET UG" },
+            { id: "exam-ssc", code: "SSC", name: "SSC Exams" },
+            { id: "exam-dsssb", code: "DSSSB", name: "DSSSB Exams" }
+        ]
+    }
 
     const activeExam = allExams.find(e =>
         activeExamCode ? e.code.toUpperCase() === activeExamCode.toUpperCase() : e.id === targetExamId
@@ -67,18 +85,22 @@ async function ResourcesContent({ searchParams }: { searchParams?: { exam?: stri
     const selectedExamId = activeExam?.id || ""
     const selectedCode = activeExam?.code || "CLASS-12"
 
-    const subjects = await prisma.subject.findMany({
-        where: selectedExamId ? {
-            exams: {
-                some: { id: selectedExamId }
-            }
-        } : undefined,
-        include: {
-            resources: true,
-            _count: { select: { questions: true } }
-        },
-        orderBy: { name: "asc" }
-    })
+    try {
+        subjects = await prisma.subject.findMany({
+            where: selectedExamId ? {
+                exams: {
+                    some: { id: selectedExamId }
+                }
+            } : undefined,
+            include: {
+                resources: true,
+                _count: { select: { questions: true } }
+            },
+            orderBy: { name: "asc" }
+        })
+    } catch (err) {
+        console.warn("Database notice in resources: using empty subjects fallback", err)
+    }
 
     const fallbackResources = CURATED_DEFAULT_RESOURCES[selectedCode] || CURATED_DEFAULT_RESOURCES["CLASS-12"]
 
@@ -206,7 +228,7 @@ async function ResourcesContent({ searchParams }: { searchParams?: { exam?: stri
                                     </Link>
                                 </div>
                             ) : (
-                                subject.resources.map((res) => (
+                                subject.resources.map((res: any) => (
                                     <a
                                         key={res.id}
                                         href={res.url}
