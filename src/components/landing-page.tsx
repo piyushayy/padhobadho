@@ -104,7 +104,7 @@ export default function LandingPage() {
             },
             {
                 question: "Which exams do you cover?",
-                answer: "We currently focus on CUET (UG & PG), JEE Mains, NEET, and CLAT. We're adding more exams like GATE and CAT soon."
+                answer: "We currently cover Class 12 Boards (CBSE & State Boards), JEE (Main & Advanced), NEET-UG, CUET-UG, SSC (CGL, CHSL, MTS), and DSSSB recruitment exams."
             }
         ],
         practice: [

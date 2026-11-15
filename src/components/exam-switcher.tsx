@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { Target, Check, ChevronDown, Sparkles } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { toast } from "sonner"
+import { updateTargetExam } from "@/actions/profile"
 
 interface Exam {
     id: string
@@ -12,10 +13,12 @@ interface Exam {
 }
 
 const DEFAULT_EXAMS: Exam[] = [
+    { id: "class-12", name: "Class 12 Boards", code: "CLASS-12" },
+    { id: "jee", name: "JEE (Main & Adv)", code: "JEE" },
+    { id: "neet", name: "NEET-UG", code: "NEET" },
     { id: "cuet-ug", name: "CUET-UG", code: "CUET-UG" },
-    { id: "cuet-pg", name: "CUET-PG", code: "CUET-PG" },
-    { id: "jee-mains", name: "JEE Mains", code: "JEE" },
-    { id: "neet-ug", name: "NEET-UG", code: "NEET" },
+    { id: "ssc", name: "SSC (CGL/CHSL/MTS)", code: "SSC" },
+    { id: "dsssb", name: "DSSSB Exams", code: "DSSSB" },
 ]
 
 export default function ExamSwitcher({
@@ -42,12 +45,18 @@ export default function ExamSwitcher({
         return () => document.removeEventListener("mousedown", handleClickOutside)
     }, [])
 
-    const handleSelect = (exam: Exam) => {
+    const handleSelect = async (exam: Exam) => {
         setSelected(exam)
         setIsOpen(false)
-        toast.success(`Target exam switched to ${exam.name}`, {
-            description: "Practice questions & mock tests tuned for this exam."
-        })
+        try {
+            await updateTargetExam(exam.id)
+            toast.success(`Target switched to ${exam.name}`, {
+                description: "Your practice drills and mock tests are now tailored for this exam."
+            })
+        } catch {
+            // Unauthenticated guest or local fallback
+            toast.success(`Viewing ${exam.name}`)
+        }
     }
 
     return (

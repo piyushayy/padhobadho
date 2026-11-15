@@ -9,6 +9,7 @@ export async function submitOnboarding(data: {
     age: number
     school: string
     stream?: string
+    targetExamCode?: string
 }) {
     const session = await auth()
     if (!session?.user?.id) {
@@ -21,8 +22,15 @@ export async function submitOnboarding(data: {
             where: { id: session.user.id }
         })
 
-        // 2. Find a default exam if none is set
+        // 2. Resolve target exam
         let targetExamId = existingUser?.targetExamId
+        if (data.targetExamCode) {
+            const foundExam = await prisma.exam.findUnique({
+                where: { code: data.targetExamCode },
+                select: { id: true }
+            })
+            if (foundExam) targetExamId = foundExam.id
+        }
         if (!targetExamId) {
             const firstExam = await prisma.exam.findFirst({ select: { id: true } })
             targetExamId = firstExam?.id || null
