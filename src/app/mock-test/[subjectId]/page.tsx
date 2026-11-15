@@ -4,6 +4,8 @@ import { redirect } from "next/navigation"
 import MockTestEngine from "@/components/mock-test-engine"
 import { ShieldAlert } from "lucide-react"
 
+export const dynamic = "force-dynamic"
+
 export default async function MockTestSession({
     params
 }: {
@@ -20,24 +22,23 @@ export default async function MockTestSession({
     })
     if (!subject) redirect("/mock-test")
 
-    // 2. Fetch full exam set (40-50 questions)
-    // For MVP, we fetch 40 questions balanced by difficulty
+    // 2. Fetch questions
     const questions = await prisma.question.findMany({
         where: { subjectId },
         take: 40,
         orderBy: { createdAt: "asc" }
     })
 
-    if (questions.length < 10) {
+    if (questions.length === 0) {
         return (
-            <div className="min-h-screen flex items-center justify-center p-8 text-center bg-slate-50 dark:bg-black">
+            <div className="min-h-screen flex items-center justify-center p-8 text-center bg-background">
                 <div className="max-w-md space-y-6">
-                    <div className="w-20 h-20 bg-rose-100 rounded-[2.5rem] flex items-center justify-center mx-auto dark:bg-white/5">
+                    <div className="w-20 h-20 bg-rose-500/10 rounded-[2.5rem] flex items-center justify-center mx-auto border border-rose-500/20">
                         <ShieldAlert className="w-10 h-10 text-rose-500" />
                     </div>
-                    <h2 className="text-3xl font-serif font-black mb-2 tracking-tight">Insufficient Questions</h2>
-                    <p className="text-muted-foreground font-medium">A mock test requires at least 40 questions. Please try a different subject or check back later.</p>
-                    <a href="/mock-test" className="inline-block px-8 py-4 bg-black text-white rounded-full font-black dark:bg-white dark:text-black hover:scale-105 transition-transform">
+                    <h2 className="text-3xl font-serif font-black mb-2 tracking-tight">Questions Coming Soon</h2>
+                    <p className="text-muted-foreground font-medium">Educators are actively curating questions for {subject.name}. Please select another subject in the meantime.</p>
+                    <a href="/mock-test" className="inline-block px-8 py-4 bg-foreground text-background rounded-full font-black hover:scale-105 transition-transform">
                         Choose Another Subject
                     </a>
                 </div>

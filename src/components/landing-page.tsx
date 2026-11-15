@@ -1,23 +1,92 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useRef } from "react"
-import { ArrowRight, Sparkles, Quote, MoveRight, CheckCircle2, Zap, Target, BookOpen, Trophy, ChevronLeft, ChevronRight, GraduationCap, Brain } from "lucide-react"
-import { motion, useScroll, useTransform } from "framer-motion"
+import { useState, useRef, useEffect } from "react"
+import { ArrowRight, Sparkles, Quote, MoveRight, CheckCircle2, Zap, Target, BookOpen, Trophy, ChevronLeft, ChevronRight, GraduationCap, Brain, Users, HelpCircle, Star, BarChart3 } from "lucide-react"
+import { motion, useScroll, useTransform, useInView, useMotionValue, useSpring, animate } from "framer-motion"
 import { FAQ } from "@/components/landing/faq"
 import { StaggerTestimonials } from "@/components/landing/stagger-testimonials"
 
+// ── Animated stat counter ───────────────────────────────────
+function AnimatedStat({ value, suffix = "", decimals = 0, icon: Icon, label, color }: {
+    value: number; suffix?: string; decimals?: number
+    icon: any; label: string; color: string
+}) {
+    const ref = useRef<HTMLDivElement>(null)
+    const isInView = useInView(ref, { once: true, margin: "-100px" })
+    const motionVal = useMotionValue(0)
+    const rounded = useTransform(motionVal, (v) =>
+        decimals > 0 ? v.toFixed(decimals) : Math.round(v).toLocaleString()
+    )
+    const [display, setDisplay] = useState(decimals > 0 ? "0.0" : "0")
+
+    useEffect(() => {
+        if (!isInView) return
+        const controls = animate(motionVal, value, {
+            duration: 2,
+            ease: [0.25, 0.46, 0.45, 0.94],
+        })
+        const unsub = rounded.on("change", (v) => setDisplay(v))
+        return () => { controls.stop(); unsub() }
+    }, [isInView, value, motionVal, rounded])
+
+    return (
+        <motion.div
+            ref={ref}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ type: "spring", stiffness: 100, damping: 20 }}
+            className="stat-card p-8 text-center"
+        >
+            <div className={`w-14 h-14 mx-auto mb-4 rounded-2xl flex items-center justify-center ${color}`}>
+                <Icon size={28} />
+            </div>
+            <div className="text-4xl md:text-5xl font-black font-serif mb-2">
+                {display}<span className="text-primary">{suffix}</span>
+            </div>
+            <div className="text-muted-foreground font-medium">{label}</div>
+        </motion.div>
+    )
+}
+
+// ── FloatingBadge with subtle hover & float ─────────────────
 function FloatingBadge({ children, className, delay = 0 }: any) {
     return (
         <motion.div
-            initial={{ y: 0 }}
-            animate={{ y: [-5, 5, -5] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay }}
+            animate={{ y: [-6, 6, -6] }}
+            transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay }}
             className={`absolute ${className}`}
         >
             {children}
         </motion.div>
     )
+}
+
+// ── Animated progress bar ───────────────────────────────────
+function AnimatedProgress({ width, color }: { width: string; color: string }) {
+    const ref = useRef<HTMLDivElement>(null)
+    const isInView = useInView(ref, { once: true, margin: "-50px" })
+
+    return (
+        <div ref={ref} className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+            <motion.div
+                initial={{ width: 0 }}
+                animate={isInView ? { width } : { width: 0 }}
+                transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className={`h-full rounded-full ${color}`}
+            />
+        </div>
+    )
+}
+
+// ── Card hover spring config ────────────────────────────────
+const cardVariants: any = {
+    hidden: { opacity: 0, y: 40 },
+    visible: (i: number) => ({
+        opacity: 1, y: 0,
+        transition: { type: "spring", stiffness: 120, damping: 16, delay: i * 0.15 }
+    })
 }
 
 export default function LandingPage() {
@@ -62,6 +131,20 @@ export default function LandingPage() {
 
             {/* HERO */}
             <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+                {/* Animated gradient blobs */}
+                <div className="hero-blob top-[-10%] left-[-5%] opacity-15" style={{ animationDelay: "0s" }} />
+                <div className="hero-blob top-[10%] right-[-8%] opacity-10" style={{ animationDelay: "2s", background: "linear-gradient(135deg, var(--secondary), var(--primary))" }} />
+                <div className="hero-blob bottom-[-15%] left-[30%] opacity-10" style={{ animationDelay: "4s", background: "linear-gradient(135deg, #10b981, #059669)" }} />
+
+                {/* Dot grid pattern overlay */}
+                <div
+                    className="absolute inset-0 opacity-[0.04] pointer-events-none"
+                    style={{
+                        backgroundImage: "radial-gradient(circle, var(--foreground) 1px, transparent 1px)",
+                        backgroundSize: "32px 32px"
+                    }}
+                />
+
                 <div className="container mx-auto px-6 max-w-6xl text-center relative z-10">
                     <motion.div
                         initial="hidden"
@@ -146,6 +229,18 @@ export default function LandingPage() {
                 </div>
             </section>
 
+            {/* ANIMATED STATS COUNTER */}
+            <section className="py-20 border-y border-border/30">
+                <div className="container mx-auto px-6 max-w-5xl">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <AnimatedStat value={10000} suffix="+" icon={Users} label="Students Active" color="bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400" />
+                        <AnimatedStat value={50000} suffix="+" icon={HelpCircle} label="Questions Solved" color="bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400" />
+                        <AnimatedStat value={95} suffix="%" icon={BarChart3} label="Accuracy Rate" color="bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400" />
+                        <AnimatedStat value={4.8} decimals={1} icon={Star} label="App Rating" color="bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400" />
+                    </div>
+                </div>
+            </section>
+
             {/* HOW IT WORKS / VALUE PROP */}
             <section className="py-24 bg-accent/30 border-y border-border/30">
                 <div className="container mx-auto px-6">
@@ -189,16 +284,23 @@ export default function LandingPage() {
                         ].map((item, i) => (
                             <motion.div
                                 key={i}
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
+                                custom={i}
+                                initial="hidden"
+                                whileInView="visible"
                                 viewport={{ once: true }}
-                                transition={{ delay: i * 0.2 }}
+                                variants={cardVariants}
                                 whileHover={{ y: -10, transition: { duration: 0.3 } }}
-                                className="bg-background p-8 rounded-2xl border border-border/50 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all cursor-default"
+                                className="group bg-background p-8 rounded-2xl border border-border/50 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all cursor-default relative overflow-hidden"
                             >
-                                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-6 transition-transform group-hover:scale-110 duration-300">
+                                {/* Gradient border on hover */}
+                                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: "linear-gradient(135deg, var(--primary), var(--secondary))", padding: "1px", mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)", maskComposite: "exclude", WebkitMaskComposite: "xor" }} />
+                                <motion.div
+                                    className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-6"
+                                    whileHover={{ rotate: 360 }}
+                                    transition={{ duration: 0.6, ease: "easeInOut" }}
+                                >
                                     <item.icon size={24} />
-                                </div>
+                                </motion.div>
                                 <h3 className="text-xl font-bold mb-3">{item.title}</h3>
                                 <p className="text-muted-foreground leading-relaxed">{item.desc}</p>
                             </motion.div>
@@ -221,14 +323,14 @@ export default function LandingPage() {
                         <div className="relative h-[400px] w-full bg-accent/20 rounded-[3rem] border border-border/50 p-8 flex items-center justify-center overflow-hidden">
                             <div className="absolute inset-0 bg-grid-slate-200/20 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))]" />
 
-                            <FloatingBadge className="top-12 left-8 bg-background p-4 rounded-xl shadow-lg border border-border/50 rotate-3 z-10" delay={0}>
+                            <FloatingBadge className="top-12 left-8 bg-background p-4 rounded-xl shadow-lg border border-border/50 rotate-3 z-10" delay={0} parallaxRange={[-20, 20]}>
                                 <div className="flex items-center gap-3">
                                     <div className="font-serif font-bold text-lg text-foreground">General Test</div>
                                     <div className="text-xs font-black bg-green-100 text-green-700 px-2 py-0.5 rounded">HIGH YIELD</div>
                                 </div>
                             </FloatingBadge>
 
-                            <FloatingBadge className="bottom-20 right-8 bg-background p-4 rounded-xl shadow-lg border border-border/50 -rotate-2 z-20" delay={1.5}>
+                            <FloatingBadge className="bottom-20 right-8 bg-background p-4 rounded-xl shadow-lg border border-border/50 -rotate-2 z-20" delay={1.5} parallaxRange={[-30, 10]}>
                                 <div className="flex items-center gap-3">
                                     <div className="font-serif font-bold text-lg text-foreground">English</div>
                                     <div className="text-xs font-black bg-blue-100 text-blue-700 px-2 py-0.5 rounded">VOCAB</div>
@@ -294,12 +396,12 @@ export default function LandingPage() {
                     <div className="relative">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {[
-                                { name: "Algebra", status: "mastered", color: "blue" },
-                                { name: "Accountancy", status: "learning", color: "purple" },
-                                { name: "Logic", status: "mastered", color: "green" },
-                                { name: "Physics", status: "learning", color: "orange" },
-                                { name: "Chemistry", status: "pending", color: "red" },
-                                { name: "Economics", status: "pending", color: "emerald" },
+                                { name: "Algebra", status: "mastered", color: "blue", progress: "100%", barColor: "bg-blue-500" },
+                                { name: "Accountancy", status: "learning", color: "purple", progress: "55%", barColor: "bg-purple-500" },
+                                { name: "Logic", status: "mastered", color: "green", progress: "100%", barColor: "bg-green-500" },
+                                { name: "Physics", status: "learning", color: "orange", progress: "40%", barColor: "bg-orange-500" },
+                                { name: "Chemistry", status: "pending", color: "red", progress: "10%", barColor: "bg-red-500" },
+                                { name: "Economics", status: "pending", color: "emerald", progress: "15%", barColor: "bg-emerald-500" },
                             ].map((topic, i) => (
                                 <motion.div
                                     key={i}
@@ -311,7 +413,7 @@ export default function LandingPage() {
                                     <div className={`w-2 h-2 rounded-full bg-${topic.color}-500`} />
                                     <span className="font-bold">{topic.name}</span>
                                     {topic.status === "mastered" && <CheckCircle2 size={16} className="text-primary ml-auto" />}
-                                    {topic.status === "learning" && <div className="h-1 w-full bg-muted rounded-full overflow-hidden"><div className="h-full w-1/2 bg-primary" /></div>}
+                                    <AnimatedProgress width={topic.progress} color={topic.barColor} />
                                 </motion.div>
                             ))}
                         </div>
@@ -400,6 +502,25 @@ export default function LandingPage() {
 
             {/* CTA */}
             <section className="py-24 md:py-32 relative overflow-hidden bg-foreground text-background text-center">
+                {/* Floating background shapes */}
+                <motion.div
+                    animate={{ y: [-20, 20, -20], x: [-10, 10, -10], rotate: [0, 90, 0] }}
+                    transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute top-10 left-[10%] w-32 h-32 rounded-full border border-primary/10 opacity-20"
+                />
+                <motion.div
+                    animate={{ y: [15, -15, 15], x: [10, -10, 10], rotate: [0, -60, 0] }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+                    className="absolute bottom-10 right-[15%] w-24 h-24 rounded-2xl border border-primary/10 opacity-20"
+                />
+                <motion.div
+                    animate={{ y: [10, -20, 10], scale: [1, 1.1, 1] }}
+                    transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 4 }}
+                    className="absolute top-1/3 right-[8%] w-16 h-16 rounded-full bg-primary/5 opacity-30"
+                />
+                {/* Animated gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 animate-gradient-x pointer-events-none" />
+
                 <div className="container mx-auto px-6 max-w-4xl relative z-10">
                     <GraduationCap className="w-16 h-16 mx-auto mb-6 text-primary/80" />
                     <h2 className="text-4xl md:text-6xl font-serif font-black mb-8 leading-tight">
@@ -408,12 +529,16 @@ export default function LandingPage() {
                     <p className="text-xl text-primary-foreground/70 mb-10 max-w-2xl mx-auto">
                         Don't let another day of vague prep go by. Start precise, daily practice today.
                     </p>
-                    <Link
-                        href="/auth/sign-up"
-                        className="inline-flex items-center gap-3 px-10 py-5 bg-background text-foreground rounded-full font-black text-xl hover:scale-105 hover:shadow-2xl transition-all duration-300"
-                    >
-                        Sign Up for Free <ArrowRight />
-                    </Link>
+                    {/* Pulsing glow button */}
+                    <div className="relative inline-block">
+                        <div className="absolute inset-0 rounded-full bg-primary/30 blur-xl animate-pulse-glow" />
+                        <Link
+                            href="/auth/sign-up"
+                            className="relative inline-flex items-center gap-3 px-10 py-5 bg-background text-foreground rounded-full font-black text-xl hover:scale-105 hover:shadow-2xl transition-all duration-300"
+                        >
+                            Sign Up for Free <ArrowRight />
+                        </Link>
+                    </div>
                 </div>
             </section>
         </div>

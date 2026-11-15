@@ -1,8 +1,9 @@
 "use client"
 
+import { useMemo } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { ChevronRight, Zap } from "lucide-react"
+import { ChevronRight, Zap, Flame, Sparkles, BookOpen, Clock } from "lucide-react"
 
 interface DashboardHeroProps {
     examCode: string
@@ -11,113 +12,126 @@ interface DashboardHeroProps {
 }
 
 export default function DashboardHero({ examCode, targetUniversity, totalAttempted }: DashboardHeroProps) {
+    const greeting = useMemo(() => {
+        const hour = new Date().getHours()
+        if (hour < 12) return "Good morning"
+        if (hour < 17) return "Good afternoon"
+        return "Good evening"
+    }, [])
+
     return (
         <motion.section
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="relative overflow-hidden rounded-[3rem] bg-zinc-950 p-12 md:p-16 text-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] group border border-white/5"
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 p-8 md:p-14 text-white shadow-2xl border border-white/10 group"
         >
-            {/* Animated Background Gradients */}
-            <div className="absolute inset-0 overflow-hidden">
+            {/* Animated Ambient Light Blobs */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <motion.div
                     animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [0.3, 0.5, 0.3],
-                        x: [0, 50, 0],
-                        y: [0, -30, 0]
+                        scale: [1, 1.25, 1],
+                        opacity: [0.25, 0.45, 0.25],
+                        x: [0, 40, 0],
+                        y: [0, -20, 0]
                     }}
-                    transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute -top-[20%] -right-[10%] w-[60%] h-[80%] bg-primary/20 blur-[120px] rounded-full will-change-transform"
+                    transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/25 blur-[100px] rounded-full will-change-transform"
                 />
                 <motion.div
                     animate={{
                         scale: [1, 1.3, 1],
-                        opacity: [0.2, 0.4, 0.2],
-                        x: [0, -40, 0],
-                        y: [0, 40, 0]
+                        opacity: [0.2, 0.35, 0.2],
+                        x: [0, -30, 0],
+                        y: [0, 30, 0]
                     }}
-                    transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute -bottom-[20%] -left-[10%] w-[50%] h-[70%] bg-blue-500/10 blur-[100px] rounded-full will-change-transform"
+                    transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-500/20 blur-[100px] rounded-full will-change-transform"
                 />
+                {/* Dot matrix grid overlay */}
+                <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:20px_20px] opacity-40" />
             </div>
 
             {/* Content Container */}
-            <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
-                {/* Left: Welcome & Progress */}
-                <div className="space-y-8">
+            <div className="relative z-10 grid lg:grid-cols-12 gap-8 items-center">
+                {/* Left: Welcome & CTAs */}
+                <div className="lg:col-span-7 space-y-6">
                     <motion.div
-                        initial={{ opacity: 0, x: -20 }}
+                        initial={{ opacity: 0, x: -16 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.2, duration: 0.8 }}
+                        transition={{ delay: 0.15, duration: 0.6 }}
+                        className="space-y-3"
                     >
-                        <h2 className="text-4xl md:text-6xl font-serif font-black tracking-tight mb-4 leading-[1.1]">
-                            Welcome back, 👋 <br />
-                            <motion.span
-                                animate={{ color: ["#fff", "#10b981", "#fff"] }}
-                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                className="italic inline-block"
-                            >
-                                Aspirant.
-                            </motion.span>
+                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs font-bold text-emerald-400">
+                            <Sparkles size={14} className="animate-pulse" />
+                            <span>Target: {examCode || "CUET 2026"}</span>
+                        </div>
+
+                        <h2 className="text-3xl md:text-5xl font-serif font-black tracking-tight leading-[1.15]">
+                            {greeting}, <br />
+                            <span className="gradient-text italic font-bold">Aspirant.</span>
                         </h2>
-                        <p className="text-lg opacity-70 font-medium max-w-md leading-relaxed">
+
+                        <p className="text-base md:text-lg text-zinc-300 font-medium max-w-lg leading-relaxed">
                             {targetUniversity
-                                ? `Destined for ${targetUniversity}. ${totalAttempted} questions down, a lifetime of glory to go.`
-                                : "Your daily streak is waiting. Let's make today count."}
+                                ? `Destined for ${targetUniversity}. ${totalAttempted} practice drills completed on your road to admission.`
+                                : "Your daily streak is active. Every question solved today compounds toward test day."}
                         </p>
                     </motion.div>
 
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4, duration: 0.8 }}
-                        className="flex flex-wrap gap-4"
+                        transition={{ delay: 0.3, duration: 0.6 }}
+                        className="flex flex-wrap gap-3.5 pt-2"
                     >
-                        <Link href="/practice" className="h-14 px-8 bg-white text-black rounded-2xl font-black flex items-center gap-2 hover:scale-105 transition-all shadow-xl active:scale-95 text-sm uppercase tracking-widest">
-                            Continue <ChevronRight size={18} strokeWidth={3} />
+                        <Link
+                            href="/practice"
+                            className="h-12 md:h-14 px-7 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 rounded-2xl font-black flex items-center gap-2 hover:scale-[1.03] transition-all duration-200 shadow-xl shadow-emerald-500/20 active:scale-95 text-xs md:text-sm uppercase tracking-wider"
+                        >
+                            <BookOpen size={18} strokeWidth={2.5} /> Continue Practice
                         </Link>
-                        <Link href="/mock-test" className="h-14 px-8 bg-zinc-800 text-white border border-white/10 rounded-2xl font-black flex items-center gap-2 hover:bg-zinc-700 transition-all text-sm uppercase tracking-widest">
-                            Mock Test
+                        <Link
+                            href="/mock-test"
+                            className="h-12 md:h-14 px-7 bg-white/10 hover:bg-white/15 text-white border border-white/15 rounded-2xl font-bold flex items-center gap-2 transition-all duration-200 text-xs md:text-sm uppercase tracking-wider backdrop-blur-sm"
+                        >
+                            <Clock size={18} /> Full Mock Test
                         </Link>
                     </motion.div>
                 </div>
 
-                {/* Right: Daily Drop Card (Gamification) */}
+                {/* Right: Daily Challenge & Streak Tile */}
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
+                    initial={{ opacity: 0, scale: 0.94 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.6, duration: 0.8 }}
-                    className="relative hidden md:block" // Hidden on mobile to save space, visible on desktop
+                    transition={{ delay: 0.4, duration: 0.7 }}
+                    className="lg:col-span-5"
                 >
-                    <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-blue-600 rounded-[2.5rem] blur-xl opacity-50 animate-pulse" />
-                    <div className="relative bg-gradient-to-br from-[#6366f1] to-[#a855f7] p-8 md:p-10 rounded-[2.5rem] text-white shadow-2xl border border-white/20">
-                        <div className="flex justify-between items-start mb-8">
-                            <div className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                                <Zap size={12} fill="currentColor" className="text-yellow-300" /> Daily Drop
+                    <div className="relative p-6 md:p-8 rounded-3xl bg-gradient-to-br from-emerald-500/15 via-teal-500/10 to-blue-500/15 border border-white/15 backdrop-blur-xl shadow-2xl overflow-hidden group/card hover:border-emerald-400/30 transition-all duration-300">
+                        <div className="absolute top-0 right-0 -mr-10 -mt-10 w-40 h-40 bg-emerald-500/20 rounded-full blur-2xl group-hover/card:scale-125 transition-transform duration-500" />
+
+                        <div className="flex justify-between items-center mb-6">
+                            <span className="px-3 py-1 bg-white/15 rounded-full text-[10px] font-black uppercase tracking-widest text-emerald-300 flex items-center gap-1.5 border border-white/10">
+                                <Zap size={12} fill="currentColor" className="text-yellow-300" /> Question of the Day
+                            </span>
+                            <div className="flex items-center gap-1 text-xs font-bold text-amber-400 bg-amber-400/10 px-2.5 py-1 rounded-full border border-amber-400/20 animate-pulse">
+                                <Flame size={14} fill="currentColor" /> +50 XP
                             </div>
                         </div>
 
-                        <h3 className="text-3xl font-black mb-2">Keep the streak alive!</h3>
-                        <p className="text-sm font-medium text-white/80 mb-8 leading-relaxed">
-                            Consistency is the key to cracking your dream college. Don't break the chain.
+                        <h3 className="text-xl md:text-2xl font-bold mb-2 text-white">Daily Habit Loop</h3>
+                        <p className="text-xs md:text-sm text-zinc-300 mb-6 leading-relaxed">
+                            Solve today&apos;s curated challenge in under 60 seconds to safeguard your streak and climb the leaderboard.
                         </p>
 
-                        <button className="w-full h-14 bg-white text-[#6366f1] rounded-xl font-black text-sm uppercase tracking-widest hover:bg-white/90 transition-colors flex items-center justify-center gap-2 shadow-lg">
-                            Start Practice <ChevronRight size={16} strokeWidth={3} />
-                        </button>
+                        <Link
+                            href="/practice/daily"
+                            className="w-full h-12 bg-white text-zinc-950 hover:bg-emerald-400 rounded-xl font-black text-xs uppercase tracking-wider transition-colors duration-200 flex items-center justify-center gap-2 shadow-lg"
+                        >
+                            Solve Today&apos;s POTD <ChevronRight size={16} strokeWidth={3} />
+                        </Link>
                     </div>
                 </motion.div>
-            </div>
-
-            {/* Floating Decorative Elements */}
-            <div className="absolute right-12 top-12 hidden lg:block opacity-20 group-hover:opacity-40 transition-opacity">
-                <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="animate-spin-slow">
-                    <circle cx="60" cy="60" r="58" stroke="white" strokeWidth="0.5" strokeDasharray="4 4" />
-                    <circle cx="60" cy="60" r="40" stroke="white" strokeWidth="0.5" />
-                    <rect x="55" y="10" width="10" height="100" fill="white" fillOpacity="0.1" />
-                    <rect x="10" y="55" width="100" height="10" fill="white" fillOpacity="0.1" />
-                </svg>
             </div>
         </motion.section>
     )

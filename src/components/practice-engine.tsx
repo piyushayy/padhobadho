@@ -17,6 +17,55 @@ interface Question {
     correctOption?: number
 }
 
+function playAudioFeedback(isCorrect: boolean) {
+    try {
+        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
+        if (!AudioCtx) return
+        const ctx = new AudioCtx()
+        const now = ctx.currentTime
+
+        if (isCorrect) {
+            // Harmonic dual chime (C5 -> G5)
+            const osc1 = ctx.createOscillator()
+            const osc2 = ctx.createOscillator()
+            const gain = ctx.createGain()
+
+            osc1.type = "sine"
+            osc2.type = "triangle"
+            osc1.frequency.setValueAtTime(523.25, now)
+            osc1.frequency.exponentialRampToValueAtTime(783.99, now + 0.12)
+            osc2.frequency.setValueAtTime(659.25, now + 0.05)
+
+            gain.gain.setValueAtTime(0.15, now)
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35)
+
+            osc1.connect(gain)
+            osc2.connect(gain)
+            gain.connect(ctx.destination)
+
+            osc1.start(now)
+            osc2.start(now + 0.05)
+            osc1.stop(now + 0.35)
+            osc2.stop(now + 0.35)
+        } else {
+            // Gentle low boop
+            const osc = ctx.createOscillator()
+            const gain = ctx.createGain()
+            osc.type = "sine"
+            osc.frequency.setValueAtTime(220, now)
+            osc.frequency.exponentialRampToValueAtTime(140, now + 0.18)
+            gain.gain.setValueAtTime(0.12, now)
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22)
+            osc.connect(gain)
+            gain.connect(ctx.destination)
+            osc.start(now)
+            osc.stop(now + 0.22)
+        }
+    } catch {
+        // Fallback silently if audio context is blocked
+    }
+}
+
 export default function PracticeEngine({
     sessionId,
     initialQuestions
@@ -67,10 +116,8 @@ export default function PracticeEngine({
         setCorrectOption(correctOpt)
         setSubmitted(true)
 
-        // Play Sound
-        const audio = new Audio(isAnswerCorrect ? '/sounds/correct.mp3' : '/sounds/incorrect.mp3')
-        audio.volume = 0.5
-        audio.play().catch(() => { })
+        // Play Sound with Web Audio API (zero 404s, 0ms latency)
+        playAudioFeedback(isAnswerCorrect)
 
         if (isAnswerCorrect) {
             setShowExplanation(true)

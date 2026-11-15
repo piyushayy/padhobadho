@@ -101,3 +101,116 @@
 .animate-marquee {
   animation: marquee var(--duration) linear infinite;
 }
+
+
+/* ── Animation Keyframes ─────────────────────────────────── */
+
+@keyframes float {
+  0%, 100% { transform: translateY(-8px); }
+  50% { transform: translateY(8px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 10%, transparent); }
+  50% { box-shadow: 0 0 24px 8px color-mix(in srgb, var(--primary) 10%, transparent); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes scale-in {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes gradient-x {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes count-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ── Animation Utility Classes ───────────────────────────── */
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up 500ms ease-out both;
+}
+
+.animate-scale-in {
+  animation: scale-in 400ms ease-out both;
+}
+
+.animate-gradient-x {
+  background-size: 200% 200%;
+  animation: gradient-x 8s ease infinite;
+}
+
+/* ── Component Classes ───────────────────────────────────── */
+
+.glass-card {
+  @apply bg-card/80 backdrop-blur-xl border border-border/50 rounded-3xl shadow-lg
+    hover:shadow-xl hover:shadow-primary/5 transition-all duration-500;
+}
+
+.stat-card {
+  @apply bg-card/80 backdrop-blur-xl border border-border/50 rounded-3xl shadow-lg
+    hover:shadow-xl hover:shadow-primary/5 transition-all duration-500
+    hover:border-primary/30 hover:-translate-y-1;
+}
+
+.hero-blob {
+  @apply absolute rounded-full blur-3xl opacity-20;
+  animation: float 4s ease-in-out infinite;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  width: 400px;
+  height: 400px;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, var(--primary), var(--secondary), var(--primary));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-x 8s ease infinite;
+}
+
+/* ── Reduced Motion ──────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-pulse-glow,
+  .animate-shimmer,
+  .animate-slide-up,
+  .animate-scale-in,
+  .animate-gradient-x,
+  .animate-marquee,
+  .hero-blob,
+  .gradient-text {
+    animation: none !important;
+  }
+}
