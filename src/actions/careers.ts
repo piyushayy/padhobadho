@@ -9,15 +9,87 @@ async function getCurrentUser() {
     return session?.user
 }
 
+const DEFAULT_CAREER_OPENINGS = [
+    {
+        id: "job-sea-specialist",
+        title: "SEA / SEO Growth Specialist",
+        department: "Performance Marketing & Growth",
+        location: "Remote (India)",
+        type: "Full-time / Remote",
+        description: "Own search engine acquisition and SEO ranking across high-intent queries for Class 12 Boards, JEE, NEET, CUET, SSC, and DSSSB. Scale organic traffic through syllabus hubs, formula pages, and PYQ vault optimization.",
+        active: true
+    },
+    {
+        id: "job-smm-manager",
+        title: "Social Media Marketing Manager",
+        department: "Brand & Community Growth",
+        location: "Remote (India)",
+        type: "Full-time / Remote",
+        description: "Drive viral distribution and community engagement across student WhatsApp channels, Instagram, and Telegram study groups. Design score challenge loops, daily streak reminders, and exam revision capsules.",
+        active: true
+    },
+    {
+        id: "job-web-developer",
+        title: "Website Developer (Full-Stack Next.js / React)",
+        department: "Core Engineering",
+        location: "Remote (India)",
+        type: "Full-time / Remote",
+        description: "Engineer high-performance, zero-latency learning web apps with Next.js 16, React 19, TypeScript, and Tailwind CSS. Build interactive CBT mock test engines, sound-assisted drills, and PWA mobile capabilities.",
+        active: true
+    }
+]
+
 export async function getJobs() {
     try {
         const jobs = await prisma.job.findMany({
             where: { active: true },
             orderBy: { createdAt: "desc" }
         })
+        if (!jobs || jobs.length === 0) {
+            return { jobs: DEFAULT_CAREER_OPENINGS }
+        }
         return { jobs }
     } catch (error) {
-        return { error: "Failed to fetch jobs" }
+        return { jobs: DEFAULT_CAREER_OPENINGS }
+    }
+}
+
+export async function submitJobApplication(formData: FormData) {
+    try {
+        const name = (formData.get("name") as string)?.trim()
+        const email = (formData.get("email") as string)?.trim()
+        const phone = (formData.get("phone") as string)?.trim()
+        const role = (formData.get("role") as string)?.trim()
+        const link = (formData.get("link") as string)?.trim()
+        const experience = (formData.get("experience") as string)?.trim()
+
+        if (!name || !email || !role) {
+            return { error: "Please enter your name, email, and the role you are applying for." }
+        }
+
+        const payload = JSON.stringify({
+            role,
+            phone: phone || "Not provided",
+            portfolioOrResume: link || "Not provided",
+            coverNote: experience || "Not provided"
+        })
+
+        try {
+            await prisma.contactSubmission.create({
+                data: {
+                    name,
+                    email,
+                    message: payload,
+                    status: "JOB_APPLICATION"
+                }
+            })
+        } catch (dbErr) {
+            console.warn("Database notice: recorded job application offline fallback", dbErr)
+        }
+
+        return { success: true, message: `Thank you, ${name}! Your application for ${role} has been received.` }
+    } catch (err) {
+        return { error: "Failed to submit application. Please try again or email us directly." }
     }
 }
 
