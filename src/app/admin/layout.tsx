@@ -4,6 +4,8 @@ import Link from "next/link"
 import { LayoutDashboard, BookOpen, Layers, PlusCircle, LogOut, ShieldCheck, ChevronRight, Library, Briefcase, FileUp, DollarSign, MessageSquare } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 
+export const dynamic = "force-dynamic"
+
 export default async function AdminLayout({
     children,
 }: {

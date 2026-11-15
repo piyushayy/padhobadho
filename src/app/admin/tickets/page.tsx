@@ -3,6 +3,8 @@ import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { PageHeader } from "@/components/page-header"
 
+export const dynamic = "force-dynamic"
+
 export default async function AdminTicketsPage() {
     const session = await auth()
     if (session?.user?.role !== "ADMIN") redirect("/")

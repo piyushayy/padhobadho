@@ -3,20 +3,27 @@ import { Users, GraduationCap, Target, BarChart3, MoreVertical } from "lucide-re
 
 import StudentListClient from "./student-list-client"
 
+export const dynamic = "force-dynamic"
+
 export default async function AdminStudentsPage() {
-    const students = await prisma.user.findMany({
-        where: { role: "STUDENT" },
-        include: {
-            _count: {
-                select: {
-                    practiceSessions: true,
-                    mockSessions: true,
-                    questionHistory: true
+    let students: any[] = []
+    try {
+        students = await prisma.user.findMany({
+            where: { role: "STUDENT" },
+            include: {
+                _count: {
+                    select: {
+                        practiceSessions: true,
+                        mockSessions: true,
+                        questionHistory: true
+                    }
                 }
-            }
-        },
-        orderBy: { createdAt: "desc" }
-    })
+            },
+            orderBy: { createdAt: "desc" }
+        })
+    } catch (e) {
+        console.error("Failed to load students in AdminStudentsPage:", e)
+    }
 
     const stats = {
         total: students.length,
