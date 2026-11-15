@@ -69,3 +69,6 @@ seed-users.ts
 seed.ts
 next-env.d.ts
 tools/
+test-results/
+playwright-report/
+
