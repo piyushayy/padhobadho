@@ -2,14 +2,13 @@
 
 import Link from "next/link"
 import { useState, useRef, useEffect } from "react"
-import { ArrowRight, Sparkles, Quote, MoveRight, CheckCircle2, Zap, Target, BookOpen, Trophy, ChevronLeft, ChevronRight, GraduationCap, Brain, Users, HelpCircle, Star, BarChart3 } from "lucide-react"
+import { ArrowRight, Sparkles, Quote, MoveRight, CheckCircle2, Zap, Target, BookOpen, Trophy, ChevronLeft, ChevronRight, GraduationCap, Brain, Users, HelpCircle, Star, BarChart3, ShieldCheck } from "lucide-react"
 import { motion, useScroll, useTransform, useInView, useMotionValue, useSpring, animate } from "framer-motion"
 import { FAQ } from "@/components/landing/faq"
-import { StaggerTestimonials } from "@/components/landing/stagger-testimonials"
 
 // ── Animated stat counter ───────────────────────────────────
-function AnimatedStat({ value, suffix = "", decimals = 0, icon: Icon, label, color }: {
-    value: number; suffix?: string; decimals?: number
+function AnimatedStat({ value, prefix = "", suffix = "", decimals = 0, icon: Icon, label, color }: {
+    value: number; prefix?: string; suffix?: string; decimals?: number
     icon: any; label: string; color: string
 }) {
     const ref = useRef<HTMLDivElement>(null)
@@ -43,7 +42,7 @@ function AnimatedStat({ value, suffix = "", decimals = 0, icon: Icon, label, col
                 <Icon size={28} />
             </div>
             <div className="text-4xl md:text-5xl font-black font-serif mb-2">
-                {display}<span className="text-primary">{suffix}</span>
+                <span className="text-primary">{prefix}</span>{display}<span className="text-primary">{suffix}</span>
             </div>
             <div className="text-muted-foreground font-medium">{label}</div>
         </motion.div>
@@ -229,14 +228,14 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* ANIMATED STATS COUNTER */}
+            {/* REAL GENUINE NUMBERS */}
             <section className="py-20 border-y border-border/30">
                 <div className="container mx-auto px-6 max-w-5xl">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                        <AnimatedStat value={10000} suffix="+" icon={Users} label="Students Active" color="bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400" />
-                        <AnimatedStat value={50000} suffix="+" icon={HelpCircle} label="Questions Solved" color="bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400" />
-                        <AnimatedStat value={95} suffix="%" icon={BarChart3} label="Accuracy Rate" color="bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400" />
-                        <AnimatedStat value={4.8} decimals={1} icon={Star} label="App Rating" color="bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400" />
+                        <AnimatedStat value={6} suffix=" Tracks" icon={BookOpen} label="Target Exams Covered" color="bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400" />
+                        <AnimatedStat value={0} prefix="₹" icon={CheckCircle2} label="100% Free For All" color="bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400" />
+                        <AnimatedStat value={100} suffix="%" icon={BarChart3} label="Verified Official PYQs" color="bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400" />
+                        <AnimatedStat value={0} icon={ShieldCheck} label="Ads or Paywalls" color="bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400" />
                     </div>
                 </div>
             </section>
@@ -482,16 +481,46 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* TESTIMONIALS */}
+            {/* OUR GENUINE COMMITMENT */}
             <section className="py-24 bg-accent/20 border-y border-border/30 overflow-hidden">
                 <div className="container mx-auto px-6 mb-12 text-center">
-                    <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6">Don't just take our word for it</h2>
-                    <p className="text-xl text-muted-foreground font-medium max-w-2xl mx-auto">
-                        Join thousands of students who are crushing their exams with Padhobadho.
+                    <h2 className="text-4xl md:text-5xl font-serif font-bold mb-4">Our Commitment to Aspirants</h2>
+                    <p className="text-lg text-muted-foreground font-medium max-w-2xl mx-auto">
+                        Education must be accessible to every student across India. No fake claims, no paywalls.
                     </p>
                 </div>
 
-                <StaggerTestimonials />
+                <div className="container mx-auto px-6 max-w-5xl">
+                    <div className="grid md:grid-cols-3 gap-6">
+                        <div className="p-8 rounded-3xl bg-card border border-border/60 space-y-4 shadow-sm">
+                            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black text-lg">
+                                ₹0
+                            </div>
+                            <h3 className="text-xl font-serif font-black">100% Free Forever</h3>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                                No paywalls, no trial expirations, and no premium upsells. Practice all available questions and mock tests freely.
+                            </p>
+                        </div>
+                        <div className="p-8 rounded-3xl bg-card border border-border/60 space-y-4 shadow-sm">
+                            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black text-xs uppercase tracking-wider">
+                                PYQ
+                            </div>
+                            <h3 className="text-xl font-serif font-black">Official Exam Papers</h3>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                                Direct official question papers, formula sheets, and marking schemes curated for Class 12 Boards, JEE, NEET, CUET, SSC, and DSSSB.
+                            </p>
+                        </div>
+                        <div className="p-8 rounded-3xl bg-card border border-border/60 space-y-4 shadow-sm">
+                            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black text-xs uppercase tracking-wider">
+                                CBT
+                            </div>
+                            <h3 className="text-xl font-serif font-black">Real Exam Interface</h3>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                                Standard NTA computer-based testing interface with question palette, timers, and mistake bank tracking.
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             {/* FAQ SECTION */}

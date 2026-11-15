@@ -356,7 +356,7 @@ export default function PracticeEngine({
                                         Attempt More Questions
                                     </h2>
                                     <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                                        You completed all <span className="font-bold text-foreground">{FREE_LIMIT} free questions</span>. Join thousands of students on padhobadho and unlock unlimited questions, real-time mock tests, and streak tracking!
+                                        You completed all <span className="font-bold text-foreground">{FREE_LIMIT} free questions</span>. Create your free account on PadhoBadho to unlock unlimited practice questions, full mock tests, and streak tracking!
                                     </p>
                                 </div>
 
@@ -441,7 +441,7 @@ export default function PracticeEngine({
                             <div className="bg-muted/40 rounded-2xl p-4 mb-6 text-left space-y-2.5 border border-border/50 text-xs font-semibold">
                                 <div className="flex items-center gap-2.5 text-foreground">
                                     <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
-                                    <span>Access 10,000+ curated exam questions</span>
+                                    <span>Access curated exam question banks & official PYQs</span>
                                 </div>
                                 <div className="flex items-center gap-2.5 text-foreground">
                                     <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
