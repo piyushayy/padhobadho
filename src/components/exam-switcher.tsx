@@ -51,11 +51,15 @@ export default function ExamSwitcher({
         try {
             await updateTargetExam(exam.id)
             toast.success(`Target switched to ${exam.name}`, {
+                duration: 3000,
                 description: "Your practice drills and mock tests are now tailored for this exam."
             })
         } catch {
             // Unauthenticated guest or local fallback
-            toast.success(`Viewing ${exam.name}`)
+            toast.success(`Viewing ${exam.name}`, {
+                duration: 3000,
+                description: "Your practice drills and mock tests are now tailored for this exam."
+            })
         }
     }
 

@@ -1,0 +1,3 @@
+# Gitleaks ignore list
+# Historical commit fe0c84af66d06fd6a9784b19c511a29c30d31916 dummy auth secret removed in subsequent commit
+fe0c84af66d06fd6a9784b19c511a29c30d31916:vercel.json:generic-api-key:6

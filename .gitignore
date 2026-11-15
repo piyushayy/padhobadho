@@ -55,6 +55,7 @@ keys*
 /scripts/list-subjects.js
 /scripts/list-users.ts
 /scripts/verify-db.ts
+/scripts/download-gitleaks.js
 /seed-users.ts
 /make-admin.js
 
@@ -66,5 +67,5 @@ keys*
 make-admin.js
 seed-users.ts
 seed.ts
-scripts/
 next-env.d.ts
+tools/

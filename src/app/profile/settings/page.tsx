@@ -27,7 +27,7 @@ export default async function SettingsPage() {
 
     return (
         <AppLayout session={session}>
-            <div className="min-h-screen pt-12">
+            <div className="pb-12">
                 <SettingsClient user={user} />
             </div>
         </AppLayout>

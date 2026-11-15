@@ -1,7 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
+import { usePathname } from "next/navigation"
 import { Menu, X, LayoutDashboard, BookOpen, Trophy, Zap, Library, Star, MessageSquare, Target } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import ExamSwitcher from "@/components/exam-switcher"
@@ -16,14 +18,38 @@ interface AppHeaderProps {
 
 export function AppHeader({ user, allExams, userName, userInitials }: AppHeaderProps) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+    const [mounted, setMounted] = useState(false)
+    const pathname = usePathname()
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    // Automatically close mobile menu when navigating routes
+    useEffect(() => {
+        setIsMobileMenuOpen(false)
+    }, [pathname])
+
+    // Prevent body scrolling when mobile menu is open
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            document.body.style.overflow = "hidden"
+        } else {
+            document.body.style.overflow = ""
+        }
+        return () => {
+            document.body.style.overflow = ""
+        }
+    }, [isMobileMenuOpen])
 
     return (
-        <header className="sticky top-0 z-50 flex h-20 md:h-24 items-center justify-between border-b border-border/40 bg-background/80 px-6 md:px-10 backdrop-blur-3xl">
+        <header className="sticky top-0 z-40 flex h-20 md:h-24 items-center justify-between border-b border-border/40 bg-background/80 px-6 md:px-10 backdrop-blur-3xl">
             <div className="flex items-center gap-4 md:gap-8">
                 {/* Mobile Burger */}
                 <button
                     onClick={() => setIsMobileMenuOpen(true)}
                     className="lg:hidden p-2 -ml-2 text-muted-foreground hover:text-foreground"
+                    aria-label="Open mobile menu"
                 >
                     <Menu />
                 </button>
@@ -47,60 +73,82 @@ export function AppHeader({ user, allExams, userName, userInitials }: AppHeaderP
                 </Link>
             </div>
 
-            {/* Mobile Menu Overlay */}
-            <AnimatePresence>
-                {isMobileMenuOpen && (
-                    <>
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm lg:hidden"
-                        />
-                        <motion.div
-                            initial={{ x: "-100%" }}
-                            animate={{ x: 0 }}
-                            exit={{ x: "-100%" }}
-                            transition={{ type: "spring", damping: 20, stiffness: 300 }}
-                            className="fixed inset-y-0 left-0 z-50 w-3/4 max-w-sm bg-card border-r border-border shadow-2xl p-6 lg:hidden"
-                        >
-                            <div className="flex items-center justify-between mb-8">
-                                <span className="text-2xl font-serif font-black tracking-tighter text-primary">pb.</span>
-                                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-muted-foreground">
-                                    <X />
-                                </button>
-                            </div>
+            {/* Mobile Menu Rendered in Body Portal to eliminate containing block clipping */}
+            {mounted && createPortal(
+                <AnimatePresence>
+                    {isMobileMenuOpen && (
+                        <>
+                            <motion.div
+                                key="mobile-drawer-backdrop"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm lg:hidden"
+                            />
+                            <motion.div
+                                key="mobile-drawer-panel"
+                                initial={{ x: "-100%" }}
+                                animate={{ x: 0 }}
+                                exit={{ x: "-100%" }}
+                                transition={{ type: "spring", damping: 25, stiffness: 280 }}
+                                className="fixed inset-y-0 left-0 z-[101] w-4/5 max-w-xs h-full bg-card border-r border-border shadow-2xl p-6 flex flex-col justify-between overflow-y-auto lg:hidden"
+                                style={{ backgroundColor: "var(--color-card, #ffffff)" }}
+                            >
+                                <div>
+                                    <div className="flex items-center justify-between mb-8 pb-4 border-b border-border/50">
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-2xl font-serif font-black tracking-tighter text-primary">pb.</span>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted px-2 py-0.5 rounded-md">Menu</span>
+                                        </div>
+                                        <button
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                                            aria-label="Close mobile menu"
+                                        >
+                                            <X size={20} />
+                                        </button>
+                                    </div>
 
-                            <nav className="space-y-2">
-                                <NavLink href="/dashboard" icon={LayoutDashboard} label="Dashboard" onClick={() => setIsMobileMenuOpen(false)} />
-                                <NavLink href="/practice" icon={BookOpen} label="Practice" onClick={() => setIsMobileMenuOpen(false)} />
-                                <NavLink href="/mock-test" icon={Zap} label="Mock Tests" onClick={() => setIsMobileMenuOpen(false)} />
-                                <NavLink href="/resources" icon={Library} label="Library" onClick={() => setIsMobileMenuOpen(false)} />
-                                <NavLink href="/community" icon={MessageSquare} label="Community" onClick={() => setIsMobileMenuOpen(false)} />
-                                <NavLink href="/leaderboard" icon={Trophy} label="Ranking" onClick={() => setIsMobileMenuOpen(false)} />
-                                <NavLink href="/analytics" icon={Target} label="Analytics" onClick={() => setIsMobileMenuOpen(false)} />
-                                <NavLink href="/achievements" icon={Star} label="Badges" onClick={() => setIsMobileMenuOpen(false)} />
-                            </nav>
+                                    <nav className="space-y-1.5">
+                                        <NavLink href="/dashboard" icon={LayoutDashboard} label="Dashboard" onClick={() => setIsMobileMenuOpen(false)} />
+                                        <NavLink href="/practice" icon={BookOpen} label="Practice" onClick={() => setIsMobileMenuOpen(false)} />
+                                        <NavLink href="/mock-test" icon={Zap} label="Mock Tests" onClick={() => setIsMobileMenuOpen(false)} />
+                                        <NavLink href="/resources" icon={Library} label="Library" onClick={() => setIsMobileMenuOpen(false)} />
+                                        <NavLink href="/community" icon={MessageSquare} label="Community" onClick={() => setIsMobileMenuOpen(false)} />
+                                        <NavLink href="/leaderboard" icon={Trophy} label="Ranking" onClick={() => setIsMobileMenuOpen(false)} />
+                                        <NavLink href="/analytics" icon={Target} label="Analytics" onClick={() => setIsMobileMenuOpen(false)} />
+                                        <NavLink href="/achievements" icon={Star} label="Badges" onClick={() => setIsMobileMenuOpen(false)} />
+                                    </nav>
+                                </div>
 
-                            <div className="mt-8 pt-8 border-t border-border">
-                                <div className="flex items-center justify-between">
-                                    <Link href="/practice" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                                        Practice
-                                    </Link>
-                                    <Link href="/leaderboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                                        Leaderboard
+                                <div className="mt-8 pt-6 border-t border-border/60 space-y-4">
+                                    <div className="flex items-center justify-between px-2">
+                                        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Theme</span>
+                                        <ThemeToggle />
+                                    </div>
+                                    <Link
+                                        href="/profile/settings"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="flex items-center justify-between p-3 rounded-xl bg-muted/40 hover:bg-muted transition-colors"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-8 w-8 rounded-lg bg-foreground text-background flex items-center justify-center font-black text-xs">
+                                                {userInitials}
+                                            </div>
+                                            <div className="text-left">
+                                                <p className="text-xs font-black leading-none">{userName}</p>
+                                                <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">Account & Preferences</p>
+                                            </div>
+                                        </div>
                                     </Link>
                                 </div>
-                                <div className="flex items-center justify-between mt-4">
-                                    <span className="text-sm font-medium text-muted-foreground">Theme</span>
-                                    <ThemeToggle />
-                                </div>
-                            </div>
-                        </motion.div>
-                    </>
-                )}
-            </AnimatePresence>
+                            </motion.div>
+                        </>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
         </header>
     )
 }
