@@ -9,6 +9,7 @@ if (!googleId || !googleSecret) {
 }
 
 export default {
+    trustHost: true,
     providers: [
         Google({
             clientId: googleId,
