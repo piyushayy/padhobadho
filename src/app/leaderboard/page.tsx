@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma"
 import { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
-import { Crown, Trophy, Medal, Star } from "lucide-react"
+import { Crown, Trophy, Medal, Star, Sparkles, Lock, ArrowRight } from "lucide-react"
+import { GoogleSignInButton } from "@/components/google-sign-in-button"
 
 export const metadata: Metadata = {
     title: "Leaderboard | PadhoBadho",
@@ -53,6 +54,8 @@ export default async function LeaderboardPage() {
 
     const topThree = topUsers.slice(0, 3)
     const restUsers = topUsers.slice(3)
+    // Guest limit: preview top 10 (top 3 podium + ranks 4 to 10)
+    const displayedUsers = !currentUserId ? restUsers.slice(0, 7) : restUsers
 
     return (
         <div className="min-h-screen bg-background pb-20">
@@ -178,7 +181,7 @@ export default async function LeaderboardPage() {
                                 <div className="col-span-2 md:col-span-2 text-center">Level</div>
                             </div>
 
-                            {restUsers.map((user, index) => (
+                            {displayedUsers.map((user, index) => (
                                 <div
                                     key={user.id}
                                     className={`grid grid-cols-12 gap-4 p-4 items-center border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors ${user.id === currentUserId ? 'bg-primary/5' : ''}`}
@@ -210,13 +213,56 @@ export default async function LeaderboardPage() {
                                     </div>
                                 </div>
                             ))}
+
+                            {/* Guest Teaser: Blurred Rows 11+ with Unlock Banner */}
+                            {!currentUserId && (
+                                <div className="relative border-t border-border/60">
+                                    <div className="select-none blur-sm pointer-events-none opacity-40 space-y-2 p-4">
+                                        {[11, 12, 13, 14, 15].map((dummyRank) => (
+                                            <div key={dummyRank} className="grid grid-cols-12 gap-4 p-3 items-center bg-muted/20 rounded-xl">
+                                                <div className="col-span-2 md:col-span-1 text-center font-black text-muted-foreground">#{dummyRank}</div>
+                                                <div className="col-span-6 md:col-span-7 flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-muted/60" />
+                                                    <span className="font-semibold text-muted-foreground">Aspirant_{dummyRank}92</span>
+                                                </div>
+                                                <div className="col-span-2 md:col-span-2 text-right font-mono font-bold text-muted-foreground">1,840</div>
+                                                <div className="col-span-2 md:col-span-2 text-center">
+                                                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-muted text-muted-foreground">Lvl 4</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="absolute inset-0 bg-gradient-to-t from-card via-card/95 to-card/40 flex flex-col items-center justify-center p-6 text-center">
+                                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest mb-3">
+                                            <Sparkles size={11} /> Top 10 Preview Only
+                                        </div>
+                                        <h3 className="text-xl sm:text-2xl font-serif font-black text-foreground mb-2">
+                                            Want to see where you rank?
+                                        </h3>
+                                        <p className="text-xs sm:text-sm text-muted-foreground max-w-md mb-5 leading-relaxed">
+                                            Sign in free to save your XP, climb the All-India leaderboard, and view complete top-100 ranks!
+                                        </p>
+                                        <div className="flex flex-col sm:flex-row items-center gap-3">
+                                            <GoogleSignInButton callbackUrl="/leaderboard" />
+                                            <Link
+                                                href="/auth/sign-up?callbackUrl=/leaderboard"
+                                                className="px-5 py-3 bg-primary text-background font-black text-xs uppercase tracking-wider rounded-xl hover:opacity-90 transition-opacity flex items-center gap-2"
+                                            >
+                                                <span>Sign Up Free</span>
+                                                <ArrowRight size={14} />
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </>
                 )}
             </main>
 
-            {/* Sticky Current User Rank (if not in view/top) */}
-            {currentUserId && currentUserData && (
+            {/* Sticky Bottom Bar */}
+            {currentUserId && currentUserData ? (
                 <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-lg border-t border-border p-4 z-50">
                     <div className="container mx-auto max-w-4xl flex items-center justify-between">
                         <div className="flex items-center gap-4">
@@ -232,6 +278,33 @@ export default async function LeaderboardPage() {
                         </div>
                         <div className="text-sm font-medium text-muted-foreground">
                             Top {(currentUserRank / (topUsers.length || 1) * 100).toFixed(0)}%
+                        </div>
+                    </div>
+                </div>
+            ) : !currentUserId && (
+                <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-xl border-t border-border/80 p-3 sm:p-4 z-50 shadow-2xl">
+                    <div className="container mx-auto max-w-4xl flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-black text-sm shrink-0">
+                                🔥
+                            </div>
+                            <div>
+                                <p className="text-xs sm:text-sm font-bold text-foreground">
+                                    Guest Mode Active
+                                </p>
+                                <p className="text-[11px] text-muted-foreground hidden sm:block">
+                                    Sign in free to preserve your streak, earn XP, and get on this leaderboard.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                            <GoogleSignInButton callbackUrl="/leaderboard" text="Google Sign In" className="hidden sm:inline-flex py-2 px-3 text-[11px]" />
+                            <Link
+                                href="/auth/sign-up?callbackUrl=/leaderboard"
+                                className="px-4 py-2 bg-primary text-background font-black text-xs uppercase tracking-wider rounded-xl hover:opacity-90 transition-opacity whitespace-nowrap"
+                            >
+                                Claim Rank
+                            </Link>
                         </div>
                     </div>
                 </div>

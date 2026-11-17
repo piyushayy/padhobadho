@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
+import { cookies } from "next/headers"
 
 export async function createPracticeSession(subjectId?: string, topicId?: string) {
     const session = await auth()
@@ -26,25 +27,70 @@ export async function submitQuestionAnswer(
 ) {
     const session = await auth()
 
-    const question = await prisma.question.findUnique({
-        where: { id: questionId },
-        select: {
-            correctOption: true,
-            subjectId: true,
-            explanation: true
+    let question: { correctOption: number; subjectId: string | null; explanation: string | null } | null = null
+    try {
+        question = await prisma.question.findUnique({
+            where: { id: questionId },
+            select: {
+                correctOption: true,
+                subjectId: true,
+                explanation: true
+            }
+        })
+    } catch {
+        // Fallback for offline demo questions
+        if (questionId.startsWith("q-demo-")) {
+            question = {
+                correctOption: 0,
+                subjectId: null,
+                explanation: "Demo question explanation."
+            }
         }
-    })
+    }
 
-    if (!question) throw new Error("Question not found")
+    if (!question) {
+        if (questionId.startsWith("q-demo-")) {
+            question = {
+                correctOption: 0,
+                subjectId: null,
+                explanation: "Demo question explanation."
+            }
+        } else {
+            throw new Error("Question not found")
+        }
+    }
 
     const isCorrect = question.correctOption === answerIndex
 
-    // Guest response: validate and return without persisting to DB
+    // Guest response: validate and enforce server-side limit via cookie
     if (!session?.user?.id) {
+        const cookieStore = await cookies()
+        const guestAttempts = parseInt(cookieStore.get("pb_guest_attempts")?.value || "0", 10)
+
+        if (guestAttempts >= 5) {
+            return {
+                isCorrect,
+                correctOption: question.correctOption,
+                explanation: question.explanation,
+                limitReached: true,
+                message: "Guest practice limit reached. Sign in free to continue."
+            }
+        }
+
+        const newAttempts = guestAttempts + 1
+        cookieStore.set("pb_guest_attempts", newAttempts.toString(), {
+            path: "/",
+            maxAge: 60 * 60 * 24 * 30, // 30 days
+            httpOnly: true,
+            sameSite: "lax"
+        })
+
         return {
             isCorrect,
             correctOption: question.correctOption,
-            explanation: question.explanation
+            explanation: question.explanation,
+            guestAttempts: newAttempts,
+            limitReached: newAttempts >= 5
         }
     }
 

@@ -3,10 +3,11 @@
 import { useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { MoveRight, Loader2, ArrowLeft } from "lucide-react"
+import { MoveRight, Loader2, ArrowLeft, Chrome } from "lucide-react"
 import { signUp } from "@/actions/auth"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
 
 export default function SignUpPage() {
     const [isLoading, setIsLoading] = useState(false)
@@ -55,6 +56,18 @@ export default function SignUpPage() {
                     <p className="text-muted-foreground mb-8">
                         Start preparing the right way.
                     </p>
+
+                    <button
+                        type="button"
+                        onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+                        className="w-full h-12 rounded-lg border font-semibold flex items-center justify-center gap-3 hover:bg-accent transition mb-6"
+                    >
+                        <Chrome size={18} /> Sign up with Google
+                    </button>
+
+                    <div className="text-center text-xs text-muted-foreground mb-6">
+                        OR CONTINUE WITH EMAIL
+                    </div>
 
                     <form onSubmit={handleSignUp} className="space-y-4">
                         <input
