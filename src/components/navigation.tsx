@@ -2,12 +2,14 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, BookOpen, Trophy, Zap, Star, Library, MessageSquare, Target } from "lucide-react"
+import { LayoutDashboard, BookOpen, Trophy, Zap, Star, Library, MessageSquare, Target, Swords } from "lucide-react"
 
 const NAV_ITEMS = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { href: "/battle", icon: Swords, label: "1v1 Battle" },
     { href: "/practice", icon: BookOpen, label: "Practice" },
     { href: "/mock-test", icon: Zap, label: "Mock Tests" },
+    { href: "/contest", icon: Trophy, label: "Sunday Arena" },
     { href: "/analytics", icon: Target, label: "Analytics" },
     { href: "/resources", icon: Library, label: "Library" },
     { href: "/community", icon: MessageSquare, label: "Community" },

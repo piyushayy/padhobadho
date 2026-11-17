@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { Trophy, ArrowRight, CheckCircle2, XCircle, Clock, Zap, Share2 } from "lucide-react"
+import { ShareCard } from "@/components/share-card"
 
 export default async function MockTestResults({
     params
@@ -59,23 +60,25 @@ export default async function MockTestResults({
                     </div>
                 </div>
 
+                {/* Shareable Scorecard & Social Challenge */}
+                <div className="max-w-xl mx-auto">
+                    <ShareCard
+                        title={`${mockSession.subject.name} Simulation`}
+                        subtitle="All-India NTA CBT Mock"
+                        score={`${mockSession.score} pts`}
+                        accuracy={accuracy.toFixed(0)}
+                        percentile={Math.min(99, Math.max(50, Math.round(accuracy * 0.95)))}
+                        shareUrl={`https://padhobadho.com/mock-test`}
+                    />
+                </div>
+
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a
-                        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                            `🎯 I scored ${mockSession.score} points with ${accuracy.toFixed(0)}% accuracy on ${mockSession.subject.name} Mock Test on PadhoBadho! 🔥\nCan you beat my score? Attempt 100% free mock tests here: https://padhobadho.com/practice`
-                        )}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full sm:w-auto px-8 py-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-black text-lg transition-all shadow-xl hover:scale-105 flex items-center justify-center gap-3"
-                    >
-                        <Share2 size={20} /> Share on WhatsApp
-                    </a>
-                    <Link href="/dashboard" className="w-full sm:w-auto px-10 py-5 bg-black text-white rounded-full font-black text-lg hover:scale-105 transition-all dark:bg-white dark:text-black shadow-xl text-center">
+                    <Link href="/dashboard" className="w-full sm:w-auto px-8 py-4 bg-primary text-background rounded-full font-black text-sm uppercase tracking-wider hover:opacity-90 transition-opacity shadow-xl text-center">
                         Go to Dashboard
                     </Link>
-                    <Link href="/practice" className="w-full sm:w-auto px-10 py-5 bg-slate-200 text-black rounded-full font-black text-lg hover:bg-slate-300 transition-all dark:bg-white/10 dark:text-white shadow-lg text-center">
-                        Review Practice
+                    <Link href="/practice" className="w-full sm:w-auto px-8 py-4 bg-muted text-foreground rounded-full font-black text-sm uppercase tracking-wider hover:bg-muted/80 transition-colors shadow-sm text-center">
+                        Practice More Drill
                     </Link>
                 </div>
 

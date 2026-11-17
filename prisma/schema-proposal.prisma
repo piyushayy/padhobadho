@@ -1,9 +1,7 @@
-// Phase B — Habit Engine Polish (LeetCode Loop) Proposal
-// Proposes Streak Freeze and Weekly Quest tracking on the User model
+// Phase B & C — Habit Engine & Social Gen-Z Features Proposal
 
 model User {
-  // Existing fields
-  // id, name, email, xp, level, currentStreak, longestStreak, lastActiveDate...
+  // Existing fields...
 
   // Streak Freeze (1 freeze/week to protect daily streak)
   streakFreezes     Int       @default(1)
@@ -11,5 +9,33 @@ model User {
   streakFreezeReset DateTime  @default(now())
 
   // Weekly Quest (e.g. Solve 50 Qs this week)
-  weeklyQuestClaimed DateTime? // Timestamp of last claimed weekly quest bonus
+  weeklyQuestClaimed DateTime?
+
+  // Phase C: Social & Follows
+  following         UserFollow[] @relation("UserFollowing")
+  followers         UserFollow[] @relation("UserFollowers")
+  contestRegistrations ContestRegistration[]
+}
+
+model UserFollow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower    User     @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+}
+
+model ContestRegistration {
+  id        String   @id @default(cuid())
+  userId    String
+  contestId String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, contestId])
 }

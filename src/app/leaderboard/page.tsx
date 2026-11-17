@@ -3,17 +3,26 @@ import { prisma } from "@/lib/prisma"
 import { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
-import { Crown, Trophy, Medal, Star, Sparkles, Lock, ArrowRight } from "lucide-react"
+import { Crown, Trophy, Medal, Star, Sparkles, Lock, ArrowRight, Users, Globe } from "lucide-react"
 import { GoogleSignInButton } from "@/components/google-sign-in-button"
+import { getFollowingUserIds } from "@/actions/friends"
+import { LeaderboardFollowButton } from "@/components/leaderboard-follow-button"
 
 export const metadata: Metadata = {
-    title: "Leaderboard | PadhoBadho",
-    description: "See the top performers on PadhoBadho."
+    title: "Leaderboard & Friends | PadhoBadho",
+    description: "All-India and Friends ranking for students on PadhoBadho.",
 }
 
-export default async function LeaderboardPage() {
+export default async function LeaderboardPage({
+    searchParams
+}: {
+    searchParams?: Promise<{ tab?: string }>
+}) {
     const session = await auth()
     const currentUserId = session?.user?.id
+    const params = await searchParams
+    const activeTab = params?.tab === "friends" ? "friends" : "all"
+    const followingIds = await getFollowingUserIds()
 
     const topUsers = await prisma.user.findMany({
         orderBy: { xp: 'desc' },
@@ -52,8 +61,13 @@ export default async function LeaderboardPage() {
         }
     }
 
-    const topThree = topUsers.slice(0, 3)
-    const restUsers = topUsers.slice(3)
+    // Filter users if on Friends tab
+    const filteredUsers = activeTab === "friends" && currentUserId
+        ? topUsers.filter(u => u.id === currentUserId || followingIds.includes(u.id))
+        : topUsers
+
+    const topThree = filteredUsers.slice(0, 3)
+    const restUsers = filteredUsers.slice(3)
     // Guest limit: preview top 10 (top 3 podium + ranks 4 to 10)
     const displayedUsers = !currentUserId ? restUsers.slice(0, 7) : restUsers
 
@@ -68,19 +82,53 @@ export default async function LeaderboardPage() {
                 </p>
             </div>
 
-            <main className="container mx-auto px-4 -mt-8 relative z-20 max-w-4xl">
-                {topUsers.length === 0 ? (
+            {/* Scope Switcher: All-India vs Friends */}
+            <div className="flex justify-center -mt-6 mb-6 relative z-30">
+                <div className="inline-flex p-1 rounded-2xl bg-card border border-border/80 shadow-lg gap-1">
+                    <Link
+                        href="/leaderboard"
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                            activeTab === "all"
+                                ? "bg-primary text-background shadow-md shadow-primary/25"
+                                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        }`}
+                    >
+                        <Globe size={13} /> All-India (AIR)
+                    </Link>
+                    <Link
+                        href="/leaderboard?tab=friends"
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                            activeTab === "friends"
+                                ? "bg-primary text-background shadow-md shadow-primary/25"
+                                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        }`}
+                    >
+                        <Users size={13} /> Friends ({followingIds.length})
+                    </Link>
+                </div>
+            </div>
+
+            <main className="container mx-auto px-4 relative z-20 max-w-4xl">
+                {filteredUsers.length === 0 ? (
                     <div className="bg-card rounded-3xl border border-dashed border-border/70 p-12 text-center space-y-4 shadow-sm">
-                        <Trophy className="w-12 h-12 text-muted-foreground/40 mx-auto" />
-                        <h2 className="text-xl font-serif font-black text-foreground">Hall of Fame is Open!</h2>
+                        {activeTab === "friends" ? (
+                            <Users className="w-12 h-12 text-muted-foreground/40 mx-auto" />
+                        ) : (
+                            <Trophy className="w-12 h-12 text-muted-foreground/40 mx-auto" />
+                        )}
+                        <h2 className="text-xl font-serif font-black text-foreground">
+                            {activeTab === "friends" ? "No Friends Followed Yet" : "Hall of Fame is Open!"}
+                        </h2>
                         <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                            Be the first student to claim the #1 spot on the leaderboard. Complete a 100% free practice drill to earn XP.
+                            {activeTab === "friends"
+                                ? "Follow peers on the All-India leaderboard using the '+' button to track your study buddies' XP and daily momentum!"
+                                : "Be the first student to claim the #1 spot on the leaderboard. Complete a 100% free practice drill to earn XP."}
                         </p>
                         <Link
-                            href="/practice"
+                            href={activeTab === "friends" ? "/leaderboard" : "/practice"}
                             className="inline-block px-6 py-3 bg-primary text-background font-black text-xs uppercase tracking-wider rounded-xl hover:opacity-90 transition-opacity"
                         >
-                            Start Practice &rarr;
+                            {activeTab === "friends" ? "Browse All-India Aspirants &rarr;" : "Start Practice &rarr;"}
                         </Link>
                     </div>
                 ) : (
@@ -189,19 +237,28 @@ export default async function LeaderboardPage() {
                                     <div className="col-span-2 md:col-span-1 text-center font-black text-muted-foreground">
                                         #{index + 4}
                                     </div>
-                                    <div className="col-span-6 md:col-span-7 flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-muted overflow-hidden flex items-center justify-center">
-                                            {user.image ? (
-                                                <Image src={user.image} alt={user.name || "User"} width={32} height={32} />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary font-bold text-xs">
-                                                    {user.name?.[0]?.toUpperCase() || "S"}
-                                                </div>
-                                            )}
+                                    <div className="col-span-6 md:col-span-7 flex items-center justify-between pr-2">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-full bg-muted overflow-hidden flex items-center justify-center">
+                                                {user.image ? (
+                                                    <Image src={user.image} alt={user.name || "User"} width={32} height={32} />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary font-bold text-xs">
+                                                        {user.name?.[0]?.toUpperCase() || "S"}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <span className={`font-semibold ${user.id === currentUserId ? 'text-primary' : ''}`}>
+                                                {user.name} {user.id === currentUserId && "(You)"}
+                                            </span>
                                         </div>
-                                        <span className={`font-semibold ${user.id === currentUserId ? 'text-primary' : ''}`}>
-                                            {user.name} {user.id === currentUserId && "(You)"}
-                                        </span>
+
+                                        {currentUserId && user.id !== currentUserId && (
+                                            <LeaderboardFollowButton
+                                                targetUserId={user.id}
+                                                isFollowingInitial={followingIds.includes(user.id)}
+                                            />
+                                        )}
                                     </div>
                                     <div className="col-span-2 md:col-span-2 text-right font-bold font-mono text-foreground/80">
                                         {user.xp.toLocaleString()}
