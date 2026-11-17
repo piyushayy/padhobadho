@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
 import { ArrowRight, ChevronLeft, Timer, ShieldAlert, Flag, Loader2, BookmarkCheck } from "lucide-react"
-import { submitMockTest } from "@/actions/mock-test"
+import { submitMockTest, initMockSession, recordMockAnswer } from "@/actions/mock-test"
 import { useRouter } from "next/navigation"
 
 interface Question {
@@ -22,12 +22,44 @@ export default function MockTestEngine({
     questions: Question[]
 }) {
     const router = useRouter()
+    const [sessionId, setSessionId] = useState<string>("")
     const [currentIndex, setCurrentIndex] = useState(0)
     const [answers, setAnswers] = useState<Record<string, number>>({})
     const [markedReview, setMarkedReview] = useState<Record<string, boolean>>({})
     const [visited, setVisited] = useState<Record<string, boolean>>({ [questions[0]?.id || ""]: true })
     const [timeLeft, setTimeLeft] = useState(45 * 60)
     const [isSubmitting, setIsSubmitting] = useState(false)
+
+    // Initialize or resume server-authoritative mock session
+    useEffect(() => {
+        let mounted = true
+
+        initMockSession(subjectId).then(res => {
+            if (!mounted || !res) return
+            setSessionId(res.sessionId)
+            if (res.timeLeft !== undefined && res.timeLeft > 0) {
+                setTimeLeft(res.timeLeft)
+            }
+
+            // Merge server saved answers with local storage backup
+            let merged = { ...res.savedAnswers }
+            try {
+                const localBackup = localStorage.getItem(`mock_backup_${subjectId}`)
+                if (localBackup) {
+                    const parsed = JSON.parse(localBackup)
+                    merged = { ...merged, ...parsed }
+                }
+            } catch {}
+
+            if (Object.keys(merged).length > 0) {
+                setAnswers(merged)
+            }
+        }).catch(() => {})
+
+        return () => {
+            mounted = false
+        }
+    }, [subjectId])
 
     useEffect(() => {
         if (timeLeft <= 0) {
@@ -56,7 +88,10 @@ export default function MockTestEngine({
         if (isSubmitting) return
         setIsSubmitting(true)
         try {
-            const result = await submitMockTest(subjectId, answers, timeLeft)
+            const result = await submitMockTest(subjectId, answers, timeLeft, sessionId)
+            try {
+                localStorage.removeItem(`mock_backup_${subjectId}`)
+            } catch {}
             router.push(`/mock-test/results/${result.sessionId}`)
             toast.success("Exam submitted successfully!")
         } catch (err) {
@@ -68,10 +103,21 @@ export default function MockTestEngine({
     const handleAnswer = (optionIndex: number) => {
         if (isSubmitting) return
         const qId = questions[currentIndex].id
-        setAnswers(prev => ({
-            ...prev,
-            [qId]: optionIndex
-        }))
+        setAnswers(prev => {
+            const updated = {
+                ...prev,
+                [qId]: optionIndex
+            }
+            try {
+                localStorage.setItem(`mock_backup_${subjectId}`, JSON.stringify(updated))
+            } catch {}
+            return updated
+        })
+
+        // Server-authoritative real-time persistence
+        if (sessionId) {
+            recordMockAnswer(sessionId, qId, optionIndex).catch(() => {})
+        }
     }
 
     const toggleMarkForReview = () => {
