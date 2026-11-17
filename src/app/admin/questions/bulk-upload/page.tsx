@@ -50,8 +50,8 @@ export default function BulkUploadPage() {
             : "subject,topic,difficulty,question,option1,option2,option3,option4,correctOption,explanation"
 
         const example = selectedSubject
-            ? "EASY,What is 2+2?,3,4,5,None,B,Basic arithmetic."
-            : "Mathematics,Algebra,EASY,What is 2+2?,3,4,5,None,B,Basic arithmetic."
+            ? "EASY,\"If $f(x) = x^2$, what is $f'(3)$?\",3,6,9,None,B,\"Derivative is $f'(x) = 2x$, evaluated at $x=3$ gives $2(3) = 6$.\""
+            : "Mathematics,Algebra,EASY,\"If $f(x) = x^2$, what is $f'(3)$?\",3,6,9,None,B,\"Derivative is $f'(x) = 2x$, evaluated at $x=3$ gives $2(3) = 6$.\""
 
         const csvContent = "data:text/csv;charset=utf-8," + headers + "\n" + example
         const encodedUri = encodeURI(csvContent)
@@ -67,6 +67,9 @@ export default function BulkUploadPage() {
             <div>
                 <h1 className="text-3xl font-bold tracking-tight mb-2">Bulk Upload Questions</h1>
                 <p className="text-muted-foreground">Upload questions via CSV. Select Subject/Topic below to use a simplified CSV format.</p>
+                <div className="mt-3 px-3.5 py-2 rounded-xl bg-primary/10 border border-primary/20 text-xs text-primary font-medium">
+                    ✨ <strong>KaTeX Math Syntax Supported</strong>: Wrap equations in <code className="font-mono bg-background px-1.5 py-0.5 rounded">$x^2$</code> for inline or <code className="font-mono bg-background px-1.5 py-0.5 rounded">$$E=mc^2$$</code> for display equations.
+                </div>
             </div>
 
             <div className="bg-card border rounded-lg p-6 space-y-6">

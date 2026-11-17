@@ -53,9 +53,10 @@ export default {
                 "/careers",
                 "/checkout",
                 "/resources",
+                "/courses",
                 "/auth/sign-in",
                 "/auth/sign-up"
-            ].includes(pathname) || pathname.startsWith("/resources")
+            ].includes(pathname) || pathname.startsWith("/resources") || pathname.startsWith("/courses")
 
             // Auth specific routes
             const isAuthRoute = [
