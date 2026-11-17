@@ -119,13 +119,34 @@ export async function submitDailyAnswer(questionId: string, selectedOption: numb
         const now = new Date()
         let newStreak = user?.currentStreak || 0
 
+        let freezeUsed = false
         if (user?.lastActiveDate) {
             const lastActive = new Date(user.lastActiveDate)
             const diffHours = (now.getTime() - lastActive.getTime()) / (1000 * 3600)
             if (diffHours >= 20 && diffHours <= 48) {
                 newStreak += 1
             } else if (diffHours > 48) {
-                newStreak = 1
+                // Streak protection: check if weekly freeze is available
+                const { getStreakFreezeStatus } = await import("./gamification")
+                const freeze = await getStreakFreezeStatus()
+                if (freeze.equipped && !freeze.usedThisWeek && (user?.currentStreak || 0) > 0) {
+                    newStreak = (user?.currentStreak || 0) + 1
+                    freezeUsed = true
+                    const { cookies } = await import("next/headers")
+                    const cookieStore = await cookies()
+                    const day = now.getDay()
+                    const diff = (day + 6) % 7
+                    const mon = new Date(now)
+                    mon.setDate(now.getDate() - diff)
+                    const mondayStr = mon.toISOString().split("T")[0]
+                    cookieStore.set(`pb_freeze_${userId}_${mondayStr}`, "used", {
+                        path: "/",
+                        maxAge: 60 * 60 * 24 * 7,
+                        sameSite: "lax"
+                    })
+                } else {
+                    newStreak = 1
+                }
             }
         } else {
             newStreak = 1

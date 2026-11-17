@@ -15,6 +15,7 @@ import { toast } from "sonner"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { signOut } from "next-auth/react"
+import { ActivityHeatmap } from "@/components/activity-heatmap"
 
 interface SettingsProps {
     user: {
@@ -27,10 +28,12 @@ interface SettingsProps {
         level: number
         xp: number
         currentStreak: number
+        longestStreak?: number
     }
+    activityHeatmap?: Record<string, number>
 }
 
-export default function SettingsClient({ user }: SettingsProps) {
+export default function SettingsClient({ user, activityHeatmap }: SettingsProps) {
     const router = useRouter()
     const [activeTab, setActiveTab] = useState("general")
     const [isSaving, setIsSaving] = useState(false)
@@ -74,6 +77,7 @@ export default function SettingsClient({ user }: SettingsProps) {
     const tabs = [
         { id: "general", label: "General", icon: User },
         { id: "academic", label: "Academic Focus", icon: GraduationCap },
+        { id: "activity", label: "Activity Heatmap", icon: Flame },
         { id: "preferences", label: "Preferences", icon: Palette },
         { id: "security", label: "Security", icon: Shield },
     ]
@@ -238,6 +242,16 @@ export default function SettingsClient({ user }: SettingsProps) {
                                             />
                                         </div>
                                     </div>
+                                </div>
+                            )}
+
+                            {activeTab === "activity" && (
+                                <div className="space-y-6">
+                                    <ActivityHeatmap
+                                        data={activityHeatmap || {}}
+                                        currentStreak={user.currentStreak}
+                                        longestStreak={user.longestStreak || 0}
+                                    />
                                 </div>
                             )}
 

@@ -19,10 +19,13 @@ import {
 } from "lucide-react"
 import { getTopicMastery, getExamReadiness } from "@/actions/analytics"
 import { getUserRank } from "@/actions/leaderboard"
+import { getWeeklyQuestProgress, getStreakFreezeStatus, getUserActivityHeatmap } from "@/actions/gamification"
 import { DashboardSkeleton } from "@/components/skeletons"
 import AppLayout from "@/components/app-layout"
 import DashboardHero from "@/components/dashboard-hero"
 import StatsGrid from "@/components/stats-grid"
+import { WeeklyQuestCard } from "@/components/weekly-quest-card"
+import { ActivityHeatmap } from "@/components/activity-heatmap"
 
 export const dynamic = "force-dynamic"
 
@@ -36,7 +39,20 @@ async function DashboardContent() {
         today.setHours(0, 0, 0, 0)
 
         // Fetch dynamic analytics and stats
-        const [user, topicMastery, examReadiness, totalSessions, totalAttempted, solvedToday, globalRank, achievements, mistakeCount] = await Promise.all([
+        const [
+            user,
+            topicMastery,
+            examReadiness,
+            totalSessions,
+            totalAttempted,
+            solvedToday,
+            globalRank,
+            achievements,
+            mistakeCount,
+            weeklyQuest,
+            streakFreeze,
+            activityHeatmap
+        ] = await Promise.all([
             prisma.user.findUnique({
                 where: { id: session.user.id },
                 select: {
@@ -47,6 +63,7 @@ async function DashboardContent() {
                     level: true,
                     xp: true,
                     currentStreak: true,
+                    longestStreak: true,
                     targetExam: {
                         select: {
                             name: true,
@@ -77,7 +94,10 @@ async function DashboardContent() {
             }),
             prisma.userQuestionHistory.count({
                 where: { userId: session.user.id, isCorrect: false }
-            })
+            }),
+            getWeeklyQuestProgress(),
+            getStreakFreezeStatus(),
+            getUserActivityHeatmap(session.user.id)
         ])
 
         if (!user) {
@@ -155,12 +175,26 @@ async function DashboardContent() {
                     </Link>
                 </div>
 
+                {/* Phase B: Weekly Quest & Streak Freeze Bento Row */}
+                <WeeklyQuestCard
+                    quest={weeklyQuest}
+                    freeze={streakFreeze}
+                    currentStreak={user?.currentStreak || 0}
+                />
+
                 <StatsGrid
                     examReadiness={examReadiness}
                     totalAttempted={totalAttempted}
                     totalSessions={totalSessions}
                     solvedToday={solvedToday}
                     dailyGoal={user?.dailyGoal || 20}
+                />
+
+                {/* Phase B: Daily Challenge Practice Intensity Heatmap */}
+                <ActivityHeatmap
+                    data={activityHeatmap}
+                    currentStreak={user?.currentStreak || 0}
+                    longestStreak={user?.longestStreak || 0}
                 />
 
                 {/* Subject & Progress Row */}

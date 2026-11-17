@@ -154,9 +154,13 @@ export async function submitQuestionAnswer(
     const now = new Date()
     const todayStr = now.toDateString()
 
+    let leveledUp = false
+    let newLevel = 1
+    let freezeUsed = false
+
     const user = await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { xp: true, currentStreak: true, lastActiveDate: true, longestStreak: true }
+        select: { xp: true, level: true, currentStreak: true, lastActiveDate: true, longestStreak: true }
     })
 
     if (user) {
@@ -171,12 +175,33 @@ export async function submitQuestionAnswer(
             if (lastActiveStr === yesterdayStr) {
                 newStreak += 1
             } else {
-                newStreak = 1
+                // Streak protection: check if weekly freeze is available
+                const { getStreakFreezeStatus } = await import("./gamification")
+                const freeze = await getStreakFreezeStatus()
+                if (freeze.equipped && !freeze.usedThisWeek && user.currentStreak > 0) {
+                    newStreak = user.currentStreak + 1
+                    freezeUsed = true
+                    const cookieStore = await cookies()
+                    const day = now.getDay()
+                    const diff = (day + 6) % 7
+                    const mon = new Date(now)
+                    mon.setDate(now.getDate() - diff)
+                    const mondayStr = mon.toISOString().split("T")[0]
+                    cookieStore.set(`pb_freeze_${session.user.id}_${mondayStr}`, "used", {
+                        path: "/",
+                        maxAge: 60 * 60 * 24 * 7,
+                        sameSite: "lax"
+                    })
+                } else {
+                    newStreak = 1
+                }
             }
         }
 
         const newXp = user.xp + solveXp
-        const newLevel = Math.floor(newXp / 1000) + 1
+        newLevel = Math.floor(newXp / 1000) + 1
+        const currentLevel = user.level || (Math.floor(user.xp / 1000) + 1)
+        leveledUp = newLevel > currentLevel
 
         await prisma.user.update({
             where: { id: session.user.id },
@@ -197,6 +222,9 @@ export async function submitQuestionAnswer(
     return {
         isCorrect,
         correctOption: question.correctOption,
-        xpEarned: solveXp
+        xpEarned: solveXp,
+        leveledUp,
+        newLevel,
+        freezeUsed
     }
 }

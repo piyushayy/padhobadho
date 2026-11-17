@@ -100,6 +100,7 @@ export default function PracticeEngine({
     const [showQuitModal, setShowQuitModal] = useState(false)
     const [showReportModal, setShowReportModal] = useState(false)
     const [showGuestPaywall, setShowGuestPaywall] = useState(false)
+    const [levelUpInfo, setLevelUpInfo] = useState<{ newLevel: number } | null>(null)
     const [mistakes, setMistakes] = useState<number[]>([]) // Indices of incorrect questions
     const [isCompleted, setIsCompleted] = useState(false)
     const [questionStartTime, setQuestionStartTime] = useState(Date.now())
@@ -206,8 +207,25 @@ export default function PracticeEngine({
             selected,
             elapsed
         ).then(res => {
-            if (res && (res as any).limitReached) {
-                setShowGuestPaywall(true)
+            if (res) {
+                if ((res as any).limitReached) {
+                    setShowGuestPaywall(true)
+                }
+                if ((res as any).freezeUsed) {
+                    toast.info("❄️ Streak Freeze Activated! Your flame was protected.")
+                }
+                if ((res as any).xpEarned && !isGuest) {
+                    toast.success(`+${(res as any).xpEarned} XP 🔥 ${isAnswerCorrect ? "You cooked!" : "Effort counts!"}`)
+                }
+                if ((res as any).leveledUp) {
+                    setLevelUpInfo({ newLevel: (res as any).newLevel })
+                    confetti({
+                        particleCount: 250,
+                        spread: 120,
+                        origin: { y: 0.5 },
+                        colors: ['#f59e0b', '#10b981', '#6366f1']
+                    })
+                }
             }
         }).catch(e => console.error("Sync failed", e))
     }
@@ -514,6 +532,44 @@ export default function PracticeEngine({
                                     Back to Practice Catalog
                                 </Link>
                             </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Level-Up Celebration Modal */}
+            <AnimatePresence>
+                {levelUpInfo && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[130] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.85, y: 25, opacity: 0 }}
+                            animate={{ scale: 1, y: 0, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="w-full max-w-md bg-card border-2 border-primary/50 shadow-2xl rounded-3xl p-8 text-center relative overflow-hidden"
+                        >
+                            <div className="w-20 h-20 mx-auto mb-4 rounded-3xl bg-primary/10 border border-primary/30 flex items-center justify-center text-4xl animate-bounce">
+                                🚀
+                            </div>
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest mb-3">
+                                <Sparkles size={12} /> Level Up Unlocked
+                            </div>
+                            <h3 className="text-3xl font-serif font-black text-foreground mb-2">
+                                Level {levelUpInfo.newLevel}!
+                            </h3>
+                            <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+                                You cooked! 🔥 Your daily practice consistency just unlocked the next mastery tier. Keep grinding to climb the All-India ranks.
+                            </p>
+                            <button
+                                onClick={() => setLevelUpInfo(null)}
+                                className="w-full py-4 bg-primary text-background font-black text-xs uppercase tracking-wider rounded-xl hover:opacity-90 active:scale-[0.99] transition-all cursor-pointer shadow-lg shadow-primary/25"
+                            >
+                                Continue Practicing &rarr;
+                            </button>
                         </motion.div>
                     </motion.div>
                 )}

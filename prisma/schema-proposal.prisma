@@ -1,23 +1,15 @@
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-  type       VerificationType @default(EMAIL)
-
-  @@unique([identifier, token])
-}
-
-enum VerificationType {
-  EMAIL
-  PHONE
-  PASSWORD_RESET
-}
+// Phase B — Habit Engine Polish (LeetCode Loop) Proposal
+// Proposes Streak Freeze and Weekly Quest tracking on the User model
 
 model User {
-  // ... existing fields
-  phoneNumber       String?
-  emailVerified     DateTime?
-  phoneVerified     DateTime?
-  // ...
+  // Existing fields
+  // id, name, email, xp, level, currentStreak, longestStreak, lastActiveDate...
+
+  // Streak Freeze (1 freeze/week to protect daily streak)
+  streakFreezes     Int       @default(1)
+  lastFreezeUsed    DateTime?
+  streakFreezeReset DateTime  @default(now())
+
+  // Weekly Quest (e.g. Solve 50 Qs this week)
+  weeklyQuestClaimed DateTime? // Timestamp of last claimed weekly quest bonus
 }
